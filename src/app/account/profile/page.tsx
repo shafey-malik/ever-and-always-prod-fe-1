@@ -2,6 +2,9 @@ import type {Metadata} from 'next';
 import { getActiveCustomer } from '@/lib/vendure/actions';
 import { redirect } from 'next/navigation';
 
+// This page uses cookies() via getActiveCustomer, so it must be dynamic
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
     title: 'Profile',
 };

@@ -7,20 +7,46 @@ import { GetActiveOrderQuery } from '@/lib/vendure/queries';
 import { cache } from 'react';
 
 const getCartQuantity = cache(async () => {
-  const orderResult = await query(GetActiveOrderQuery, undefined, {
-    useAuthToken: true,
-    tags: ['cart'],
-  });
-
-  return orderResult.data.activeOrder?.totalQuantity || 0;
+  try {
+    const orderResult = await query(GetActiveOrderQuery, undefined, {
+      useAuthToken: true,
+      tags: ['cart'],
+    });
+    return orderResult.data.activeOrder?.totalQuantity || 0;
+  } catch (error) {
+    // Gracefully handle API errors during build (e.g., missing env vars)
+    console.warn('Failed to fetch cart quantity:', error);
+    return 0;
+  }
 });
 
 export async function HeaderWrapper() {
-  const [collections, customer, cartQuantity] = await Promise.all([
-    getTopCollections(),
-    getActiveCustomer(),
-    getCartQuantity(),
-  ]);
+  // Gracefully handle API errors during build (e.g., missing env vars or backend not available)
+  let collections = [];
+  let customer = null;
+  let cartQuantity = 0;
+
+  try {
+    [collections, customer, cartQuantity] = await Promise.all([
+      getTopCollections().catch((error) => {
+        console.warn('Failed to fetch collections:', error);
+        return [];
+      }),
+      getActiveCustomer().catch((error) => {
+        // getActiveCustomer uses cookies() which may fail during build
+        // This is expected and we'll just show as not signed in
+        if (error?.digest === 'DYNAMIC_SERVER_USAGE' || error?.message?.includes('cookies')) {
+          return null;
+        }
+        console.warn('Failed to fetch customer:', error);
+        return null;
+      }),
+      getCartQuantity(),
+    ]);
+  } catch (error) {
+    // If all API calls fail, continue with empty/default values
+    console.warn('HeaderWrapper: Some API calls failed during build:', error);
+  }
 
   const isSignedIn = !!customer?.id;
 

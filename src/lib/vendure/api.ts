@@ -1,6 +1,6 @@
-import type {TadaDocumentNode} from 'gql.tada';
-import {print} from 'graphql';
-import {getAuthToken} from '@/lib/auth';
+import type { TadaDocumentNode } from 'gql.tada';
+import { print } from 'graphql';
+import { getAuthToken } from '@/lib/auth';
 
 const VENDURE_CHANNEL_TOKEN = process.env.VENDURE_CHANNEL_TOKEN || process.env.NEXT_PUBLIC_VENDURE_CHANNEL_TOKEN || '__default_channel__';
 const VENDURE_AUTH_TOKEN_HEADER = process.env.VENDURE_AUTH_TOKEN_HEADER || 'vendure-auth-token';
@@ -8,14 +8,11 @@ const VENDURE_CHANNEL_TOKEN_HEADER = process.env.VENDURE_CHANNEL_TOKEN_HEADER ||
 
 /**
  * Get the Vendure API URL from environment variables
- * Throws an error if not set when actually needed (lazy evaluation)
+ * Returns null if not set (allows graceful handling during build)
  */
-function getVendureApiUrl(): string {
+function getVendureApiUrl(): string | null {
     const url = process.env.VENDURE_SHOP_API_URL || process.env.NEXT_PUBLIC_VENDURE_SHOP_API_URL;
-    if (!url) {
-        throw new Error('VENDURE_SHOP_API_URL or NEXT_PUBLIC_VENDURE_SHOP_API_URL environment variable is not set');
-    }
-    return url;
+    return url || null;
 }
 
 interface VendureRequestOptions {
@@ -28,7 +25,7 @@ interface VendureRequestOptions {
 
 interface VendureResponse<T> {
     data?: T;
-    errors?: Array<{ message: string; [key: string]: unknown }>;
+    errors?: Array<{ message: string;[key: string]: unknown }>;
 }
 
 /**
@@ -75,37 +72,58 @@ export async function query<TResult, TVariables>(
     headers[VENDURE_CHANNEL_TOKEN_HEADER] = channelToken || VENDURE_CHANNEL_TOKEN;
 
     const vendureApiUrl = getVendureApiUrl();
-    const response = await fetch(vendureApiUrl, {
-        ...fetchOptions,
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-            query: print(document),
-            variables: variables || {},
-        }),
-        ...(tags && {next: {tags}}),
-    });
-
-    if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+    
+    // Gracefully handle missing API URL (e.g., during build without env vars)
+    if (!vendureApiUrl) {
+        throw new Error('VENDURE_SHOP_API_URL or NEXT_PUBLIC_VENDURE_SHOP_API_URL environment variable is not set');
     }
 
-    const result: VendureResponse<TResult> = await response.json();
+    // Add timeout and proper fetch configuration
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
-    if (result.errors) {
-        throw new Error(result.errors.map(e => e.message).join(', '));
+    try {
+        const response = await fetch(vendureApiUrl, {
+            ...fetchOptions,
+            method: 'POST',
+            headers,
+            body: JSON.stringify({
+                query: print(document),
+                variables: variables || {},
+            }),
+            signal: controller.signal,
+            ...(tags && { next: { tags } }),
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result: VendureResponse<TResult> = await response.json();
+
+        if (result.errors) {
+            throw new Error(result.errors.map(e => e.message).join(', '));
+        }
+
+        if (!result.data) {
+            throw new Error('No data returned from Vendure API');
+        }
+
+        const newToken = extractAuthToken(response.headers);
+
+        return {
+            data: result.data,
+            ...(newToken && { token: newToken }),
+        };
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (error instanceof Error && error.name === 'AbortError') {
+            throw new Error('Request timeout: Vendure API did not respond within 30 seconds');
+        }
+        throw error;
     }
-
-    if (!result.data) {
-        throw new Error('No data returned from Vendure API');
-    }
-
-    const newToken = extractAuthToken(response.headers);
-
-    return {
-        data: result.data,
-        ...(newToken && {token: newToken}),
-    };
 }
 
 /**

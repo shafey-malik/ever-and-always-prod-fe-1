@@ -8,11 +8,21 @@ import {getAuthToken} from "@/lib/auth";
 
 
 export const getActiveCustomer = cache(async () => {
-    const token = await getAuthToken();
-    const result = await query(GetActiveCustomerQuery, undefined, {
-        token
-    });
-    return readFragment(ActiveCustomerFragment, result.data.activeCustomer);
+    try {
+        const token = await getAuthToken();
+        const result = await query(GetActiveCustomerQuery, undefined, {
+            token
+        });
+        return readFragment(ActiveCustomerFragment, result.data.activeCustomer);
+    } catch (error) {
+        // Gracefully handle API errors during build (e.g., missing env vars or cookies() not available)
+        // This is expected during static generation
+        if (error?.digest === 'DYNAMIC_SERVER_USAGE' || error?.message?.includes('cookies')) {
+            return null;
+        }
+        console.warn('Failed to fetch active customer:', error);
+        return null;
+    }
 })
 
 export const getActiveChannel = getActiveChannelCached;

@@ -46,7 +46,9 @@ export default async function Home(_props: PageProps<'/'>) {
             </AnimatedSection>
 
             <AnimatedSection delay={0.3}>
-                <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}>
+                <Suspense
+                    fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}
+                >
                     <FilterSectionWrapper />
                 </Suspense>
             </AnimatedSection>

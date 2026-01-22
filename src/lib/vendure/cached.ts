@@ -25,6 +25,12 @@ export const getAvailableCountriesCached = cache(async () => {
  * Collections rarely change, so we cache them for 1 day.
  */
 export const getTopCollections = cache(async () => {
-    const result = await query(GetTopCollectionsQuery);
-    return result.data.collections.items;
+    try {
+        const result = await query(GetTopCollectionsQuery);
+        return result.data.collections.items;
+    } catch (error) {
+        // Gracefully handle API errors during build (e.g., missing env vars)
+        console.warn('Failed to fetch top collections:', error);
+        return [];
+    }
 });
