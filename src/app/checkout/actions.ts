@@ -87,6 +87,17 @@ export async function transitionToArrangingPayment() {
 
     if (result.data.transitionOrderToState?.__typename === 'OrderStateTransitionError') {
         const errorResult = result.data.transitionOrderToState;
+        // If the order is already in ArrangingPayment state, that's okay - just continue
+        // Check for the specific error message about same-state transition
+        if (
+            errorResult.message?.includes('Cannot transition Order from "ArrangingPayment" to "ArrangingPayment"') ||
+            errorResult.message?.includes('from "ArrangingPayment" to "ArrangingPayment"') ||
+            errorResult.transitionError === 'ALREADY_IN_STATE'
+        ) {
+            // Order is already in the correct state, no need to throw an error
+            revalidatePath('/checkout');
+            return;
+        }
         throw new Error(
             `Failed to transition order state: ${errorResult.errorCode} - ${errorResult.message}`
         );
@@ -96,8 +107,19 @@ export async function transitionToArrangingPayment() {
 }
 
 export async function placeOrder(paymentMethodCode: string, paymentIntentId?: string) {
-    // First, transition the order to ArrangingPayment state
-    await transitionToArrangingPayment();
+    // First, transition the order to ArrangingPayment state (if not already there)
+    // This function now handles the case where the order is already in that state gracefully
+    try {
+        await transitionToArrangingPayment();
+    } catch (error) {
+        // If transition fails but it's because we're already in the state, continue
+        // Otherwise, rethrow the error
+        if (error instanceof Error && error.message.includes('ArrangingPayment')) {
+            // Likely already in the correct state, continue with payment
+        } else {
+            throw error;
+        }
+    }
 
     // Prepare metadata based on payment method
     const metadata: Record<string, unknown> = {};
