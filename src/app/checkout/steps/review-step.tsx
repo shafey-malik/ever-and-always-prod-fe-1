@@ -19,21 +19,38 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
     (method) => method.code === selectedPaymentMethodCode
   );
 
+  const [error, setError] = useState<string | null>(null);
+
   const handlePlaceOrder = async () => {
     if (!selectedPaymentMethodCode) return;
 
     setLoading(true);
+    setError(null);
+    
     try {
       // For Stripe payments, pass the payment intent ID
       await placeOrderAction(selectedPaymentMethodCode, stripePaymentIntentId || undefined);
+      // If we get here without redirect, something went wrong
+      // But redirect() throws, so we shouldn't reach here
     } catch (error) {
       // Check if this is a Next.js redirect (which is expected)
-      if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-        // This is a redirect, not an error - let it propagate
-        throw error;
+      if (error instanceof Error) {
+        // Next.js redirect throws a special error with digest
+        if (error.message.includes('NEXT_REDIRECT') || 
+            (error as any).digest?.startsWith('NEXT_REDIRECT')) {
+          // This is a redirect, not an error - let it propagate
+          throw error;
+        }
+        // For other errors, show user-friendly message
+        const errorMessage = error.message || 'An unexpected error occurred';
+        console.error('Error placing order:', error);
+        setError(errorMessage);
+        setLoading(false);
+      } else {
+        console.error('Unknown error placing order:', error);
+        setError('An unexpected error occurred. Please try again.');
+        setLoading(false);
       }
-      console.error('Error placing order:', error);
-      setLoading(false);
     }
   };
 
@@ -146,6 +163,13 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
         {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         Place Order
       </Button>
+
+      {error && (
+        <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-md">
+          <p className="text-sm text-destructive font-medium">Error placing order</p>
+          <p className="text-sm text-destructive/80 mt-1">{error}</p>
+        </div>
+      )}
 
       {(!order.shippingAddress || !order.shippingLines?.length || !selectedPaymentMethodCode) && (
         <p className="text-sm text-destructive text-center">
