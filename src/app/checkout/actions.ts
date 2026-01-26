@@ -92,25 +92,18 @@ export async function createCustomerAddress(address: AddressInput) {
 
 export async function createStripePaymentIntent() {
     try {
-        console.log('Server: Creating Stripe payment intent...');
-        
         // First, ensure the order is in ArrangingPayment state
         // This is required by Vendure before creating a payment intent
         try {
             const orderQuery = await query(GetActiveOrderForCheckoutQuery, {}, { useAuthToken: true });
             const currentState = (orderQuery.data as any).activeOrder?.state;
-            console.log('Server: Current order state:', currentState);
             
             if (currentState !== 'ArrangingPayment') {
-                console.log('Server: Order not in ArrangingPayment, transitioning...');
                 await transitionToArrangingPayment();
-                console.log('Server: Order transitioned to ArrangingPayment');
-            } else {
-                console.log('Server: Order already in ArrangingPayment state');
             }
         } catch (transitionError) {
-            console.warn('Server: Could not check/transition order state, proceeding anyway:', transitionError);
-            // Continue anyway - the mutation might still work
+            // Log but continue - the mutation might still work
+            console.warn('Could not check/transition order state:', transitionError);
         }
         
         const result = await mutate(
@@ -119,39 +112,23 @@ export async function createStripePaymentIntent() {
             { useAuthToken: true }
         );
 
-        console.log('Server: Payment intent result:', {
-            __typename: result.data.createStripePaymentIntent.__typename,
-            hasClientSecret: !!(result.data.createStripePaymentIntent as any).clientSecret
-        });
+        // The mutation returns a String (client secret) directly
+        const clientSecret = result.data.createStripePaymentIntent as string;
 
-        if (
-            result.data.createStripePaymentIntent.__typename === 'StripePaymentIntent' &&
-            (result.data.createStripePaymentIntent as any).clientSecret
-        ) {
-            console.log('Server: Payment intent created successfully');
+        if (clientSecret && typeof clientSecret === 'string' && clientSecret.length > 0) {
             return {
                 success: true,
-                clientSecret: (result.data.createStripePaymentIntent as any).clientSecret,
+                clientSecret: clientSecret,
             };
         } else {
-            const errorResult = result.data.createStripePaymentIntent;
-            const errorMessage = (errorResult as any).__typename === 'ErrorResult'
-                ? (errorResult as any).message || 'Failed to create Stripe payment intent'
-                : 'Failed to create Stripe payment intent';
-            console.error('Server: Failed to create payment intent:', errorResult);
             return {
                 success: false,
-                error: errorMessage,
+                error: 'Failed to create Stripe payment intent: No client secret returned',
             };
         }
     } catch (error) {
-        console.error('Server: Error in createStripePaymentIntent:', error);
         const errorMessage = error instanceof Error ? error.message : 'Failed to create payment intent';
-        console.error('Server: Error details:', {
-            message: errorMessage,
-            stack: error instanceof Error ? error.stack : undefined,
-            name: error instanceof Error ? error.name : undefined
-        });
+        console.error('Error creating Stripe payment intent:', errorMessage);
         return {
             success: false,
             error: errorMessage,
@@ -277,13 +254,6 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
             console.warn('Stripe payment method selected but no payment intent ID provided');
         }
 
-        // Log what we're sending for debugging
-        console.log('Placing order with:', {
-            paymentMethodCode,
-            hasPaymentIntentId: !!paymentIntentId,
-            metadataKeys: Object.keys(metadata)
-        });
-
         // Add payment to the order
         // Build the input object - only include metadata if it has values
         const paymentInput: { method: string; metadata?: Record<string, unknown> } = {
@@ -293,8 +263,6 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
         if (Object.keys(metadata).length > 0) {
             paymentInput.metadata = metadata;
         }
-
-        console.log('Sending payment input:', JSON.stringify(paymentInput, null, 2));
 
         const result = await mutate(
             AddPaymentToOrderMutation,
@@ -309,14 +277,7 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
             const errorResult = result.data.addPaymentToOrder;
             const errorMessage = `Failed to place order: ${errorResult.errorCode} - ${errorResult.message}`;
 
-            // Enhanced logging for debugging
-            console.error('=== PAYMENT FAILED ===');
-            console.error('Error:', errorMessage);
-            console.error('Payment method code:', paymentMethodCode);
-            console.error('Payment intent ID:', paymentIntentId || 'none');
-            console.error('Metadata sent:', JSON.stringify(metadata, null, 2));
-            console.error('Full error result:', JSON.stringify(errorResult, null, 2));
-            console.error('========================');
+            console.error('Payment failed:', errorMessage);
 
             throw new Error(errorMessage);
         }

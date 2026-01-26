@@ -291,17 +291,7 @@ export const AddPaymentToOrderMutation = graphql(`
 
 export const CreateStripePaymentIntentMutation = graphql(`
     mutation CreateStripePaymentIntent {
-        createStripePaymentIntent {
-            __typename
-            ... on StripePaymentIntent {
-                id
-                clientSecret
-            }
-            ... on ErrorResult {
-                errorCode
-                message
-            }
-        }
+        createStripePaymentIntent
     }
 `);
 

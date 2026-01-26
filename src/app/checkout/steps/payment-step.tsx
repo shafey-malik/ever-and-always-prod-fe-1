@@ -98,25 +98,20 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
   useEffect(() => {
     // Create Stripe payment intent when Stripe method is selected
     if (selectedPaymentMethodCode && isStripeMethod(selectedPaymentMethodCode)) {
-      console.log('Creating Stripe payment intent for method:', selectedPaymentMethodCode);
       const createPaymentIntent = async () => {
         setLoadingStripe(true);
         setStripeError(null);
         setStripeClientSecret(null);
         try {
-          console.log('Calling createStripePaymentIntent server action...');
           const result = await createStripePaymentIntent();
 
           if (result.success && result.clientSecret) {
-            console.log('Payment intent created successfully');
             setStripeClientSecret(result.clientSecret);
           } else {
             const errorMessage = result.error || 'Failed to create Stripe payment intent';
-            console.error('Failed to create Stripe payment intent:', errorMessage);
             setStripeError(errorMessage);
           }
         } catch (error) {
-          console.error('Error creating payment intent:', error);
           setStripeError(error instanceof Error ? error.message : 'Failed to create payment intent');
         } finally {
           setLoadingStripe(false);
