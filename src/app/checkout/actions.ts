@@ -95,7 +95,7 @@ export async function transitionToArrangingPayment() {
     revalidatePath('/checkout');
 }
 
-export async function placeOrder(paymentMethodCode: string) {
+export async function placeOrder(paymentMethodCode: string, paymentIntentId?: string) {
     // First, transition the order to ArrangingPayment state
     await transitionToArrangingPayment();
 
@@ -107,6 +107,11 @@ export async function placeOrder(paymentMethodCode: string) {
         metadata.shouldDecline = false;
         metadata.shouldError = false;
         metadata.shouldErrorOnSettle = false;
+    }
+
+    // For Stripe payments, include the payment intent ID
+    if (paymentIntentId && paymentMethodCode.toLowerCase().includes('stripe')) {
+        metadata.paymentIntentId = paymentIntentId;
     }
 
     // Add payment to the order

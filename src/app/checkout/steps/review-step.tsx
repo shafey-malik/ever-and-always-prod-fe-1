@@ -12,7 +12,7 @@ interface ReviewStepProps {
 }
 
 export default function ReviewStep({ onEditStep }: ReviewStepProps) {
-  const { order, paymentMethods, selectedPaymentMethodCode } = useCheckout();
+  const { order, paymentMethods, selectedPaymentMethodCode, stripePaymentIntentId } = useCheckout();
   const [loading, setLoading] = useState(false);
 
   const selectedPaymentMethod = paymentMethods.find(
@@ -24,7 +24,8 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
 
     setLoading(true);
     try {
-      await placeOrderAction(selectedPaymentMethodCode);
+      // For Stripe payments, pass the payment intent ID
+      await placeOrderAction(selectedPaymentMethodCode, stripePaymentIntentId || undefined);
     } catch (error) {
       // Check if this is a Next.js redirect (which is expected)
       if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {

@@ -49,6 +49,8 @@ interface CheckoutContextType {
   paymentMethods: PaymentMethod[];
   selectedPaymentMethodCode: string | null;
   setSelectedPaymentMethodCode: (code: string | null) => void;
+  stripePaymentIntentId: string | null;
+  setStripePaymentIntentId: (id: string | null) => void;
 }
 
 const CheckoutContext = createContext<CheckoutContextType | null>(null);
@@ -73,6 +75,7 @@ export function CheckoutProvider({
   const [selectedPaymentMethodCode, setSelectedPaymentMethodCode] = useState<string | null>(
     paymentMethods.length === 1 ? paymentMethods[0].code : null
   );
+  const [stripePaymentIntentId, setStripePaymentIntentId] = useState<string | null>(null);
 
   return (
     <CheckoutContext.Provider
@@ -84,6 +87,8 @@ export function CheckoutProvider({
         paymentMethods,
         selectedPaymentMethodCode,
         setSelectedPaymentMethodCode,
+        stripePaymentIntentId,
+        setStripePaymentIntentId,
       }}
     >
       {children}
