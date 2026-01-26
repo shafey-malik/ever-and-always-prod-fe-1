@@ -87,17 +87,33 @@ export async function transitionToArrangingPayment() {
 
     if (result.data.transitionOrderToState?.__typename === 'OrderStateTransitionError') {
         const errorResult = result.data.transitionOrderToState;
-        // If the order is already in ArrangingPayment state, that's okay - just continue
-        // Check for the specific error message about same-state transition
-        if (
+        
+        // Check if the order is already in ArrangingPayment state
+        // This can happen if the user navigates back or the order was already transitioned
+        const isAlreadyInState = 
+            (errorResult.fromState === 'ArrangingPayment' && errorResult.toState === 'ArrangingPayment') ||
+            (errorResult.fromState === 'ArrangingPayment');
+        
+        // Also check the error message for the same-state transition
+        const messageIndicatesSameState = 
             errorResult.message?.includes('Cannot transition Order from "ArrangingPayment" to "ArrangingPayment"') ||
             errorResult.message?.includes('from "ArrangingPayment" to "ArrangingPayment"') ||
-            errorResult.transitionError === 'ALREADY_IN_STATE'
-        ) {
+            errorResult.message?.toLowerCase().includes('already in state') ||
+            errorResult.message?.includes('ArrangingPayment') && errorResult.message?.includes('ArrangingPayment');
+        
+        // Check error code - ORDER_STATE_TRANSITION_ERROR with same from/to states
+        const isSameStateError = 
+            errorResult.errorCode === 'ORDER_STATE_TRANSITION_ERROR' && 
+            isAlreadyInState;
+        
+        if (isAlreadyInState || messageIndicatesSameState || isSameStateError) {
             // Order is already in the correct state, no need to throw an error
+            // This is a valid scenario - just continue
             revalidatePath('/checkout');
             return;
         }
+        
+        // For any other transition error, throw it
         throw new Error(
             `Failed to transition order state: ${errorResult.errorCode} - ${errorResult.message}`
         );
@@ -108,18 +124,9 @@ export async function transitionToArrangingPayment() {
 
 export async function placeOrder(paymentMethodCode: string, paymentIntentId?: string) {
     // First, transition the order to ArrangingPayment state (if not already there)
-    // This function now handles the case where the order is already in that state gracefully
-    try {
-        await transitionToArrangingPayment();
-    } catch (error) {
-        // If transition fails but it's because we're already in the state, continue
-        // Otherwise, rethrow the error
-        if (error instanceof Error && error.message.includes('ArrangingPayment')) {
-            // Likely already in the correct state, continue with payment
-        } else {
-            throw error;
-        }
-    }
+    // The transitionToArrangingPayment function now handles the case where 
+    // the order is already in that state gracefully, so we don't need extra try-catch here
+    await transitionToArrangingPayment();
 
     // Prepare metadata based on payment method
     const metadata: Record<string, unknown> = {};
