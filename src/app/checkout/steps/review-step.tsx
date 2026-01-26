@@ -22,7 +22,28 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
   const [error, setError] = useState<string | null>(null);
 
   const handlePlaceOrder = async () => {
-    if (!selectedPaymentMethodCode) return;
+    // Validate prerequisites
+    if (!selectedPaymentMethodCode) {
+      setError('Please select a payment method.');
+      return;
+    }
+
+    if (!order.shippingAddress) {
+      setError('Please provide a shipping address.');
+      return;
+    }
+
+    if (!order.shippingLines || order.shippingLines.length === 0) {
+      setError('Please select a shipping method.');
+      return;
+    }
+
+    // For Stripe payments, validate payment intent ID
+    const isStripePayment = selectedPaymentMethodCode.toLowerCase().includes('stripe');
+    if (isStripePayment && !stripePaymentIntentId) {
+      setError('Payment confirmation is required. Please complete the payment step.');
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -35,8 +56,6 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
     } catch (error) {
       // Check if this is a Next.js redirect (which is expected)
       if (error instanceof Error) {
-        // Next.js redirect throws a special error - check message, not just digest
-        // Redirect errors have "NEXT_REDIRECT" in message, not just digest starting with number
         const isRedirect = 
           error.message.includes('NEXT_REDIRECT') || 
           (error as any).digest?.startsWith('NEXT_REDIRECT');
@@ -46,26 +65,21 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
           throw error;
         }
         
-        // For other errors, show user-friendly message
-        // Extract the actual error message (might be nested)
-        let errorMessage = error.message || 'An unexpected error occurred';
+        // Extract user-friendly error message
+        let errorMessage = error.message || 'Failed to place order. Please try again.';
         
-        // If error message is the generic Next.js error, try to get more info
-        if (errorMessage.includes('Server Components render') && (error as any).originalError) {
-          errorMessage = (error as any).originalError.message || errorMessage;
+        // Clean up technical error messages
+        if (errorMessage.includes('Server Components render')) {
+          if ((error as any).originalError) {
+            errorMessage = (error as any).originalError.message || errorMessage;
+          } else {
+            errorMessage = 'An error occurred while processing your order. Please try again.';
+          }
         }
-        
-        console.error('Error placing order:', error);
-        console.error('Error details:', {
-          message: error.message,
-          digest: (error as any).digest,
-          stack: error.stack
-        });
         
         setError(errorMessage);
         setLoading(false);
       } else {
-        console.error('Unknown error placing order:', error);
         setError('An unexpected error occurred. Please try again.');
         setLoading(false);
       }

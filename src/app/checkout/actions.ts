@@ -96,14 +96,33 @@ export async function createStripePaymentIntent() {
         // This is required by Vendure before creating a payment intent
         try {
             const orderQuery = await query(GetActiveOrderForCheckoutQuery, {}, { useAuthToken: true });
-            const currentState = (orderQuery.data as any).activeOrder?.state;
+            const order = (orderQuery.data as any).activeOrder;
+            
+            if (!order) {
+                return {
+                    success: false,
+                    error: 'No active order found. Please add items to your cart.',
+                };
+            }
+            
+            const currentState = order.state;
             
             if (currentState !== 'ArrangingPayment') {
                 await transitionToArrangingPayment();
             }
         } catch (transitionError) {
-            // Log but continue - the mutation might still work
-            console.warn('Could not check/transition order state:', transitionError);
+            // If transition fails, try to continue anyway - the mutation might still work
+            // But log the error for debugging
+            if (transitionError instanceof Error) {
+                // Only continue if it's a state transition error (order might already be in correct state)
+                if (!transitionError.message.includes('ORDER_STATE_TRANSITION_ERROR') && 
+                    !transitionError.message.includes('ArrangingPayment')) {
+                    return {
+                        success: false,
+                        error: 'Failed to prepare order for payment. Please try again.',
+                    };
+                }
+            }
         }
         
         const result = await mutate(
@@ -115,7 +134,16 @@ export async function createStripePaymentIntent() {
         // The mutation returns a String (client secret) directly
         const clientSecret = result.data.createStripePaymentIntent as string;
 
+        // Validate client secret format (Stripe client secrets start with specific prefixes)
         if (clientSecret && typeof clientSecret === 'string' && clientSecret.length > 0) {
+            // Basic validation: Stripe client secrets are typically long strings
+            if (clientSecret.length < 20) {
+                return {
+                    success: false,
+                    error: 'Invalid payment intent received. Please try again.',
+                };
+            }
+            
             return {
                 success: true,
                 clientSecret: clientSecret,
@@ -123,12 +151,34 @@ export async function createStripePaymentIntent() {
         } else {
             return {
                 success: false,
-                error: 'Failed to create Stripe payment intent: No client secret returned',
+                error: 'Failed to create payment intent. Please try again or contact support.',
             };
         }
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Failed to create payment intent';
-        console.error('Error creating Stripe payment intent:', errorMessage);
+        // Handle different error types
+        let errorMessage = 'Failed to create payment intent. Please try again.';
+        
+        if (error instanceof Error) {
+            // Network errors
+            if (error.message.includes('fetch') || error.message.includes('network') || error.message.includes('timeout')) {
+                errorMessage = 'Network error. Please check your connection and try again.';
+            }
+            // HTTP errors
+            else if (error.message.includes('HTTP error')) {
+                if (error.message.includes('401') || error.message.includes('403')) {
+                    errorMessage = 'Authentication error. Please sign in and try again.';
+                } else if (error.message.includes('400')) {
+                    errorMessage = 'Invalid request. Please refresh the page and try again.';
+                } else if (error.message.includes('500')) {
+                    errorMessage = 'Server error. Please try again in a moment.';
+                }
+            }
+            // Other errors - use the original message if it's user-friendly
+            else if (error.message && !error.message.includes('at ') && !error.message.includes('Error:')) {
+                errorMessage = error.message;
+            }
+        }
+        
         return {
             success: false,
             error: errorMessage,
@@ -196,15 +246,30 @@ export async function transitionToArrangingPayment() {
 }
 
 export async function placeOrder(paymentMethodCode: string, paymentIntentId?: string) {
+    // Validate inputs
+    if (!paymentMethodCode || typeof paymentMethodCode !== 'string' || paymentMethodCode.trim().length === 0) {
+        throw new Error('Payment method is required');
+    }
+
     try {
         // Check current order state before attempting transition
         let currentState: string | undefined;
+        let order: any = null;
+        
         try {
             const orderQuery = await query(GetActiveOrderForCheckoutQuery, {}, { useAuthToken: true });
-            currentState = orderQuery.data.activeOrder?.state;
-            console.log('Current order state:', currentState);
+            order = (orderQuery.data as any).activeOrder;
+            currentState = order?.state;
+            
+            // Validate order exists
+            if (!order) {
+                throw new Error('No active order found. Please add items to your cart.');
+            }
         } catch (queryError) {
-            console.warn('Could not query order state, proceeding with transition:', queryError);
+            if (queryError instanceof Error && queryError.message.includes('No active order')) {
+                throw queryError;
+            }
+            // Continue with transition attempt if query fails
         }
 
         // Only transition if not already in ArrangingPayment
@@ -212,24 +277,21 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
             try {
                 await transitionToArrangingPayment();
             } catch (transitionError) {
-                // Log the transition error but continue if it's the same-state error
+                // Handle transition errors gracefully
                 if (transitionError instanceof Error) {
                     // Check if it's the same-state transition error (safe to ignore)
                     if (transitionError.message.includes('ArrangingPayment') ||
                         transitionError.message.includes('ORDER_STATE_TRANSITION_ERROR')) {
                         // Order is already in correct state, continue
-                        console.log('Order already in ArrangingPayment state, continuing...');
+                        // This is expected in some edge cases
                     } else {
-                        // Different error, rethrow
-                        console.error('Unexpected transition error:', transitionError);
-                        throw transitionError;
+                        // Different error - might be critical
+                        throw new Error(`Failed to prepare order for payment: ${transitionError.message}`);
                     }
                 } else {
-                    throw transitionError;
+                    throw new Error('Failed to prepare order for payment. Please try again.');
                 }
             }
-        } else {
-            console.log('Order already in ArrangingPayment state, skipping transition');
         }
 
         // Prepare metadata based on payment method
@@ -244,14 +306,18 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
 
         // For Stripe payments, include the payment intent ID in metadata
         // Vendure Stripe plugin expects this to link the payment
-        // Note: For Stripe, if payment is already confirmed, we might not need metadata
-        // The webhook will handle the payment confirmation
         if (paymentIntentId && paymentMethodCode.toLowerCase().includes('stripe')) {
-            metadata.paymentIntentId = paymentIntentId;
+            // Validate payment intent ID format (Stripe IDs start with specific prefixes)
+            if (paymentIntentId.startsWith('pi_') || paymentIntentId.length > 20) {
+                metadata.paymentIntentId = paymentIntentId;
+            } else {
+                // Invalid payment intent ID format
+                throw new Error('Invalid payment confirmation. Please complete the payment again.');
+            }
         } else if (paymentMethodCode.toLowerCase().includes('stripe') && !paymentIntentId) {
-            // Stripe payment but no intent ID - payment might be handled by webhook
+            // Stripe payment but no intent ID - this shouldn't happen if payment was confirmed
+            // But we'll allow it in case webhook handles it
             // Don't add metadata, let webhook handle it
-            console.warn('Stripe payment method selected but no payment intent ID provided');
         }
 
         // Add payment to the order
@@ -282,12 +348,10 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
             throw new Error(errorMessage);
         }
 
-        const orderCode = result.data.addPaymentToOrder.code;
+        const orderCode = (result.data.addPaymentToOrder as any).code;
 
-        if (!orderCode) {
-            console.error('Order code is missing from response');
-            console.error('Full response:', JSON.stringify(result.data.addPaymentToOrder, null, 2));
-            throw new Error('Order code is missing from response');
+        if (!orderCode || typeof orderCode !== 'string' || orderCode.trim().length === 0) {
+            throw new Error('Order confirmation failed. Please contact support with your payment details.');
         }
 
         // Update the cart tag to immediately invalidate cached cart data
@@ -298,43 +362,34 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
         // Note: redirect() throws a special error that Next.js catches - this is expected
         redirect(`/order-confirmation/${orderCode}`);
     } catch (error) {
-        // Log the full error for debugging
-        console.error('=== PLACE ORDER ERROR ===');
-        console.error('Error type:', error?.constructor?.name);
-        console.error('Error message:', error instanceof Error ? error.message : String(error));
-        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
-        if (error instanceof Error && 'digest' in error) {
-            console.error('Error digest:', (error as any).digest);
-        }
-        console.error('==========================');
-
-        // Re-throw with more context if it's not a redirect
+        // Handle redirects (Next.js redirect() throws an error, but it's expected)
         if (error instanceof Error) {
-            // Check if it's a Next.js redirect (which throws an error but is expected)
-            // Redirect errors have a specific message pattern, not just digest
             const isRedirect =
                 error.message.includes('NEXT_REDIRECT') ||
-                error.message.includes('redirect') ||
                 (error as any).digest?.startsWith('NEXT_REDIRECT');
 
-            // Don't treat state transition errors as redirects
-            const isStateTransitionError =
-                error.message.includes('ORDER_STATE_TRANSITION_ERROR') ||
-                error.message.includes('ArrangingPayment') ||
-                error.message.includes('transition');
-
-            if (isRedirect && !isStateTransitionError) {
+            if (isRedirect) {
                 // This is a redirect, let it propagate (Next.js handles this)
                 throw error;
             }
 
-            // For other errors, add more context but preserve original message
-            // This ensures the actual error message is visible
-            const enhancedError = new Error(`Failed to place order: ${error.message}`);
-            (enhancedError as any).originalError = error;
-            (enhancedError as any).digest = (error as any).digest; // Preserve digest for debugging
-            throw enhancedError;
+            // For other errors, provide user-friendly messages
+            let errorMessage = error.message;
+            
+            // Enhance error messages for common cases
+            if (error.message.includes('No active order')) {
+                errorMessage = 'Your cart is empty. Please add items before placing an order.';
+            } else if (error.message.includes('transition') || error.message.includes('state')) {
+                errorMessage = 'Order processing error. Please refresh the page and try again.';
+            } else if (error.message.includes('Payment') || error.message.includes('payment')) {
+                errorMessage = error.message; // Keep payment-related errors as-is
+            } else if (!error.message || error.message.includes('at ') || error.message.includes('Error:')) {
+                errorMessage = 'Failed to place order. Please try again or contact support.';
+            }
+
+            throw new Error(errorMessage);
         }
-        throw error;
+        
+        throw new Error('An unexpected error occurred. Please try again.');
     }
 }

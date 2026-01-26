@@ -27,37 +27,89 @@ function StripePaymentForm({ onComplete, onPaymentConfirmed }: {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate Stripe and Elements are loaded
     if (!stripe || !elements) {
+      setError('Payment form is not ready. Please wait a moment and try again.');
       return;
     }
 
     setProcessing(true);
     setError(null);
 
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      setError(submitError.message || 'An error occurred');
-      setProcessing(false);
-      return;
-    }
+    try {
+      // Validate form before submission
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        setError(submitError.message || 'Please check your payment details and try again.');
+        setProcessing(false);
+        return;
+      }
 
-    const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/checkout`,
-      },
-      redirect: 'if_required',
-    });
+      // Confirm payment with Stripe
+      const { error: confirmError, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/checkout`,
+        },
+        redirect: 'if_required',
+      });
 
-    if (confirmError) {
-      setError(confirmError.message || 'Payment failed');
-      setProcessing(false);
-    } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      // Payment succeeded, store the payment intent ID
-      onPaymentConfirmed(paymentIntent.id);
-      onComplete();
-    } else {
-      setError('Payment was not completed. Please try again.');
+      if (confirmError) {
+        // Handle different Stripe error types
+        let errorMessage = 'Payment failed. Please try again.';
+        
+        if (confirmError.type === 'card_error' || confirmError.type === 'validation_error') {
+          errorMessage = confirmError.message || 'Please check your card details and try again.';
+        } else if (confirmError.type === 'rate_limit_error') {
+          errorMessage = 'Too many requests. Please wait a moment and try again.';
+        } else if (confirmError.message) {
+          errorMessage = confirmError.message;
+        }
+        
+        setError(errorMessage);
+        setProcessing(false);
+        return;
+      }
+
+      // Validate payment intent
+      if (!paymentIntent) {
+        setError('Payment confirmation incomplete. Please try again.');
+        setProcessing(false);
+        return;
+      }
+
+      // Check payment status
+      if (paymentIntent.status === 'succeeded') {
+        // Validate payment intent ID
+        if (!paymentIntent.id || paymentIntent.id.length === 0) {
+          setError('Payment succeeded but confirmation failed. Please contact support.');
+          setProcessing(false);
+          return;
+        }
+        
+        // Payment succeeded, store the payment intent ID and proceed
+        onPaymentConfirmed(paymentIntent.id);
+        onComplete();
+      } else if (paymentIntent.status === 'processing') {
+        // Payment is processing (e.g., requires authentication)
+        setError('Your payment is being processed. Please wait...');
+        // Don't set processing to false - keep loading state
+      } else if (paymentIntent.status === 'requires_action') {
+        // Payment requires additional action (e.g., 3D Secure)
+        // Stripe will handle the redirect automatically
+        setError('Additional authentication required. Please complete the verification.');
+        setProcessing(false);
+      } else {
+        // Payment in unexpected state
+        setError(`Payment status: ${paymentIntent.status}. Please try again or contact support.`);
+        setProcessing(false);
+      }
+    } catch (error) {
+      // Handle unexpected errors
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An unexpected error occurred. Please try again.';
+      setError(errorMessage);
       setProcessing(false);
     }
   };
@@ -98,30 +150,54 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
   useEffect(() => {
     // Create Stripe payment intent when Stripe method is selected
     if (selectedPaymentMethodCode && isStripeMethod(selectedPaymentMethodCode)) {
+      let isCancelled = false;
+      
       const createPaymentIntent = async () => {
         setLoadingStripe(true);
         setStripeError(null);
         setStripeClientSecret(null);
+        
         try {
           const result = await createStripePaymentIntent();
 
+          // Don't update state if component unmounted or payment method changed
+          if (isCancelled) return;
+
           if (result.success && result.clientSecret) {
-            setStripeClientSecret(result.clientSecret);
+            // Validate client secret before setting
+            if (result.clientSecret && result.clientSecret.length > 0) {
+              setStripeClientSecret(result.clientSecret);
+            } else {
+              setStripeError('Invalid payment intent received. Please try again.');
+            }
           } else {
-            const errorMessage = result.error || 'Failed to create Stripe payment intent';
+            const errorMessage = result.error || 'Failed to create payment intent. Please try again.';
             setStripeError(errorMessage);
           }
         } catch (error) {
-          setStripeError(error instanceof Error ? error.message : 'Failed to create payment intent');
+          if (isCancelled) return;
+          
+          const errorMessage = error instanceof Error 
+            ? error.message 
+            : 'Failed to create payment intent. Please try again.';
+          setStripeError(errorMessage);
         } finally {
-          setLoadingStripe(false);
+          if (!isCancelled) {
+            setLoadingStripe(false);
+          }
         }
       };
 
       createPaymentIntent();
+      
+      // Cleanup function to prevent state updates if component unmounts or payment method changes
+      return () => {
+        isCancelled = true;
+      };
     } else {
       setStripeClientSecret(null);
       setStripeError(null);
+      setLoadingStripe(false);
     }
   }, [selectedPaymentMethodCode]);
 
