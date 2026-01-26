@@ -90,6 +90,7 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
   } = useCheckout();
   const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
   const [loadingStripe, setLoadingStripe] = useState(false);
+  const [stripeError, setStripeError] = useState<string | null>(null);
 
   const isStripeMethod = (code: string) => {
     return code.toLowerCase().includes('stripe');
@@ -98,25 +99,42 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
   useEffect(() => {
     // Create Stripe payment intent when Stripe method is selected
     if (selectedPaymentMethodCode && isStripeMethod(selectedPaymentMethodCode)) {
+      console.log('Creating Stripe payment intent for method:', selectedPaymentMethodCode);
       const createPaymentIntent = async () => {
         setLoadingStripe(true);
+        setStripeError(null);
+        setStripeClientSecret(null);
         try {
+          console.log('Calling CreateStripePaymentIntentMutation...');
           const result = await mutate(
             CreateStripePaymentIntentMutation,
             {},
             { useAuthToken: true }
           );
 
+          console.log('Payment intent result:', {
+            __typename: result.data.createStripePaymentIntent.__typename,
+            hasClientSecret: !!(result.data.createStripePaymentIntent as any).clientSecret
+          });
+
           if (
             result.data.createStripePaymentIntent.__typename === 'StripePaymentIntent' &&
-            result.data.createStripePaymentIntent.clientSecret
+            (result.data.createStripePaymentIntent as any).clientSecret
           ) {
-            setStripeClientSecret(result.data.createStripePaymentIntent.clientSecret);
+            const clientSecret = (result.data.createStripePaymentIntent as any).clientSecret;
+            console.log('Payment intent created successfully');
+            setStripeClientSecret(clientSecret);
           } else {
-            console.error('Failed to create Stripe payment intent');
+            const errorResult = result.data.createStripePaymentIntent;
+            const errorMessage = (errorResult as any).__typename === 'ErrorResult' 
+              ? (errorResult as any).message || 'Failed to create Stripe payment intent'
+              : 'Failed to create Stripe payment intent';
+            console.error('Failed to create Stripe payment intent:', errorResult);
+            setStripeError(errorMessage);
           }
         } catch (error) {
           console.error('Error creating payment intent:', error);
+          setStripeError(error instanceof Error ? error.message : 'Failed to create payment intent');
         } finally {
           setLoadingStripe(false);
         }
@@ -125,6 +143,7 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
       createPaymentIntent();
     } else {
       setStripeClientSecret(null);
+      setStripeError(null);
     }
   }, [selectedPaymentMethodCode]);
 
@@ -137,7 +156,7 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
   }
 
   const selectedMethod = paymentMethods.find(m => m.code === selectedPaymentMethodCode);
-  const showStripeForm = selectedMethod && isStripeMethod(selectedMethod.code) && stripeClientSecret;
+  const showStripeForm = selectedMethod && isStripeMethod(selectedMethod.code) && stripeClientSecret && !loadingStripe;
 
   return (
     <div className="space-y-6">
@@ -164,13 +183,19 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
         ))}
       </RadioGroup>
 
-      {showStripeForm ? (
+      {selectedPaymentMethodCode && isStripeMethod(selectedPaymentMethodCode) ? (
         <div className="mt-6">
           {loadingStripe ? (
-            <div className="flex items-center justify-center py-8">
+            <div className="flex flex-col items-center justify-center py-8 space-y-2">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">Loading payment form...</p>
             </div>
-          ) : (
+          ) : stripeError ? (
+            <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-md">
+              <p className="text-sm text-destructive font-medium">Error loading payment form</p>
+              <p className="text-sm text-destructive/80 mt-1">{stripeError}</p>
+            </div>
+          ) : stripeClientSecret ? (
             <StripeProvider clientSecret={stripeClientSecret}>
               <StripePaymentForm 
                 onComplete={onComplete}
@@ -179,13 +204,17 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
                 }}
               />
             </StripeProvider>
+          ) : (
+            <div className="p-4 bg-muted rounded-md">
+              <p className="text-sm text-muted-foreground">Preparing payment form...</p>
+            </div>
           )}
         </div>
       ) : selectedPaymentMethodCode && !isStripeMethod(selectedPaymentMethodCode) ? (
         <Button
           onClick={onComplete}
           disabled={!selectedPaymentMethodCode}
-          className="w-full"
+          className="w-full mt-6"
         >
           Continue to review
         </Button>
