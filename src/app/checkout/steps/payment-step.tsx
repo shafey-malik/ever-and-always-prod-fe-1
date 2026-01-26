@@ -9,8 +9,7 @@ import { CreditCard, Loader2 } from 'lucide-react';
 import { useCheckout } from '../checkout-provider';
 import { StripeProvider } from '@/components/stripe-provider';
 import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { mutate } from '@/lib/vendure/api';
-import { CreateStripePaymentIntentMutation } from '@/lib/vendure/mutations';
+import { createStripePaymentIntent } from '../actions';
 
 interface PaymentStepProps {
   onComplete: () => void;
@@ -105,31 +104,15 @@ export default function PaymentStep({ onComplete }: PaymentStepProps) {
         setStripeError(null);
         setStripeClientSecret(null);
         try {
-          console.log('Calling CreateStripePaymentIntentMutation...');
-          const result = await mutate(
-            CreateStripePaymentIntentMutation,
-            {},
-            { useAuthToken: true }
-          );
+          console.log('Calling createStripePaymentIntent server action...');
+          const result = await createStripePaymentIntent();
 
-          console.log('Payment intent result:', {
-            __typename: result.data.createStripePaymentIntent.__typename,
-            hasClientSecret: !!(result.data.createStripePaymentIntent as any).clientSecret
-          });
-
-          if (
-            result.data.createStripePaymentIntent.__typename === 'StripePaymentIntent' &&
-            (result.data.createStripePaymentIntent as any).clientSecret
-          ) {
-            const clientSecret = (result.data.createStripePaymentIntent as any).clientSecret;
+          if (result.success && result.clientSecret) {
             console.log('Payment intent created successfully');
-            setStripeClientSecret(clientSecret);
+            setStripeClientSecret(result.clientSecret);
           } else {
-            const errorResult = result.data.createStripePaymentIntent;
-            const errorMessage = (errorResult as any).__typename === 'ErrorResult' 
-              ? (errorResult as any).message || 'Failed to create Stripe payment intent'
-              : 'Failed to create Stripe payment intent';
-            console.error('Failed to create Stripe payment intent:', errorResult);
+            const errorMessage = result.error || 'Failed to create Stripe payment intent';
+            console.error('Failed to create Stripe payment intent:', errorMessage);
             setStripeError(errorMessage);
           }
         } catch (error) {

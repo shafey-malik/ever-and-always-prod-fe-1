@@ -8,6 +8,7 @@ import {
     AddPaymentToOrderMutation,
     CreateCustomerAddressMutation,
     TransitionOrderToStateMutation,
+    CreateStripePaymentIntentMutation,
 } from '@/lib/vendure/mutations';
 import { GetActiveOrderForCheckoutQuery } from '@/lib/vendure/queries';
 import { revalidatePath, updateTag } from 'next/cache';
@@ -87,6 +88,40 @@ export async function createCustomerAddress(address: AddressInput) {
 
     revalidatePath('/checkout');
     return result.data.createCustomerAddress;
+}
+
+export async function createStripePaymentIntent() {
+    try {
+        const result = await mutate(
+            CreateStripePaymentIntentMutation,
+            {},
+            { useAuthToken: true }
+        );
+
+        if (
+            result.data.createStripePaymentIntent.__typename === 'StripePaymentIntent' &&
+            (result.data.createStripePaymentIntent as any).clientSecret
+        ) {
+            return {
+                success: true,
+                clientSecret: (result.data.createStripePaymentIntent as any).clientSecret,
+            };
+        } else {
+            const errorResult = result.data.createStripePaymentIntent;
+            const errorMessage = (errorResult as any).__typename === 'ErrorResult'
+                ? (errorResult as any).message || 'Failed to create Stripe payment intent'
+                : 'Failed to create Stripe payment intent';
+            return {
+                success: false,
+                error: errorMessage,
+            };
+        }
+    } catch (error) {
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to create payment intent',
+        };
+    }
 }
 
 export async function transitionToArrangingPayment() {
