@@ -98,7 +98,26 @@ export async function query<TResult, TVariables>(
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // Try to get error details from response body
+            let errorDetails = '';
+            try {
+                const errorBody = await response.text();
+                errorDetails = errorBody;
+                // Try to parse as JSON for better error message
+                try {
+                    const errorJson = JSON.parse(errorBody);
+                    if (errorJson.errors && Array.isArray(errorJson.errors)) {
+                        errorDetails = errorJson.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ');
+                    } else if (errorJson.message) {
+                        errorDetails = errorJson.message;
+                    }
+                } catch {
+                    // Not JSON, use text as-is
+                }
+            } catch {
+                errorDetails = `HTTP ${response.status} ${response.statusText}`;
+            }
+            throw new Error(`HTTP error! status: ${response.status} - ${errorDetails}`);
         }
 
         const result: VendureResponse<TResult> = await response.json();
