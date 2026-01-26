@@ -35,15 +35,33 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
     } catch (error) {
       // Check if this is a Next.js redirect (which is expected)
       if (error instanceof Error) {
-        // Next.js redirect throws a special error with digest
-        if (error.message.includes('NEXT_REDIRECT') || 
-            (error as any).digest?.startsWith('NEXT_REDIRECT')) {
+        // Next.js redirect throws a special error - check message, not just digest
+        // Redirect errors have "NEXT_REDIRECT" in message, not just digest starting with number
+        const isRedirect = 
+          error.message.includes('NEXT_REDIRECT') || 
+          (error as any).digest?.startsWith('NEXT_REDIRECT');
+        
+        if (isRedirect) {
           // This is a redirect, not an error - let it propagate
           throw error;
         }
+        
         // For other errors, show user-friendly message
-        const errorMessage = error.message || 'An unexpected error occurred';
+        // Extract the actual error message (might be nested)
+        let errorMessage = error.message || 'An unexpected error occurred';
+        
+        // If error message is the generic Next.js error, try to get more info
+        if (errorMessage.includes('Server Components render') && (error as any).originalError) {
+          errorMessage = (error as any).originalError.message || errorMessage;
+        }
+        
         console.error('Error placing order:', error);
+        console.error('Error details:', {
+          message: error.message,
+          digest: (error as any).digest,
+          stack: error.stack
+        });
+        
         setError(errorMessage);
         setLoading(false);
       } else {
