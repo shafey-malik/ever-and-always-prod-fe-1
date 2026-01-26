@@ -1,6 +1,6 @@
 'use server';
 
-import {mutate} from '@/lib/vendure/api';
+import {mutate, query} from '@/lib/vendure/api';
 import {
     SetOrderShippingAddressMutation,
     SetOrderBillingAddressMutation,
@@ -9,6 +9,7 @@ import {
     CreateCustomerAddressMutation,
     TransitionOrderToStateMutation,
 } from '@/lib/vendure/mutations';
+import {GetActiveOrderForCheckoutQuery} from '@/lib/vendure/queries';
 import {revalidatePath, updateTag} from 'next/cache';
 import {redirect} from "next/navigation";
 
@@ -139,21 +140,39 @@ export async function transitionToArrangingPayment() {
 
 export async function placeOrder(paymentMethodCode: string, paymentIntentId?: string) {
     try {
-        // First, transition the order to ArrangingPayment state (if not already there)
-        // The transitionToArrangingPayment function now handles the case where 
-        // the order is already in that state gracefully
+        // Check current order state before attempting transition
+        let currentState: string | undefined;
         try {
-            await transitionToArrangingPayment();
-        } catch (transitionError) {
-            // Log the transition error but continue if it's the same-state error
-            console.error('Transition error (may be safe to ignore):', transitionError);
-            // If it's not a same-state error, rethrow it
-            if (transitionError instanceof Error && 
-                !transitionError.message.includes('ArrangingPayment') &&
-                !transitionError.message.includes('ORDER_STATE_TRANSITION_ERROR')) {
-                throw transitionError;
+            const orderQuery = await query(GetActiveOrderForCheckoutQuery, {}, {useAuthToken: true});
+            currentState = orderQuery.data.activeOrder?.state;
+            console.log('Current order state:', currentState);
+        } catch (queryError) {
+            console.warn('Could not query order state, proceeding with transition:', queryError);
+        }
+
+        // Only transition if not already in ArrangingPayment
+        if (currentState !== 'ArrangingPayment') {
+            try {
+                await transitionToArrangingPayment();
+            } catch (transitionError) {
+                // Log the transition error but continue if it's the same-state error
+                if (transitionError instanceof Error) {
+                    // Check if it's the same-state transition error (safe to ignore)
+                    if (transitionError.message.includes('ArrangingPayment') || 
+                        transitionError.message.includes('ORDER_STATE_TRANSITION_ERROR')) {
+                        // Order is already in correct state, continue
+                        console.log('Order already in ArrangingPayment state, continuing...');
+                    } else {
+                        // Different error, rethrow
+                        console.error('Unexpected transition error:', transitionError);
+                        throw transitionError;
+                    }
+                } else {
+                    throw transitionError;
+                }
             }
-            // Otherwise, continue with payment
+        } else {
+            console.log('Order already in ArrangingPayment state, skipping transition');
         }
 
         // Prepare metadata based on payment method
@@ -166,10 +185,18 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
             metadata.shouldErrorOnSettle = false;
         }
 
-        // For Stripe payments, include the payment intent ID
+        // For Stripe payments, include the payment intent ID in metadata
+        // Vendure Stripe plugin expects this to link the payment
         if (paymentIntentId && paymentMethodCode.toLowerCase().includes('stripe')) {
             metadata.paymentIntentId = paymentIntentId;
         }
+
+        // Log what we're sending for debugging
+        console.log('Placing order with:', {
+            paymentMethodCode,
+            hasPaymentIntentId: !!paymentIntentId,
+            metadataKeys: Object.keys(metadata)
+        });
 
         // Add payment to the order
         const result = await mutate(
@@ -177,16 +204,26 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
             {
                 input: {
                     method: paymentMethodCode,
-                    metadata,
+                    metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
                 },
             },
             {useAuthToken: true}
         );
 
+        // Check the result
         if (result.data.addPaymentToOrder.__typename !== 'Order') {
             const errorResult = result.data.addPaymentToOrder;
             const errorMessage = `Failed to place order: ${errorResult.errorCode} - ${errorResult.message}`;
-            console.error('Payment failed:', errorMessage);
+            
+            // Enhanced logging for debugging
+            console.error('=== PAYMENT FAILED ===');
+            console.error('Error:', errorMessage);
+            console.error('Payment method code:', paymentMethodCode);
+            console.error('Payment intent ID:', paymentIntentId || 'none');
+            console.error('Metadata sent:', JSON.stringify(metadata, null, 2));
+            console.error('Full error result:', JSON.stringify(errorResult, null, 2));
+            console.error('========================');
+            
             throw new Error(errorMessage);
         }
 
@@ -194,7 +231,8 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
 
         if (!orderCode) {
             console.error('Order code is missing from response');
-            throw new Error('Order code is missing');
+            console.error('Full response:', JSON.stringify(result.data.addPaymentToOrder, null, 2));
+            throw new Error('Order code is missing from response');
         }
 
         // Update the cart tag to immediately invalidate cached cart data
@@ -202,19 +240,36 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
         updateTag('active-order');
 
         // Redirect to order confirmation
+        // Note: redirect() throws a special error that Next.js catches - this is expected
         redirect(`/order-confirmation/${orderCode}`);
     } catch (error) {
         // Log the full error for debugging
-        console.error('placeOrder error:', error);
+        console.error('=== PLACE ORDER ERROR ===');
+        console.error('Error type:', error?.constructor?.name);
+        console.error('Error message:', error instanceof Error ? error.message : String(error));
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+        if (error instanceof Error && 'digest' in error) {
+            console.error('Error digest:', (error as any).digest);
+        }
+        console.error('==========================');
         
         // Re-throw with more context if it's not a redirect
         if (error instanceof Error) {
             // Check if it's a Next.js redirect (which throws an error but is expected)
-            if (error.message.includes('NEXT_REDIRECT') || error.digest?.startsWith('NEXT_REDIRECT')) {
-                throw error; // Let redirect errors propagate
+            // Redirect errors have a specific digest pattern
+            const isRedirect = 
+                error.message.includes('NEXT_REDIRECT') || 
+                (error as any).digest?.startsWith('NEXT_REDIRECT') ||
+                (error as any).digest?.startsWith('1'); // Next.js redirect digest pattern
+            
+            if (isRedirect) {
+                // This is a redirect, let it propagate (Next.js handles this)
+                throw error;
             }
-            // For other errors, add more context
-            throw new Error(`Failed to place order: ${error.message}`);
+            // For other errors, add more context but preserve original message
+            const enhancedError = new Error(`Failed to place order: ${error.message}`);
+            (enhancedError as any).originalError = error;
+            throw enhancedError;
         }
         throw error;
     }
