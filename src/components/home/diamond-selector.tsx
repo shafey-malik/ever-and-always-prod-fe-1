@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const diamondTypes = [
   {
@@ -53,6 +54,20 @@ const diamondTypes = [
     color: 'from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))]',
   },
 ];
+
+// Map diamond IDs to collection slugs
+const getCollectionLink = (diamondId: string): string => {
+  const collectionMap: Record<string, string> = {
+    round: 'round-cut-diamond-rings',
+    princess: 'princess-cut-diamond-rings',
+    emerald: 'emerald-cut-diamond-rings',
+    oval: 'oval-cut-diamond-rings',
+    cushion: 'cushion-cut-diamond-rings',
+    pear: 'pear-shaped-diamond-rings',
+  };
+  const slug = collectionMap[diamondId] || 'round-cut-diamond-rings';
+  return `/collection/${slug}`;
+};
 
 export function DiamondSelector() {
   const [selectedDiamond, setSelectedDiamond] = useState('round');
@@ -211,6 +226,16 @@ export function DiamondSelector() {
                 </h3>
               </div>
               <div className="h-1.5 w-24 bg-[hsl(var(--secondary))] rounded-full"></div>
+
+              {/* View Collection Button */}
+              <Link
+                href={getCollectionLink(selectedDiamond)}
+                className="inline-block mt-4 sm:mt-6"
+              >
+                <button className="btn-luxury text-[hsl(var(--secondary))] hover:text-[hsl(var(--background))] px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-normal tracking-wide transition-all duration-300 cursor-pointer">
+                  View {diamondTypes.find((d) => d.id === selectedDiamond)?.name} Collection
+                </button>
+              </Link>
             </div>
 
             <div className="space-y-6 text-[hsl(var(--muted-foreground))] font-luxury-sans">
