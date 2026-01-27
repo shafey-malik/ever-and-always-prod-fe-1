@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import Link from 'next/link';
 import {Package, User, MapPin} from 'lucide-react';
 import {noIndexRobots} from '@/lib/metadata';
+import {LogoutButton} from './logout-button';
 
 export const metadata: Metadata = {
     robots: noIndexRobots(),
@@ -29,6 +30,9 @@ export default async function AccountLayout({children}: LayoutProps<'/account'>)
                                 {item.label}
                             </Link>
                         ))}
+                        <div className="pt-4 mt-4 border-t border-gray-200">
+                            <LogoutButton />
+                        </div>
                     </nav>
                 </aside>
                 <main className="flex-1">

@@ -44,6 +44,6 @@ export async function loginAction(prevState: { error?: string } | undefined, for
 export async function logoutAction() {
     await mutate(LogoutMutation);
     await removeAuthToken();
-
-    redirect('/')
+    revalidatePath('/', 'layout');
+    redirect('/');
 }
