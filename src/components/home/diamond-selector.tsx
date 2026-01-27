@@ -79,11 +79,8 @@ export function DiamondSelector() {
   return (
     <section className="py-12 sm:py-24 bg-[hsl(var(--card))] relative overflow-hidden">
       {/* Animated background elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/2 animate-pulse bg-[hsl(var(--secondary))]"></div>
-      <div
-        className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-20 translate-x-1/2 translate-y-1/2 animate-pulse bg-[hsl(var(--secondary))]"
-        style={{ animationDelay: '1s' }}
-      ></div>
+      <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/2"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-20 translate-x-1/2 translate-y-1/2"></div>
 
       <div className="container mx-auto px-3 sm:px-6 relative z-10">
         <div className="text-center space-y-4 sm:space-y-6 mb-12 sm:mb-16 lg:mb-20">
