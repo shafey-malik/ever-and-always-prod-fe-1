@@ -48,7 +48,7 @@ const bestsellers = [
     price: '$12,500',
     image:
       'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=300&h=300&fit=crop',
-    description: '1.5ct Round Brilliant Diamond, Platinum Setting',
+    description: '1.5ct Round Diamond, Platinum Setting',
   },
   {
     id: 2,
@@ -78,12 +78,12 @@ const bestsellers = [
 
 export function TestimonialsSection() {
   return (
-    <section className="py-20 bg-gradient-to-b from-[hsl(var(--background))] to-[hsl(var(--card))]">
-      <div className="container mx-auto px-6">
+    <section className="py-20 bg-gradient-to-b from-[hsl(var(--background))] to-[hsl(var(--card))] overflow-x-hidden">
+      <div className="container mx-auto px-3 sm:px-6">
         {/* Testimonials */}
         <div className="mb-20">
           <div className="text-center space-y-4 mb-12">
-            <h2 className="font-luxury-serif text-4xl lg:text-5xl font-bold text-[hsl(var(--foreground))]">
+            <h2 className="font-luxury-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[hsl(var(--foreground))] break-words">
               What Our Clients Say
             </h2>
             <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-lg max-w-2xl mx-auto">
@@ -92,7 +92,7 @@ export function TestimonialsSection() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {testimonials.map((testimonial) => (
               <Card
                 key={testimonial.id}
@@ -145,7 +145,7 @@ export function TestimonialsSection() {
                 Premium Collection
               </span>
             </div>
-            <h2 className="font-luxury-serif text-5xl lg:text-6xl font-bold text-[hsl(var(--foreground))] leading-tight">
+            <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-[hsl(var(--foreground))] leading-tight break-words">
               Designer's Choice Collection
             </h2>
             <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-lg max-w-2xl mx-auto leading-relaxed">
@@ -154,7 +154,7 @@ export function TestimonialsSection() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
             {bestsellers.map((ring) => (
               <Card
                 key={ring.id}

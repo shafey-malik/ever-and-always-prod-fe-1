@@ -90,8 +90,8 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
   const caratFacets = facetGroups['carat'] || [];
 
   return (
-    <section className="py-20 bg-[hsl(var(--background))]">
-      <div className="container mx-auto px-6">
+    <section className="py-20 bg-[hsl(var(--background))] overflow-x-hidden">
+      <div className="container mx-auto px-3 sm:px-6">
         <div className="text-center space-y-4 mb-12">
           <h2 className="font-luxury-serif text-4xl lg:text-5xl font-bold text-[hsl(var(--foreground))]">
             Find Your Perfect Ring
@@ -102,7 +102,7 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
           </p>
         </div>
 
-        <Card className="bg-[hsl(var(--card))] rounded-2xl shadow-[var(--shadow-card)] p-8 max-w-6xl mx-auto min-h-[600px] border-0 transition-none" style={{ transform: 'translateY(-5px)' }}>
+        <Card className="bg-[hsl(var(--card))] rounded-2xl shadow-[var(--shadow-card)] p-4 sm:p-8 max-w-6xl mx-auto min-h-[600px] border-0 transition-none" style={{ transform: 'translateY(-5px)' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Shape Filter - Dynamic */}
             {shapeFacets.length > 0 && (
