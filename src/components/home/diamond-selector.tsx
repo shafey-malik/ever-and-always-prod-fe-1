@@ -62,7 +62,7 @@ export function DiamondSelector() {
   )?.centralImg;
 
   return (
-    <section className="py-24 bg-[hsl(var(--card))] relative overflow-hidden">
+    <section className="py-12 sm:py-24 bg-[hsl(var(--card))] relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/2 animate-pulse bg-[hsl(var(--secondary))]"></div>
       <div
@@ -70,31 +70,31 @@ export function DiamondSelector() {
         style={{ animationDelay: '1s' }}
       ></div>
 
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="text-center space-y-6 mb-16 lg:mb-20">
+      <div className="container mx-auto px-3 sm:px-6 relative z-10">
+        <div className="text-center space-y-4 sm:space-y-6 mb-12 sm:mb-16 lg:mb-20">
           <div className="inline-block">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="h-1 w-12 bg-gradient-to-r from-transparent to-[hsl(var(--primary))]"></div>
-              <span className="text-[hsl(var(--primary))] font-luxury-sans text-sm font-semibold tracking-widest uppercase">
+              <div className="h-1 w-8 sm:w-12 bg-gradient-to-r from-transparent to-[hsl(var(--primary))]"></div>
+              <span className="text-[hsl(var(--primary))] font-luxury-sans text-xs sm:text-sm font-semibold tracking-widest uppercase">
                 Discover
               </span>
-              <div className="h-1 w-12 bg-gradient-to-l from-transparent to-[hsl(var(--primary))]"></div>
+              <div className="h-1 w-8 sm:w-12 bg-gradient-to-l from-transparent to-[hsl(var(--primary))]"></div>
             </div>
           </div>
-          <h2 className="font-luxury-serif text-5xl lg:text-6xl font-bold bg-[hsl(var(--secondary))] bg-clip-text text-transparent">
+          <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-bold bg-[hsl(var(--secondary))] bg-clip-text text-transparent break-words">
             <span className="text-[hsl(var(--foreground))]">Select Your </span>{' '}
             Diamond <span className="text-[hsl(var(--foreground))]">Cut</span>
           </h2>
-          <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-lg max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed px-2">
             Each diamond cut reflects light differently, creating its own unique
             sparkle and character. Hover over each cut to discover your perfect
             match.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-20">
           {/* Circular Diamond Selector */}
-          <div className="relative w-96 h-96 flex-shrink-0 mx-auto lg:mx-0">
+          <div className="relative w-72 h-72 sm:w-96 sm:h-96 flex-shrink-0 mx-auto lg:mx-0">
             {/* Animated outer rings */}
             <div
               className="absolute inset-0 rounded-full border-2 border-[hsl(var(--primary))] opacity-20 animate-spin"
@@ -110,7 +110,7 @@ export function DiamondSelector() {
             <div className="absolute inset-8 rounded-full border border-[hsl(var(--primary))] opacity-10"></div>
 
             {/* Central Ring Image - Enhanced */}
-            <div className="absolute inset-16 bg-gradient-to-br from-white via-slate-50 to-slate-100 rounded-full shadow-2xl flex items-center justify-center group ring-2 ring-[hsl(var(--primary))]/20 transition-all duration-500 overflow-hidden">
+            <div className="absolute inset-12 sm:inset-16 bg-gradient-to-br from-white via-slate-50 to-slate-100 rounded-full shadow-2xl flex items-center justify-center group ring-2 ring-[hsl(var(--primary))]/20 transition-all duration-500 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--primary))]/5 to-transparent rounded-full group-hover:from-[hsl(var(--primary))]/10 transition-all duration-500"></div>
               {currentCentralImg && (
                 <Image
@@ -118,7 +118,7 @@ export function DiamondSelector() {
                   alt="Selected Diamond"
                   width={160}
                   height={160}
-                  className="w-40 h-40 object-contain rounded-full transition-all duration-500 drop-shadow-lg group-hover:drop-shadow-2xl group-hover:scale-105"
+                  className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-full transition-all duration-500 drop-shadow-lg group-hover:drop-shadow-2xl group-hover:scale-105"
                 />
               )}
             </div>
@@ -135,7 +135,7 @@ export function DiamondSelector() {
                   onClick={() => setSelectedDiamond(diamond.id)}
                   onMouseEnter={() => setHoveredDiamond(diamond.id)}
                   onMouseLeave={() => setHoveredDiamond(null)}
-                  className={`absolute w-20 h-20 rounded-full transition-all duration-300 flex items-center justify-center group relative cursor-pointer ${isActive ? 'z-50' : ''
+                  className={`absolute w-14 h-14 sm:w-20 sm:h-20 rounded-full transition-all duration-300 flex items-center justify-center group relative cursor-pointer ${isActive ? 'z-50' : ''
                     }`}
                   style={{
                     top: diamond.position.top,
@@ -168,12 +168,12 @@ export function DiamondSelector() {
                     alt={diamond.name}
                     width={48}
                     height={48}
-                    className="w-12 h-12 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110"
+                    className="w-8 h-8 sm:w-12 sm:h-12 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110"
                   />
 
                   {/* Tooltip */}
                   <div
-                    className={`absolute bottom-full mb-3 px-4 py-2 bg-gradient-to-r ${diamond.color} text-slate-900 text-sm font-luxury-sans font-semibold rounded-lg transition-all duration-200 whitespace-nowrap shadow-xl backdrop-blur-sm ${isHovered
+                    className={`absolute bottom-full mb-2 sm:mb-3 px-2 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r ${diamond.color} text-slate-900 text-xs sm:text-sm font-luxury-sans font-semibold rounded-lg transition-all duration-200 whitespace-nowrap shadow-xl backdrop-blur-sm ${isHovered
                       ? 'opacity-100 translate-y-0'
                       : 'opacity-0 translate-y-2 pointer-events-none'
                       }`}
@@ -198,7 +198,7 @@ export function DiamondSelector() {
           </div>
 
           {/* Selected Diamond Info - Enhanced */}
-          <div className="max-w-md w-full space-y-8 backdrop-blur-sm">
+          <div className="max-w-md w-full space-y-6 sm:space-y-8 backdrop-blur-sm px-2 sm:px-0">
             <div className="space-y-4 animate-fade-in">
               <div>
                 <div className="inline-block mb-3">
@@ -206,7 +206,7 @@ export function DiamondSelector() {
                     Featured Cut
                   </span>
                 </div>
-                <h3 className="font-luxury-serif text-4xl lg:text-5xl font-bold text-[hsl(var(--foreground))] capitalize transition-all duration-300">
+                <h3 className="font-luxury-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-[hsl(var(--foreground))] capitalize transition-all duration-300 break-words">
                   {diamondTypes.find((d) => d.id === selectedDiamond)?.name} Cut
                 </h3>
               </div>
@@ -216,7 +216,7 @@ export function DiamondSelector() {
             <div className="space-y-6 text-[hsl(var(--muted-foreground))] font-luxury-sans">
               {selectedDiamond === 'round' && (
                 <div className="space-y-4 animate-fade-in">
-                  <p className="text-base leading-relaxed">
+                  <p className="text-sm sm:text-base leading-relaxed">
                     The most popular diamond cut, known for its exceptional
                     brilliance and fire. The round brilliant cut maximizes light
                     return through its 58 facets.
@@ -240,7 +240,7 @@ export function DiamondSelector() {
 
               {selectedDiamond === 'princess' && (
                 <div className="space-y-4 animate-fade-in">
-                  <p className="text-base leading-relaxed">
+                  <p className="text-sm sm:text-base leading-relaxed">
                     A modern square cut that combines the brilliance of a round
                     with a contemporary geometric shape. Perfect for those who
                     love clean lines.
@@ -264,7 +264,7 @@ export function DiamondSelector() {
 
               {selectedDiamond === 'emerald' && (
                 <div className="space-y-4 animate-fade-in">
-                  <p className="text-base leading-relaxed">
+                  <p className="text-sm sm:text-base leading-relaxed">
                     A step-cut diamond featuring long, lean lines that create a
                     hall-of-mirrors effect. Emphasizes clarity and showcases the
                     diamond's natural beauty.
@@ -288,7 +288,7 @@ export function DiamondSelector() {
 
               {selectedDiamond === 'oval' && (
                 <div className="space-y-4 animate-fade-in">
-                  <p className="text-base leading-relaxed">
+                  <p className="text-sm sm:text-base leading-relaxed">
                     An elongated version of the round brilliant cut that offers
                     similar sparkle while creating the illusion of greater size
                     and elegant finger coverage.
@@ -312,7 +312,7 @@ export function DiamondSelector() {
 
               {selectedDiamond === 'cushion' && (
                 <div className="space-y-4 animate-fade-in">
-                  <p className="text-base leading-relaxed">
+                  <p className="text-sm sm:text-base leading-relaxed">
                     A romantic cut with rounded corners and larger facets that
                     create a soft, romantic glow. Perfect blend of old-world
                     charm and modern brilliance.
@@ -336,7 +336,7 @@ export function DiamondSelector() {
 
               {selectedDiamond === 'pear' && (
                 <div className="space-y-4 animate-fade-in">
-                  <p className="text-base leading-relaxed">
+                  <p className="text-sm sm:text-base leading-relaxed">
                     A unique combination of round and marquise cuts, creating an
                     elegant teardrop shape that's both classic and distinctive.
                   </p>
