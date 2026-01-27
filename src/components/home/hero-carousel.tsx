@@ -15,7 +15,7 @@ const slides = [
     subtitle: 'Classic solitaire engagement rings',
     description:
       'Discover the perfect symbol of eternal love with our exquisite collection of diamond solitaires.',
-    collectionLink: '/collection/solitaire',
+    collectionLink: '/collection/engagement-solitaire',
   },
   {
     id: 2,
@@ -24,7 +24,7 @@ const slides = [
     subtitle: 'Warm and sophisticated emerald cuts',
     description:
       'Embrace modern luxury with our stunning emerald cut diamonds in romantic rose gold settings.',
-    collectionLink: '/collection/rose-gold',
+    collectionLink: '/collection/engagement-emerald',
   },
   {
     id: 3,
@@ -33,7 +33,7 @@ const slides = [
     subtitle: 'Elegant oval diamonds with pavé detail',
     description:
       'Experience the brilliance of oval diamonds complemented by delicate pavé craftsmanship.',
-    collectionLink: '/collection/oval',
+    collectionLink: '/collection/engagement-oval',
   },
   {
     id: 4,
@@ -42,7 +42,7 @@ const slides = [
     subtitle: 'Ultimate luxury in platinum settings',
     description:
       'Indulge in the finest platinum settings featuring our most brilliant round diamonds.',
-    collectionLink: '/collection/platinum',
+    collectionLink: '/collection/engagement-round',
   },
 ];
 
