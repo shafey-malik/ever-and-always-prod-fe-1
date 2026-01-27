@@ -71,16 +71,16 @@ export default function AboutUsPage() {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                     <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up">
                         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))] mb-6 shadow-lg">
-                            <Sparkles className="w-10 h-10 text-white" />
+                            <Sparkles className="w-10 h-10 text-[hsl(var(--primary-foreground))]" />
                         </div>
-                        
+
                         <h1 className="font-luxury-serif text-4xl sm:text-5xl lg:text-7xl font-light text-[hsl(var(--foreground))] leading-tight">
                             Celebrating Love,<br />
                             <span className="text-[hsl(var(--secondary))]">One Moment at a Time</span>
                         </h1>
-                        
+
                         <p className="text-lg sm:text-xl lg:text-2xl text-[hsl(var(--muted-foreground))] font-luxury-sans max-w-3xl mx-auto leading-relaxed">
-                            We believe every love story deserves to be told through exceptional jewelry. 
+                            We believe every love story deserves to be told through exceptional jewelry.
                             For over two decades, we've been crafting pieces that capture life's most precious moments.
                         </p>
 
@@ -102,21 +102,21 @@ export default function AboutUsPage() {
 
                         <div className="space-y-6 text-[hsl(var(--muted-foreground))] font-luxury-sans text-base sm:text-lg leading-relaxed animate-fade-in-up" style={{ animationDelay: '100ms' }}>
                             <p>
-                                Ever & Always began with a simple vision: to create jewelry that would be treasured for generations. 
-                                Founded in 2003 by master jeweler Michael Chen, our journey started in a small workshop where every piece 
+                                Ever & Always began with a simple vision: to create jewelry that would be treasured for generations.
+                                Founded in 2003 by master jeweler Michael Chen, our journey started in a small workshop where every piece
                                 was crafted with meticulous care and unwavering attention to detail.
                             </p>
-                            
+
                             <p>
-                                Michael's passion for exceptional craftsmanship and his belief that jewelry should tell a story led him 
-                                to source only the finest diamonds and precious metals. He understood that an engagement ring, a wedding 
-                                band, or any piece of fine jewelry represents more than just an accessory—it's a symbol of love, commitment, 
+                                Michael's passion for exceptional craftsmanship and his belief that jewelry should tell a story led him
+                                to source only the finest diamonds and precious metals. He understood that an engagement ring, a wedding
+                                band, or any piece of fine jewelry represents more than just an accessory—it's a symbol of love, commitment,
                                 and cherished memories.
                             </p>
-                            
+
                             <p>
-                                Today, while we've grown from that small workshop into a trusted name in fine jewelry, our core values 
-                                remain unchanged. Every piece we create is still crafted with the same dedication to quality and artistry 
+                                Today, while we've grown from that small workshop into a trusted name in fine jewelry, our core values
+                                remain unchanged. Every piece we create is still crafted with the same dedication to quality and artistry
                                 that defined our beginnings. We're honored to be part of your story.
                             </p>
                         </div>
@@ -130,30 +130,30 @@ export default function AboutUsPage() {
                     <div className="max-w-6xl mx-auto">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
                             <Card className="border-none shadow-none bg-transparent animate-fade-in-up">
-                                <CardContent className="p-8 lg:p-10 bg-gradient-to-br from-[hsl(var(--accent))] to-transparent border border-[hsl(var(--border))] rounded-2xl">
+                                <CardContent className="p-8 lg:p-10 bg-[hsl(var(--card))] border border-[hsl(var(--background))] rounded-2xl shadow-lg">
                                     <div className="w-14 h-14 rounded-full bg-[hsl(var(--secondary))] flex items-center justify-center mb-6">
-                                        <Heart className="w-7 h-7 text-white" />
+                                        <Heart className="w-7 h-7 text-[hsl(var(--foreground))]" />
                                     </div>
                                     <h3 className="font-luxury-serif text-2xl sm:text-3xl font-light text-[hsl(var(--foreground))] mb-4">
                                         Our Mission
                                     </h3>
-                                    <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans leading-relaxed">
-                                        To create exceptional jewelry that celebrates life's most meaningful moments, 
+                                    <p className="text-[hsl(var(--foreground))] opacity-70 font-luxury-sans leading-relaxed">
+                                        To create exceptional jewelry that celebrates life's most meaningful moments,
                                         combining timeless design with uncompromising quality and personalized service.
                                     </p>
                                 </CardContent>
                             </Card>
 
                             <Card className="border-none shadow-none bg-transparent animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-                                <CardContent className="p-8 lg:p-10 bg-gradient-to-br from-[hsl(var(--accent))] to-transparent border border-[hsl(var(--border))] rounded-2xl">
+                                <CardContent className="p-8 lg:p-10 bg-[hsl(var(--card))] border border-[hsl(var(--background))] rounded-2xl shadow-lg">
                                     <div className="w-14 h-14 rounded-full bg-[hsl(var(--secondary))] flex items-center justify-center mb-6">
-                                        <Sparkles className="w-7 h-7 text-white" />
+                                        <Sparkles className="w-7 h-7 text-[hsl(var(--foreground))]" />
                                     </div>
                                     <h3 className="font-luxury-serif text-2xl sm:text-3xl font-light text-[hsl(var(--foreground))] mb-4">
                                         Our Vision
                                     </h3>
-                                    <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans leading-relaxed">
-                                        To be the most trusted name in fine jewelry, known for our integrity, craftsmanship, 
+                                    <p className="text-[hsl(var(--foreground))] opacity-70 font-luxury-sans leading-relaxed">
+                                        To be the most trusted name in fine jewelry, known for our integrity, craftsmanship,
                                         and dedication to making every customer's experience extraordinary.
                                     </p>
                                 </CardContent>
@@ -179,14 +179,14 @@ export default function AboutUsPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                             {differentiators.map((item, index) => (
-                                <Card 
+                                <Card
                                     key={index}
                                     className="group hover:shadow-lg transition-all duration-300 border border-[hsl(var(--border))] animate-fade-in-up"
                                     style={{ animationDelay: `${index * 100}ms` }}
                                 >
                                     <CardContent className="p-8">
                                         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))] flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
-                                            <item.icon className="w-6 h-6 text-white" />
+                                            <item.icon className="w-6 h-6 text-[hsl(var(--primary-foreground))]" />
                                         </div>
                                         <h3 className="font-luxury-serif text-xl font-semibold text-[hsl(var(--foreground))] mb-3">
                                             {item.title}
@@ -217,7 +217,7 @@ export default function AboutUsPage() {
 
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                             {values.map((value, index) => (
-                                <div 
+                                <div
                                     key={index}
                                     className="text-center space-y-4 animate-fade-in-up"
                                     style={{ animationDelay: `${index * 100}ms` }}
@@ -245,9 +245,9 @@ export default function AboutUsPage() {
                         <h2 className="font-luxury-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))]">
                             Let's Create Something Beautiful Together
                         </h2>
-                        
+
                         <p className="text-lg sm:text-xl text-[hsl(var(--muted-foreground))] font-luxury-sans max-w-2xl mx-auto">
-                            Whether you're looking for the perfect engagement ring, a special gift, or a custom piece, 
+                            Whether you're looking for the perfect engagement ring, a special gift, or a custom piece,
                             we're here to help bring your vision to life.
                         </p>
 
@@ -259,8 +259,8 @@ export default function AboutUsPage() {
                                 </Button>
                             </Link>
                             <Link href="/search">
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="outline"
                                     className="px-8 py-6 text-base border-2 hover:bg-[hsl(var(--accent))] transition-all duration-300"
                                 >
                                     Explore Collections
@@ -274,15 +274,15 @@ export default function AboutUsPage() {
                                 Have questions? We're here to help.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm">
-                                <a 
-                                    href="tel:+15551234567" 
+                                <a
+                                    href="tel:+15551234567"
                                     className="text-[hsl(var(--foreground))] hover:text-[hsl(var(--secondary))] transition-colors flex items-center gap-2"
                                 >
                                     <span className="font-medium">Call us:</span> +1 (555) 123-4567
                                 </a>
                                 <span className="hidden sm:inline text-[hsl(var(--border))]">|</span>
-                                <a 
-                                    href="mailto:hello@everandalways.com" 
+                                <a
+                                    href="mailto:hello@everandalways.com"
                                     className="text-[hsl(var(--foreground))] hover:text-[hsl(var(--secondary))] transition-colors flex items-center gap-2"
                                 >
                                     <span className="font-medium">Email:</span> hello@everandalways.com

@@ -19,7 +19,7 @@ export default function ConsultationPage() {
             <section className="relative py-20 sm:py-24 lg:py-32 bg-gradient-to-b from-[hsl(var(--card))] to-[hsl(var(--background))]">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="max-w-3xl mx-auto text-center space-y-6 animate-fade-in-up">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--accent))] mb-4">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[hsl(var(--secondary))] mb-4">
                             <Sparkles className="w-8 h-8 text-[hsl(var(--accent-foreground))]" />
                         </div>
                         <h1 className="font-luxury-serif text-4xl sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))]">
