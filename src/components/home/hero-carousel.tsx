@@ -15,6 +15,7 @@ const slides = [
     subtitle: 'Classic solitaire engagement rings',
     description:
       'Discover the perfect symbol of eternal love with our exquisite collection of diamond solitaires.',
+    collectionLink: '/collection/solitaire',
   },
   {
     id: 2,
@@ -23,6 +24,7 @@ const slides = [
     subtitle: 'Warm and sophisticated emerald cuts',
     description:
       'Embrace modern luxury with our stunning emerald cut diamonds in romantic rose gold settings.',
+    collectionLink: '/collection/rose-gold',
   },
   {
     id: 3,
@@ -31,6 +33,7 @@ const slides = [
     subtitle: 'Elegant oval diamonds with pavé detail',
     description:
       'Experience the brilliance of oval diamonds complemented by delicate pavé craftsmanship.',
+    collectionLink: '/collection/oval',
   },
   {
     id: 4,
@@ -39,6 +42,7 @@ const slides = [
     subtitle: 'Ultimate luxury in platinum settings',
     description:
       'Indulge in the finest platinum settings featuring our most brilliant round diamonds.',
+    collectionLink: '/collection/platinum',
   },
 ];
 
@@ -143,7 +147,7 @@ export function HeroCarousel() {
                   className="flex flex-col sm:flex-row gap-4 sm:gap-5 pt-4 sm:pt-6 w-full sm:w-auto"
                 >
                   <Link
-                    href="/search"
+                    href={slides[currentSlide].collectionLink}
                     className="btn-luxury text-[hsl(var(--secondary))] hover:text-[hsl(var(--background))] px-8 sm:px-10 py-3 sm:py-3.5 text-sm sm:text-base font-normal tracking-wide w-full sm:w-auto flex items-center justify-center cursor-pointer"
                   >
                     <Calendar className="w-4 h-4 mr-2" />
