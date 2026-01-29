@@ -29,7 +29,7 @@ interface FilterSectionProps {
 
 export function FilterSection({ facetValues = [] }: FilterSectionProps) {
   const router = useRouter();
-  const [priceRange, setPriceRange] = useState([1000, 50000]);
+  const [priceRange, setPriceRange] = useState([100, 50000]);
   const [selectedFacets, setSelectedFacets] = useState<Record<string, string>>({
     shape: '',
     setting: '',
@@ -62,7 +62,7 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
       size: '',
       carat: '',
     });
-    setPriceRange([1000, 50000]);
+    setPriceRange([100, 50000]);
   };
 
   const navigateToSearch = () => {
@@ -257,7 +257,7 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 mt-8 pt-8 border-t border-[hsl(var(--border))]">
             <button
-              className="btn-luxury hover:text-[hsl(var(--primary))] flex-1 flex items-center justify-center cursor-pointer"
+              className="btn-luxury text-[hsl(var(--secondary))] hover:text-[hsl(var(--primary))] flex-1 flex items-center justify-center cursor-pointer"
               onClick={navigateToSearch}
             >
               <Search className="w-5 h-5 mr-2" />

@@ -10,7 +10,7 @@ const testimonials = [
     rating: 5,
     text: "The most beautiful ring I've ever seen! The team at Luxe Diamonds helped me find exactly what I was looking for. The craftsmanship is absolutely exceptional.",
     image:
-      'https://images.unsplash.com/photo-1494790108755-2616b612b593?w=150&h=150&fit=crop&crop=face',
+      'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
   },
   {
     id: 2,
@@ -63,7 +63,7 @@ const bestsellers = [
     name: 'Modern Emerald',
     price: '$22,750',
     image:
-      'https://images.unsplash.com/photo-1596944946094-0f47c48df3e4?w=300&h=300&fit=crop',
+      'https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=300&h=300&fit=crop',
     description: '1.8ct Emerald Cut Diamond, White Gold',
   },
   {
@@ -71,7 +71,7 @@ const bestsellers = [
     name: 'Three Stone Legacy',
     price: '$15,400',
     image:
-      'https://images.unsplash.com/photo-1588444650733-de72c75ad2d6?w=300&h=300&fit=crop',
+      'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=300&h=300&fit=crop',
     description: '1ct Center with 0.5ct Side Stones, Platinum',
   },
 ];
