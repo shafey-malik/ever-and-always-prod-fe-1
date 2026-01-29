@@ -229,7 +229,7 @@ export function DiamondSelector() {
                 href={getCollectionLink(selectedDiamond)}
                 className="inline-block mt-4 sm:mt-6"
               >
-                <button className="btn-luxury text-[hsl(var(--secondary))] hover:text-[hsl(var(--background))] px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-normal tracking-wide transition-all duration-300 cursor-pointer">
+                <button className="bg-[hsl(var(--card))] px-5 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 text-xs sm:text-sm md:text-base font-normal border border-[hsl(var(--foreground))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--lead-text))] hover:text-[hsl(var(--background))] transition-all duration-500 tracking-wide w-full sm:w-auto rounded-lg cursor-pointer flex items-center justify-center">
                   View {diamondTypes.find((d) => d.id === selectedDiamond)?.name} Collection
                 </button>
               </Link>
@@ -383,6 +383,6 @@ export function DiamondSelector() {
         </div>
       </div>
 
-    </section>
+    </section >
   );
 }
