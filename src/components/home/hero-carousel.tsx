@@ -97,12 +97,12 @@ export function HeroCarousel() {
         >
           <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 h-full">
             {/* Content */}
-            <div className="px-3 sm:px-8 lg:px-20 xl:px-32 py-6 sm:py-12 lg:py-0 z-10 flex flex-col justify-center bg-[hsl(var(--background))] lg:bg-transparent">
+            <div className="px-3 sm:px-6 md:px-8 lg:px-20 xl:px-32 py-6 sm:py-10 md:py-12 lg:py-0 z-10 flex flex-col justify-center bg-[hsl(var(--background))] lg:bg-transparent">
               <motion.div
                 initial={{ y: 30, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.7 }}
-                className="max-w-2xl space-y-4 sm:space-y-8 w-full"
+                className="max-w-2xl space-y-4 sm:space-y-6 md:space-y-8 w-full"
               >
                 {/* Decorative line */}
                 <motion.div
@@ -112,12 +112,12 @@ export function HeroCarousel() {
                   className="h-1 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--secondary))]"
                 />
 
-                <div className="space-y-2 sm:space-y-4">
+                <div className="space-y-2 sm:space-y-3 md:space-y-4">
                   <motion.p
                     initial={{ y: 15, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.35 }}
-                    className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-xs sm:text-sm uppercase tracking-[0.15em] font-light"
+                    className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-xs sm:text-sm md:text-sm uppercase tracking-[0.15em] font-light"
                   >
                     {slides[currentSlide].subtitle}
                   </motion.p>
@@ -125,7 +125,7 @@ export function HeroCarousel() {
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ delay: 0.25, duration: 0.8 }}
-                    className="font-luxury-serif text-3xl sm:text-5xl lg:text-7xl xl:text-8xl font-light text-[hsl(var(--foreground))] leading-tight tracking-tight break-words"
+                    className="font-luxury-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-light text-[hsl(var(--foreground))] leading-tight tracking-tight break-words"
                   >
                     {slides[currentSlide].title}
                   </motion.h1>
@@ -135,7 +135,7 @@ export function HeroCarousel() {
                   initial={{ y: 15, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-xs sm:text-base lg:text-lg leading-relaxed max-w-md font-light"
+                  className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed max-w-md font-light"
                 >
                   {slides[currentSlide].description}
                 </motion.p>
@@ -144,18 +144,18 @@ export function HeroCarousel() {
                   initial={{ y: 15, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-5 pt-3 sm:pt-6 w-full sm:w-auto"
+                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 pt-3 sm:pt-5 md:pt-6 w-full sm:w-auto"
                 >
                   <Link
                     href={slides[currentSlide].collectionLink}
-                    className="btn-luxury text-[hsl(var(--secondary))] hover:text-[hsl(var(--background))] px-6 sm:px-10 py-2.5 sm:py-3.5 text-xs sm:text-base font-normal tracking-wide w-full sm:w-auto flex items-center justify-center cursor-pointer"
+                    className="btn-luxury text-[hsl(var(--secondary))] hover:text-[hsl(var(--background))] px-5 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 text-xs sm:text-sm md:text-base font-normal tracking-wide w-full sm:w-auto flex items-center justify-center cursor-pointer"
                   >
-                    <Calendar className="w-4 h-4 mr-2" />
+                    <Calendar className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 mr-2 flex-shrink-0" />
                     View Collection
                   </Link>
                   <Link
                     href="/consultation"
-                    className="bg-[hsl(var(--card))] px-6 sm:px-10 py-2.5 sm:py-3.5 text-xs sm:text-base font-normal border border-[hsl(var(--foreground))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--secondary))] transition-all duration-500 tracking-wide w-full sm:w-auto rounded-lg cursor-pointer flex items-center justify-center"
+                    className="bg-[hsl(var(--card))] px-5 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 text-xs sm:text-sm md:text-base font-normal border border-[hsl(var(--foreground))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--secondary))] transition-all duration-500 tracking-wide w-full sm:w-auto rounded-lg cursor-pointer flex items-center justify-center"
                   >
                     Book Consultation
                   </Link>
@@ -168,7 +168,7 @@ export function HeroCarousel() {
               initial={{ scale: 1.05, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.1, duration: 0.8 }}
-              className="relative flex-1 min-h-[40vh] sm:min-h-[45vh] lg:min-h-0 w-full overflow-hidden"
+              className="relative flex-1 min-h-[40vh] sm:min-h-[42vh] md:min-h-[45vh] lg:min-h-0 w-full overflow-hidden"
             >
               <Image
                 src={slides[currentSlide].image}
@@ -193,21 +193,21 @@ export function HeroCarousel() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="absolute inset-0 top-40 sm:top-8 lg:inset-0 pointer-events-none flex items-start lg:items-center justify-between px-2 sm:px-8 lg:px-12 z-20"
+        className="absolute left-0 right-0 top-[30vh] sm:top-8 md:top-12 lg:top-0 lg:bottom-0 pointer-events-none flex items-start lg:items-center justify-between px-2 sm:px-6 md:px-8 lg:px-12 z-20"
       >
         <button
           type="button"
           onClick={prevSlide}
-          className="pointer-events-auto bg-white/8 backdrop-blur-md hover:bg-white/15 border border-white/10 rounded-full p-2 sm:p-4 transition-all duration-300 hover:scale-110 group z-30 cursor-pointer"
+          className="pointer-events-auto bg-white/8 backdrop-blur-md hover:bg-white/15 border border-white/10 rounded-full p-2.5 sm:p-3.5 md:p-4 transition-all duration-300 hover:scale-110 group z-30 cursor-pointer flex-shrink-0"
         >
-          <ChevronLeft className="w-4 h-4 sm:w-6 sm:h-6 text-[hsl(var(--secondary))] group-hover:text-[hsl(var(--primary))]" />
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[hsl(var(--secondary))] group-hover:text-[hsl(var(--primary))]" />
         </button>
         <button
           type="button"
           onClick={nextSlide}
-          className="pointer-events-auto bg-white/8 backdrop-blur-md hover:bg-white/15 border border-white/10 rounded-full p-2 sm:p-4 transition-all duration-300 hover:scale-110 group z-30 cursor-pointer"
+          className="pointer-events-auto bg-white/8 backdrop-blur-md hover:bg-white/15 border border-white/10 rounded-full p-2.5 sm:p-3.5 md:p-4 transition-all duration-300 hover:scale-110 group z-30 cursor-pointer flex-shrink-0"
         >
-          <ChevronRight className="w-4 h-4 sm:w-6 sm:h-6 text-[hsl(var(--secondary))] group-hover:text-[hsl(var(--primary))]" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[hsl(var(--secondary))] group-hover:text-[hsl(var(--primary))]" />
         </button>
       </motion.div>
 
@@ -216,16 +216,16 @@ export function HeroCarousel() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
-        className="absolute bottom-4 sm:bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-4"
+        className="absolute bottom-4 sm:bottom-8 md:bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-3 md:space-x-4 z-20"
       >
         {slides.map((_, index) => (
           <motion.button
             key={index}
             onClick={() => goToSlide(index)}
             whileHover={{ scale: 1.2 }}
-            className={`transition-all duration-500 rounded-full cursor-pointer ${index === currentSlide
-              ? 'w-6 sm:w-10 h-1.5 sm:h-2.5 bg-gradient-to-r from-[hsl(var(--rose-gold))] to-[hsl(var(--rose-gold))]'
-              : 'w-1.5 sm:w-2.5 h-1.5 sm:h-2.5 bg-white hover:bg-white/40 border border-black/10'
+            className={`transition-all duration-500 rounded-full cursor-pointer flex-shrink-0 ${index === currentSlide
+              ? 'w-6 sm:w-8 md:w-10 h-1.5 sm:h-2 md:h-2.5 bg-gradient-to-r from-[hsl(var(--rose-gold))] to-[hsl(var(--rose-gold))]'
+              : 'w-1.5 sm:w-2 md:w-2.5 h-1.5 sm:h-2 md:h-2.5 bg-white hover:bg-white/40 border border-black/10'
               }`}
           />
         ))}
