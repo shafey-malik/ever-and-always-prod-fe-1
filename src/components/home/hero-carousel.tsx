@@ -193,7 +193,7 @@ export function HeroCarousel() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1 }}
-        className="absolute inset-0 pointer-events-none flex items-center justify-between px-2 sm:px-8 lg:px-12 z-20"
+        className="absolute inset-0 top-40 sm:top-8 lg:inset-0 pointer-events-none flex items-start lg:items-center justify-between px-2 sm:px-8 lg:px-12 z-20"
       >
         <button
           type="button"
