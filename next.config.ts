@@ -4,10 +4,10 @@ const nextConfig: NextConfig = {
     // cacheComponents disabled - causes build issues with dynamic routes
     // Using React cache() instead for data caching
     // Fix workspace root warning by explicitly setting the root
-    typescript: {
-        // Ignore TypeScript errors during build (e.g., implicit any types)
-        ignoreBuildErrors: true,
-    },
+    // typescript: {
+    //     // Ignore TypeScript errors during build (e.g., implicit any types)
+    //     ignoreBuildErrors: true,
+    // },
     turbopack: {
         root: process.cwd(),
     },
@@ -27,10 +27,10 @@ const nextConfig: NextConfig = {
                 hostname: 'images.unsplash.com'
             },
             {
-                hostname: 'www.my-shop.com'
+                hostname: 'everandalways.com'
             },
             {
-                hostname: 'my-shop.com'
+                hostname: 'www.everandalways.com'
             }
         ],
     },
