@@ -31,6 +31,16 @@ const nextConfig: NextConfig = {
             },
             {
                 hostname: 'www.everandalways.com'
+            },
+            {
+                // Cloudflare R2 public bucket URL (r2.dev subdomain or custom domain)
+                hostname: '*.r2.dev'
+            },
+            {
+                hostname: '*.r2.cloudflarestorage.com'
+            },
+            {
+                hostname: 'backend-production-28e0.up.railway.app'
             }
         ],
     },
