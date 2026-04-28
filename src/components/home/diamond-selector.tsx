@@ -3,14 +3,32 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 
+/**
+ * Thumbnail positions computed on a perfect hexagonal circle.
+ *
+ * Container: w-72 (288px) on mobile, w-96 (384px) on sm+.
+ * Orbit radius: 46% of container (thumbnail centres at 46% from container centre).
+ * Starting angle: –90° (12 o'clock), stepping +60° clockwise.
+ *
+ *   i  angle   cos       sin        left           top
+ *   0  -90°    0        -1         50%             4%
+ *   1  -30°    0.866   -0.5        89.8%           27%
+ *   2   30°    0.866    0.5        89.8%           73%
+ *   3   90°    0         1         50%             96%
+ *   4  150°   -0.866    0.5        10.2%           73%
+ *   5  210°   -0.866   -0.5        10.2%           27%
+ *
+ * translate(-50%, -50%) centres each button on its coordinate.
+ */
 const diamondTypes = [
   {
     id: 'round',
     name: 'Round',
     img: '/round.png',
     centralImg: '/round.png',
-    position: { top: '0%', left: '50%' },
+    position: { top: '4%', left: '50%' },        // 12 o'clock
     color: 'from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))]',
   },
   {
@@ -18,7 +36,7 @@ const diamondTypes = [
     name: 'Princess',
     img: '/princess.png',
     centralImg: '/princess.png',
-    position: { top: '5%', left: '95%' },
+    position: { top: '27%', left: '89.8%' },    // 2 o'clock
     color: 'from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))]',
   },
   {
@@ -26,7 +44,7 @@ const diamondTypes = [
     name: 'Emerald',
     img: '/emerald.png',
     centralImg: '/emerald.png',
-    position: { top: '35%', left: '95%' },
+    position: { top: '73%', left: '89.8%' },    // 4 o'clock
     color: 'from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))]',
   },
   {
@@ -34,7 +52,7 @@ const diamondTypes = [
     name: 'Oval',
     img: '/oval.png',
     centralImg: '/oval.png',
-    position: { top: '40%', left: '50%' },
+    position: { top: '96%', left: '50%' },      // 6 o'clock
     color: 'from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))]',
   },
   {
@@ -42,7 +60,7 @@ const diamondTypes = [
     name: 'Cushion',
     img: '/cushion.png',
     centralImg: '/cushion.png',
-    position: { top: '-5%', left: '5%' },
+    position: { top: '73%', left: '10.2%' },    // 8 o'clock
     color: 'from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))]',
   },
   {
@@ -50,12 +68,38 @@ const diamondTypes = [
     name: 'Pear',
     img: '/pear.png',
     centralImg: '/pear.png',
-    position: { top: '-80%', left: '5%' },
+    position: { top: '27%', left: '10.2%' },    // 10 o'clock
     color: 'from-[hsl(var(--secondary))] to-[hsl(var(--secondary-rich))]',
   },
 ];
 
-// Map diamond IDs to collection slugs
+const diamondDescriptions: Record<string, { body: string; traits: string[] }> = {
+  round: {
+    body: 'The most popular diamond cut, known for its exceptional brilliance and fire. The round brilliant cut maximizes light return through its 58 facets.',
+    traits: ['Maximum brilliance and sparkle', 'Timeless and classic appeal', 'Excellent for all ring styles'],
+  },
+  princess: {
+    body: 'A modern square cut that combines the brilliance of a round with a contemporary geometric shape. Perfect for those who love clean lines.',
+    traits: ['Modern and sophisticated', 'Brilliant sparkle', 'Great value proposition'],
+  },
+  emerald: {
+    body: "A step-cut diamond featuring long, lean lines that create a hall-of-mirrors effect. Emphasizes clarity and showcases the diamond's natural beauty.",
+    traits: ['Elegant hall-of-mirrors effect', 'Vintage-inspired glamour', 'Emphasizes diamond clarity'],
+  },
+  oval: {
+    body: 'An elongated version of the round brilliant cut that offers similar sparkle while creating the illusion of greater size and elegant finger coverage.',
+    traits: ['Elongated elegant appearance', 'Creates illusion of larger size', 'Flattering on all hand types'],
+  },
+  cushion: {
+    body: 'A romantic cut with rounded corners and larger facets that create a soft, romantic glow. Perfect blend of old-world charm and modern brilliance.',
+    traits: ['Romantic vintage appeal', 'Soft, pillow-like appearance', 'Excellent fire and brilliance'],
+  },
+  pear: {
+    body: "A unique combination of round and marquise cuts, creating an elegant teardrop shape that's both classic and distinctive.",
+    traits: ['Unique teardrop silhouette', 'Elongates the finger', 'Distinctive and eye-catching'],
+  },
+};
+
 const getCollectionLink = (diamondId: string): string => {
   const collectionMap: Record<string, string> = {
     round: 'round-cut-diamond-rings',
@@ -65,324 +109,227 @@ const getCollectionLink = (diamondId: string): string => {
     cushion: 'cushion-cut-diamond-rings',
     pear: 'pear-shaped-diamond-rings',
   };
-  const slug = collectionMap[diamondId] || 'round-cut-diamond-rings';
-  return `/collection/${slug}`;
+  return `/collection/${collectionMap[diamondId] || 'round-cut-diamond-rings'}`;
 };
 
 export function DiamondSelector() {
   const [selectedDiamond, setSelectedDiamond] = useState('round');
   const [hoveredDiamond, setHoveredDiamond] = useState<string | null>(null);
-  const currentCentralImg = diamondTypes.find((d) =>
-    hoveredDiamond ? d.id === hoveredDiamond : d.id === selectedDiamond,
-  )?.centralImg;
+  const [rippling, setRippling] = useState<string | null>(null);
+
+  const activeDiamond = hoveredDiamond || selectedDiamond;
+  const activeData = diamondTypes.find((d) => d.id === activeDiamond)!;
+  const activeDesc = diamondDescriptions[activeDiamond];
+
+  const handleSelect = (id: string) => {
+    if (id === selectedDiamond) return;
+    setSelectedDiamond(id);
+    setRippling(id);
+    setTimeout(() => setRippling(null), 700);
+  };
 
   return (
-    <section className="py-12 sm:py-24 bg-[hsl(var(--card))] relative overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 rounded-full blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 rounded-full blur-3xl opacity-20 translate-x-1/2 translate-y-1/2"></div>
+    <section className="py-12 sm:py-24 bg-[hsl(var(--surface-champagne))] dark:bg-[hsl(var(--surface-alt))] relative overflow-hidden">
 
-      <div className="container mx-auto px-3 sm:px-6 relative z-10">
-        <div className="text-center space-y-4 sm:space-y-6 mb-12 sm:mb-16 lg:mb-20">
-          <div className="inline-block">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="h-1 w-8 sm:w-12 bg-gradient-to-r from-transparent to-[hsl(var(--primary))]"></div>
-              <span className="text-[hsl(var(--primary))] font-luxury-sans text-xs sm:text-sm font-semibold tracking-widest uppercase">
-                Discover
-              </span>
-              <div className="h-1 w-8 sm:w-12 bg-gradient-to-l from-transparent to-[hsl(var(--primary))]"></div>
-            </div>
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+
+        {/* Section heading */}
+        <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <div className="h-px w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
+            <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.35em] uppercase">
+              Discover
+            </span>
+            <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
           </div>
-          <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-bold bg-[hsl(var(--secondary))] bg-clip-text text-transparent break-words">
-            <span className="text-[hsl(var(--foreground))]">Select Your </span>{' '}
-            Diamond <span className="text-[hsl(var(--foreground))]">Cut</span>
+          <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-tight">
+            Select Your{' '}
+            <span className="italic text-[hsl(var(--secondary))]">Diamond</span>{' '}
+            Cut
           </h2>
-          <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-lg max-w-2xl mx-auto leading-relaxed px-2">
-            Each diamond cut reflects light differently, creating its own unique
-            sparkle and character. Hover over each cut to discover your perfect
-            match.
+          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-base max-w-lg mx-auto leading-relaxed px-2">
+            Each cut reflects light differently, creating its own unique sparkle
+            and character. Hover to discover your perfect match.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 lg:gap-20">
-          {/* Circular Diamond Selector */}
-          <div className="relative w-72 h-72 sm:w-96 sm:h-96 flex-shrink-0 mx-auto lg:mx-0">
-            {/* Animated outer rings */}
+        {/* Main layout: circle + info */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 sm:gap-16 lg:gap-20">
+
+          {/* ── Circular selector ── */}
+          <div className="relative w-72 h-72 sm:w-96 sm:h-96 shrink-0 mx-auto lg:mx-0">
+
+            {/* Spinning rings */}
             <div
-              className="absolute inset-0 rounded-full border-2 border-[hsl(var(--primary))] opacity-20 animate-spin"
+              className="absolute inset-0 rounded-full border-2 border-[hsl(var(--secondary))] opacity-20 animate-spin"
               style={{ animationDuration: '20s' }}
-            ></div>
+            />
             <div
               className="absolute inset-4 rounded-full border border-[hsl(var(--secondary))] opacity-10 animate-spin"
-              style={{
-                animationDuration: '30s',
-                animationDirection: 'reverse',
-              }}
-            ></div>
-            <div className="absolute inset-8 rounded-full border border-[hsl(var(--primary))] opacity-10"></div>
+              style={{ animationDuration: '30s', animationDirection: 'reverse' }}
+            />
+            <div className="absolute inset-8 rounded-full border border-[hsl(var(--secondary))] opacity-10" />
 
-            {/* Central Ring Image - Enhanced */}
-            <div className="absolute inset-12 sm:inset-16 bg-gradient-to-br from-white via-slate-50 to-slate-100 rounded-full shadow-2xl flex items-center justify-center group ring-2 ring-[hsl(var(--primary))]/20 transition-all duration-500 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[hsl(var(--primary))]/5 to-transparent rounded-full group-hover:from-[hsl(var(--primary))]/10 transition-all duration-500"></div>
-              {currentCentralImg && (
-                <Image
-                  src={currentCentralImg}
-                  alt="Selected Diamond"
-                  width={160}
-                  height={160}
-                  className="w-32 h-32 sm:w-40 sm:h-40 object-contain rounded-full transition-all duration-500 drop-shadow-lg group-hover:drop-shadow-2xl group-hover:scale-105"
-                />
-              )}
+            {/* Central disc — always light so the diamond image is visible */}
+            <div className="absolute inset-16 sm:inset-20 bg-linear-to-br from-white via-slate-50 to-slate-100 rounded-full shadow-2xl flex items-center justify-center ring-2 ring-[hsl(var(--secondary)/0.2)] overflow-hidden">
+              <div className="absolute inset-0 bg-linear-to-br from-[hsl(var(--secondary)/0.08)] to-transparent" />
+              {/* Image crossfades when selection changes */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedDiamond}
+                  initial={{ opacity: 0, scale: 0.75, rotate: -8 }}
+                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                  exit={{ opacity: 0, scale: 0.75, rotate: 8 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative z-10"
+                >
+                  <Image
+                    src={activeData.centralImg}
+                    alt={activeData.name}
+                    width={160}
+                    height={160}
+                    className="w-28 h-28 sm:w-36 sm:h-36 object-contain drop-shadow-lg"
+                    priority
+                  />
+                </motion.div>
+              </AnimatePresence>
             </div>
 
-            {/* Diamond Cut Buttons - Enhanced with animations */}
+            {/* Orbital thumbnail buttons */}
             {diamondTypes.map((diamond) => {
               const isSelected = selectedDiamond === diamond.id;
               const isHovered = hoveredDiamond === diamond.id;
               const isActive = isSelected || isHovered;
+              const isRippling = rippling === diamond.id;
 
               return (
                 <button
                   key={diamond.id}
-                  onClick={() => setSelectedDiamond(diamond.id)}
+                  onClick={() => handleSelect(diamond.id)}
                   onMouseEnter={() => setHoveredDiamond(diamond.id)}
                   onMouseLeave={() => setHoveredDiamond(null)}
-                  className={`absolute w-14 h-14 sm:w-20 sm:h-20 rounded-full transition-all duration-300 flex items-center justify-center group relative cursor-pointer ${isActive ? 'z-50' : ''
-                    }`}
+                  className={`absolute w-14 h-14 sm:w-20 sm:h-20 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${
+                    isActive ? 'z-50' : 'z-10'
+                  }`}
                   style={{
                     top: diamond.position.top,
                     left: diamond.position.left,
                     transform: isActive
-                      ? 'translate(-50%, -50%) scale(1.25)'
+                      ? 'translate(-50%, -50%) scale(1.2)'
                       : 'translate(-50%, -50%)',
-                    transformOrigin: 'center center',
                   }}
                 >
-                  {/* Animated background glow */}
-                  <div
-                    className={`absolute inset-0 rounded-full blur-lg opacity-0 transition-all duration-300 ${isActive
-                      ? `bg-gradient-to-br ${diamond.color} opacity-60 animate-pulse`
-                      : ''
-                      }`}
-                  ></div>
+                  {/* Ripple ring — expands outward on click */}
+                  <AnimatePresence>
+                    {isRippling && (
+                      <motion.span
+                        key="ripple"
+                        className={`absolute inset-0 rounded-full bg-linear-to-br ${diamond.color} pointer-events-none`}
+                        initial={{ scale: 1, opacity: 0.7 }}
+                        animate={{ scale: 3, opacity: 0 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.65, ease: 'easeOut' }}
+                      />
+                    )}
+                  </AnimatePresence>
 
-                  {/* Main button container */}
-                  <div
-                    className={`absolute inset-0 rounded-full transition-all duration-300 ${isActive
-                      ? `bg-gradient-to-br ${diamond.color} shadow-2xl`
-                      : 'bg-white shadow-lg hover:shadow-xl border border-[hsl(var(--primary))]/10'
-                      }`}
-                  ></div>
+                  {/* Pulse glow behind active button */}
+                  {isActive && (
+                    <div
+                      className={`absolute inset-0 rounded-full blur-md opacity-60 animate-pulse bg-linear-to-br ${diamond.color}`}
+                    />
+                  )}
 
-                  {/* Diamond Image */}
+                  {/* Button face — white bg keeps black images visible; gold gradient when active */}
+                  <div
+                    className={`absolute inset-0 rounded-full transition-all duration-300 ${
+                      isActive
+                        ? `bg-linear-to-br ${diamond.color} shadow-2xl`
+                        : 'bg-white shadow-lg hover:shadow-xl border border-[hsl(var(--secondary)/0.18)]'
+                    }`}
+                  />
+
+                  {/* Diamond shape image */}
                   <Image
                     src={diamond.img}
                     alt={diamond.name}
                     width={48}
                     height={48}
-                    className="w-8 h-8 sm:w-12 sm:h-12 object-contain relative z-10 transition-transform duration-300 group-hover:scale-110"
+                    className={`w-8 h-8 sm:w-12 sm:h-12 object-contain relative z-10 transition-transform duration-300 ${
+                      isActive ? 'scale-110' : 'hover:scale-110'
+                    }`}
                   />
 
-                  {/* Tooltip */}
-                  <div
-                    className={`absolute bottom-full mb-2 sm:mb-3 px-2 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r ${diamond.color} text-slate-900 text-xs sm:text-sm font-luxury-sans font-semibold rounded-lg transition-all duration-200 whitespace-nowrap shadow-xl backdrop-blur-sm ${isHovered
-                      ? 'opacity-100 translate-y-0'
-                      : 'opacity-0 translate-y-2 pointer-events-none'
-                      }`}
+                  {/* Tooltip — appears above the button */}
+                  <span
+                    className={`absolute bottom-full mb-2 sm:mb-3 px-3 py-1.5 bg-linear-to-r ${diamond.color} text-[hsl(var(--foreground))] text-xs sm:text-sm font-luxury-sans font-semibold rounded-lg whitespace-nowrap shadow-xl pointer-events-none transition-all duration-200 z-20 ${
+                      isHovered
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 translate-y-2'
+                    }`}
                   >
                     {diamond.name}
-                    <div
-                      className={`absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-[hsl(var(--primary))] ${isHovered ? '' : ''
-                        }`}
-                    ></div>
-                  </div>
+                  </span>
 
-                  {/* Selection ring indicator */}
+                  {/* Selection ring */}
                   {isSelected && (
-                    <div
-                      className="absolute inset-0 rounded-full border-2 border-white bg-[hsl(var(--secondary-rich))] animate-pulse"
-                      style={{ animationDuration: '4s' }}
-                    ></div>
+                    <div className="absolute inset-0 rounded-full ring-2 ring-[hsl(var(--secondary))] ring-offset-2 ring-offset-[hsl(var(--surface-champagne))] dark:ring-offset-[hsl(var(--surface-alt))]" />
                   )}
                 </button>
               );
             })}
           </div>
 
-          {/* Selected Diamond Info - Enhanced */}
-          <div className="max-w-md w-full space-y-6 sm:space-y-8 backdrop-blur-sm px-2 sm:px-0">
-            <div className="space-y-4 animate-fade-in">
-              <div>
-                <div className="inline-block mb-3">
-                  <span className="text-xs font-semibold tracking-widest uppercase text-[hsl(var(--secondary))] font-luxury-sans">
+          {/* ── Info panel ── */}
+          <div className="max-w-md w-full space-y-6 sm:space-y-8 text-center lg:text-left px-2 sm:px-0">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selectedDiamond}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-6 sm:space-y-8"
+              >
+                <div className="space-y-3">
+                  <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.3em] uppercase">
                     Featured Cut
                   </span>
+                  <h3 className="font-luxury-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))] capitalize">
+                    {activeData.name}
+                  </h3>
+                  <div className="h-1 w-20 bg-[hsl(var(--secondary))] rounded-full mx-auto lg:mx-0" />
                 </div>
-                <h3 className="font-luxury-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-[hsl(var(--foreground))] capitalize transition-all duration-300 break-words">
-                  {diamondTypes.find((d) => d.id === selectedDiamond)?.name} Cut
-                </h3>
-              </div>
-              <div className="h-1.5 w-24 bg-[hsl(var(--secondary))] rounded-full"></div>
 
-              {/* View Collection Button */}
-              <Link
-                href={getCollectionLink(selectedDiamond)}
-                className="inline-block mt-4 sm:mt-6"
-              >
-                <button className="bg-[hsl(var(--card))] px-5 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 text-xs sm:text-sm md:text-base font-normal border border-[hsl(var(--foreground))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--lead-text))] hover:text-[hsl(var(--background))] transition-all duration-500 tracking-wide w-full sm:w-auto rounded-lg cursor-pointer flex items-center justify-center">
-                  View {diamondTypes.find((d) => d.id === selectedDiamond)?.name} Collection
-                </button>
-              </Link>
-            </div>
-
-            <div className="space-y-6 text-[hsl(var(--muted-foreground))] font-luxury-sans">
-              {selectedDiamond === 'round' && (
-                <div className="space-y-4 animate-fade-in">
+                <div className="space-y-4 text-[hsl(var(--muted-foreground))] font-luxury-sans">
                   <p className="text-sm sm:text-base leading-relaxed">
-                    The most popular diamond cut, known for its exceptional
-                    brilliance and fire. The round brilliant cut maximizes light
-                    return through its 58 facets.
+                    {activeDesc.body}
                   </p>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Maximum brilliance and sparkle</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Timeless and classic appeal</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Excellent for all ring styles</span>
-                    </li>
+                  <ul className="space-y-2.5 text-sm">
+                    {activeDesc.traits.map((trait) => (
+                      <li
+                        key={trait}
+                        className="flex items-center gap-3 justify-center lg:justify-start group"
+                      >
+                        <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] shrink-0 group-hover:scale-150 transition-transform duration-300" />
+                        <span>{trait}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
-              )}
 
-              {selectedDiamond === 'princess' && (
-                <div className="space-y-4 animate-fade-in">
-                  <p className="text-sm sm:text-base leading-relaxed">
-                    A modern square cut that combines the brilliance of a round
-                    with a contemporary geometric shape. Perfect for those who
-                    love clean lines.
-                  </p>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Modern and sophisticated</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Brilliant sparkle</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Great value proposition</span>
-                    </li>
-                  </ul>
-                </div>
-              )}
-
-              {selectedDiamond === 'emerald' && (
-                <div className="space-y-4 animate-fade-in">
-                  <p className="text-sm sm:text-base leading-relaxed">
-                    A step-cut diamond featuring long, lean lines that create a
-                    hall-of-mirrors effect. Emphasizes clarity and showcases the
-                    diamond's natural beauty.
-                  </p>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Elegant hall-of-mirrors effect</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Vintage-inspired glamour</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Emphasizes diamond clarity</span>
-                    </li>
-                  </ul>
-                </div>
-              )}
-
-              {selectedDiamond === 'oval' && (
-                <div className="space-y-4 animate-fade-in">
-                  <p className="text-sm sm:text-base leading-relaxed">
-                    An elongated version of the round brilliant cut that offers
-                    similar sparkle while creating the illusion of greater size
-                    and elegant finger coverage.
-                  </p>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Elongated elegant appearance</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Creates illusion of larger size</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Flattering on all hand types</span>
-                    </li>
-                  </ul>
-                </div>
-              )}
-
-              {selectedDiamond === 'cushion' && (
-                <div className="space-y-4 animate-fade-in">
-                  <p className="text-sm sm:text-base leading-relaxed">
-                    A romantic cut with rounded corners and larger facets that
-                    create a soft, romantic glow. Perfect blend of old-world
-                    charm and modern brilliance.
-                  </p>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Romantic vintage appeal</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Soft, pillow-like appearance</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Excellent fire and brilliance</span>
-                    </li>
-                  </ul>
-                </div>
-              )}
-
-              {selectedDiamond === 'pear' && (
-                <div className="space-y-4 animate-fade-in">
-                  <p className="text-sm sm:text-base leading-relaxed">
-                    A unique combination of round and marquise cuts, creating an
-                    elegant teardrop shape that's both classic and distinctive.
-                  </p>
-                  <ul className="space-y-3 text-sm">
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Unique teardrop silhouette</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Elongates the finger</span>
-                    </li>
-                    <li className="flex items-center gap-3 group">
-                      <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] group-hover:scale-150 transition-transform duration-300"></span>
-                      <span>Distinctive and eye-catching</span>
-                    </li>
-                  </ul>
-                </div>
-              )}
-            </div>
+                <Link href={getCollectionLink(selectedDiamond)}>
+                  <button className="inline-flex items-center border border-[hsl(var(--foreground)/0.25)] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] hover:border-[hsl(var(--secondary))] px-8 py-3 text-xs tracking-[0.18em] uppercase font-light transition-all duration-400 cursor-pointer rounded-sm">
+                    View {activeData.name} Collection
+                    <span className="ml-2 text-[hsl(var(--secondary))]">→</span>
+                  </button>
+                </Link>
+              </motion.div>
+            </AnimatePresence>
           </div>
+
         </div>
       </div>
-
-    </section >
+    </section>
   );
 }

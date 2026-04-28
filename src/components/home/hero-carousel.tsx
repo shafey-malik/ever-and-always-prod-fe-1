@@ -1,45 +1,48 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 
 const slides = [
   {
     id: 1,
+    // TODO: GIF asset — replace with cinematic hero video/GIF for this slide
     image: '/hero-diamond-1.jpg',
     title: 'Timeless Elegance',
-    subtitle: 'Classic solitaire engagement rings',
+    subtitle: 'Classic Solitaire Collection',
     description:
       'Discover the perfect symbol of eternal love with our exquisite collection of diamond solitaires.',
     collectionLink: '/collection/engagement-solitaire',
   },
   {
     id: 2,
+    // TODO: GIF asset — replace with cinematic hero video/GIF for this slide
     image: '/hero-diamond-2.jpg',
     title: 'Rose Gold Romance',
-    subtitle: 'Warm and sophisticated emerald cuts',
+    subtitle: 'Emerald Cut · Rose Gold',
     description:
       'Embrace modern luxury with our stunning emerald cut diamonds in romantic rose gold settings.',
     collectionLink: '/collection/engagement-emerald',
   },
   {
     id: 3,
+    // TODO: GIF asset — replace with cinematic hero video/GIF for this slide
     image: '/hero-diamond-3.jpg',
     title: 'Oval Cut Perfection',
-    subtitle: 'Elegant oval diamonds with pavé detail',
+    subtitle: 'Oval Diamonds · Pavé Detail',
     description:
       'Experience the brilliance of oval diamonds complemented by delicate pavé craftsmanship.',
     collectionLink: '/collection/engagement-oval',
   },
   {
     id: 4,
+    // TODO: GIF asset — replace with cinematic hero video/GIF for this slide
     image: '/hero-diamond-4.jpg',
     title: 'Platinum Prestige',
-    subtitle: 'Ultimate luxury in platinum settings',
+    subtitle: 'Round Brilliant · Platinum',
     description:
       'Indulge in the finest platinum settings featuring our most brilliant round diamonds.',
     collectionLink: '/collection/engagement-round',
@@ -85,150 +88,159 @@ export function HeroCarousel() {
   };
 
   return (
-    <div className="relative h-[75vh] min-h-[500px] sm:h-[70vh] sm:min-h-0 lg:h-[85vh] overflow-hidden bg-[hsl(var(--card))] w-full">
+    <div className="relative h-[calc(100vh-4.25rem)] md:h-[calc(100vh-7rem)] min-h-[580px] overflow-hidden bg-[hsl(var(--foreground))]">
+
+      {/* Full-bleed background image */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 1.04 }}
+          animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
           className="absolute inset-0"
         >
-          <div className="flex flex-col-reverse lg:grid lg:grid-cols-2 h-full">
-            {/* Content */}
-            <div className="px-3 sm:px-6 md:px-8 lg:px-20 xl:px-32 py-6 sm:py-10 md:py-12 lg:py-0 z-10 flex flex-col justify-center bg-[hsl(var(--background))] lg:bg-transparent">
-              <motion.div
-                initial={{ y: 30, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.7 }}
-                className="max-w-2xl space-y-4 sm:space-y-6 md:space-y-8 w-full"
-              >
-                {/* Decorative line */}
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: 48 }}
-                  transition={{ delay: 0.3, duration: 0.8 }}
-                  className="h-1 bg-gradient-to-r from-[hsl(var(--gold))] to-[hsl(var(--secondary))]"
-                />
-
-                <div className="space-y-2 sm:space-y-3 md:space-y-4">
-                  <motion.p
-                    initial={{ y: 15, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.35 }}
-                    className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-xs sm:text-sm md:text-sm uppercase tracking-[0.15em] font-light"
-                  >
-                    {slides[currentSlide].subtitle}
-                  </motion.p>
-                  <motion.h1
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.25, duration: 0.8 }}
-                    className="font-luxury-serif text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-light text-[hsl(var(--foreground))] leading-tight tracking-tight break-words"
-                  >
-                    {slides[currentSlide].title}
-                  </motion.h1>
-                </div>
-
-                <motion.p
-                  initial={{ y: 15, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed max-w-md font-light"
-                >
-                  {slides[currentSlide].description}
-                </motion.p>
-
-                <motion.div
-                  initial={{ y: 15, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5 pt-3 sm:pt-5 md:pt-6 w-full sm:w-auto"
-                >
-                  <Link
-                    href={slides[currentSlide].collectionLink}
-                    className="btn-luxury text-[hsl(var(--secondary))] hover:text-[hsl(var(--background))] px-5 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 text-xs sm:text-sm md:text-base font-normal tracking-wide w-full sm:w-auto flex items-center justify-center cursor-pointer"
-                  >
-                    <Calendar className="w-4 h-4 sm:w-4 sm:h-4 md:w-4 md:h-4 mr-2 flex-shrink-0" />
-                    View Collection
-                  </Link>
-                  <Link
-                    href="/consultation"
-                    className="bg-[hsl(var(--card))] px-5 sm:px-8 md:px-10 py-2.5 sm:py-3 md:py-3.5 text-xs sm:text-sm md:text-base font-normal border border-[hsl(var(--foreground))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--secondary))] transition-all duration-500 tracking-wide w-full sm:w-auto rounded-lg cursor-pointer flex items-center justify-center"
-                  >
-                    Book Consultation
-                  </Link>
-                </motion.div>
-              </motion.div>
-            </div>
-
-            {/* Image */}
-            <motion.div
-              initial={{ scale: 1.05, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.1, duration: 0.8 }}
-              className="relative flex-1 min-h-[40vh] sm:min-h-[42vh] md:min-h-[45vh] lg:min-h-0 w-full overflow-hidden"
-            >
-              <Image
-                src={slides[currentSlide].image}
-                alt={slides[currentSlide].title}
-                fill
-                className="object-cover object-center"
-                priority={currentSlide === 0}
-              />
-              <div
-                className="absolute inset-0 opacity-60 lg:opacity-100"
-                style={{
-                  background: 'linear-gradient(to bottom, transparent, transparent, linear-gradient(to right, transparent)'
-                }}
-              />
-            </motion.div>
-          </div>
+          <Image
+            src={slides[currentSlide].image}
+            alt={slides[currentSlide].title}
+            fill
+            className="object-cover object-center"
+            priority={currentSlide === 0}
+          />
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation Arrows */}
+      {/* Gradient overlays for text readability */}
+      <div className="absolute inset-0 bg-linear-to-r from-black/65 via-black/30 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/75 via-transparent to-black/20 pointer-events-none" />
+
+      {/* Editorial content — anchored bottom-left */}
+      <div className="absolute inset-0 flex flex-col justify-end pb-16 sm:pb-20 lg:pb-24 px-8 sm:px-14 lg:px-20 xl:px-28 z-10">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentSlide}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="max-w-xl"
+          >
+            {/* Overline */}
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="text-[hsl(var(--secondary))] font-luxury-sans text-xs tracking-[0.3em] uppercase font-light mb-5"
+            >
+              {slides[currentSlide].subtitle}
+            </motion.p>
+
+            {/* Decorative rule */}
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: 56 }}
+              transition={{ delay: 0.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="h-px bg-[hsl(var(--secondary))] mb-6 opacity-80"
+            />
+
+            {/* Title */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="font-luxury-serif text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-light text-white leading-[0.92] tracking-tight mb-8"
+            >
+              {slides[currentSlide].title}
+            </motion.h1>
+
+            {/* Description */}
+            <motion.p
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.38, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="text-white/65 font-luxury-sans text-sm sm:text-base leading-relaxed max-w-xs mb-10 font-light"
+            >
+              {slides[currentSlide].description}
+            </motion.p>
+
+            {/* CTAs */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.48, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="flex flex-col sm:flex-row items-start sm:items-center gap-5"
+            >
+              <Link
+                href={slides[currentSlide].collectionLink}
+                className="inline-flex items-center border border-[hsl(var(--secondary)/0.55)] text-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))] hover:text-black hover:border-[hsl(var(--secondary))] px-8 py-3 text-xs tracking-[0.18em] uppercase font-light transition-all duration-400 cursor-pointer"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.65, 0, 0.35, 1)' }}
+              >
+                View Collection
+              </Link>
+              <Link
+                href="/consultation"
+                className="text-white/60 hover:text-white font-luxury-sans text-xs tracking-[0.15em] uppercase font-light transition-colors duration-300 flex items-center gap-2 cursor-pointer"
+              >
+                Book Consultation
+                <span className="text-[hsl(var(--secondary))]">→</span>
+              </Link>
+            </motion.div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Navigation arrows — glass circles at mid-height edges */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="absolute left-0 right-0 top-[30vh] sm:top-8 md:top-12 lg:top-0 lg:bottom-0 pointer-events-none flex items-start lg:items-center justify-between px-2 sm:px-6 md:px-8 lg:px-12 z-20"
+        transition={{ delay: 1, duration: 0.6 }}
+        className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-4 sm:px-6 pointer-events-none z-20"
       >
         <button
           type="button"
           onClick={prevSlide}
-          className="pointer-events-auto bg-white/8 backdrop-blur-md hover:bg-white/15 border border-white/10 rounded-full p-2.5 sm:p-3.5 md:p-4 transition-all duration-300 hover:scale-110 group z-30 cursor-pointer flex-shrink-0"
+          className="pointer-events-auto bg-white/8 backdrop-blur-md hover:bg-white/16 border border-white/12 rounded-full p-3 sm:p-3.5 transition-all duration-300 hover:scale-110 group cursor-pointer flex-shrink-0"
         >
-          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[hsl(var(--secondary))] group-hover:text-[hsl(var(--primary))]" />
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 text-white/80 group-hover:text-white" />
         </button>
         <button
           type="button"
           onClick={nextSlide}
-          className="pointer-events-auto bg-white/8 backdrop-blur-md hover:bg-white/15 border border-white/10 rounded-full p-2.5 sm:p-3.5 md:p-4 transition-all duration-300 hover:scale-110 group z-30 cursor-pointer flex-shrink-0"
+          className="pointer-events-auto bg-white/8 backdrop-blur-md hover:bg-white/16 border border-white/12 rounded-full p-3 sm:p-3.5 transition-all duration-300 hover:scale-110 group cursor-pointer flex-shrink-0"
         >
-          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-[hsl(var(--secondary))] group-hover:text-[hsl(var(--primary))]" />
+          <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-white/80 group-hover:text-white" />
         </button>
       </motion.div>
 
-      {/* Slide Indicators */}
+      {/* Bottom bar — dots left, counter right */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1 }}
-        className="absolute bottom-4 sm:bottom-8 md:bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-2 sm:space-x-3 md:space-x-4 z-20"
+        transition={{ delay: 1, duration: 0.6 }}
+        className="absolute bottom-8 sm:bottom-10 left-8 sm:left-14 lg:left-20 xl:left-28 right-8 sm:right-12 flex items-center justify-between z-20"
       >
-        {slides.map((_, index) => (
-          <motion.button
-            key={index}
-            onClick={() => goToSlide(index)}
-            whileHover={{ scale: 1.2 }}
-            className={`transition-all duration-500 rounded-full cursor-pointer flex-shrink-0 ${index === currentSlide
-              ? 'w-6 sm:w-8 md:w-10 h-1.5 sm:h-2 md:h-2.5 bg-gradient-to-r from-[hsl(var(--rose-gold))] to-[hsl(var(--rose-gold))]'
-              : 'w-1.5 sm:w-2 md:w-2.5 h-1.5 sm:h-2 md:h-2.5 bg-white hover:bg-white/40 border border-black/10'
-              }`}
-          />
-        ))}
+        {/* Dot indicators */}
+        <div className="flex items-center gap-2.5">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`transition-all duration-500 rounded-full cursor-pointer flex-shrink-0 ${index === currentSlide
+                ? 'w-8 h-1.5 bg-[hsl(var(--secondary))]'
+                : 'w-1.5 h-1.5 bg-white/35 hover:bg-white/60'
+                }`}
+            />
+          ))}
+        </div>
+
+        {/* Editorial slide counter */}
+        <div className="flex items-center gap-2 font-luxury-sans text-xs text-white/45 tracking-[0.15em]">
+          <span className="text-white/75">
+            {String(currentSlide + 1).padStart(2, '0')}
+          </span>
+          <span className="w-6 h-px bg-white/30" />
+          <span>{String(slides.length).padStart(2, '0')}</span>
+        </div>
       </motion.div>
     </div>
   );

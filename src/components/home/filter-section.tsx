@@ -90,19 +90,26 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
   const caratFacets = facetGroups['carat'] || [];
 
   return (
-    <section className="py-20 bg-[hsl(var(--background))] overflow-x-hidden">
-      <div className="container mx-auto px-3 sm:px-6">
-        <div className="text-center space-y-4 mb-12">
-          <h2 className="font-luxury-serif text-4xl lg:text-5xl font-bold text-[hsl(var(--foreground))]">
+    <section className="py-20 sm:py-28 bg-[hsl(var(--surface-alt))] dark:bg-[hsl(var(--background))] overflow-hidden">
+      <div className="container mx-auto px-6 sm:px-8 lg:px-12">
+        <div className="text-center mb-12 sm:mb-16">
+          <div className="flex items-center justify-center gap-3 mb-5">
+            <div className="h-px w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
+            <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.35em] uppercase">
+              Curate
+            </span>
+            <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
+          </div>
+          <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))]">
             Find Your Perfect Ring
           </h2>
-          <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-lg max-w-2xl mx-auto">
+          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
             Use our advanced filters to discover the diamond ring that matches
             your vision and budget.
           </p>
         </div>
 
-        <Card className="bg-[hsl(var(--card))] rounded-2xl shadow-[var(--shadow-card)] p-4 sm:p-8 max-w-6xl mx-auto min-h-[600px] border-0 transition-none" style={{ transform: 'translateY(-5px)' }}>
+        <Card className="bg-[hsl(var(--card))] rounded-2xl shadow-(--shadow-elegant) p-6 sm:p-10 max-w-6xl mx-auto border border-[hsl(var(--border)/0.5)] transition-none">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Shape Filter - Dynamic */}
             {shapeFacets.length > 0 && (

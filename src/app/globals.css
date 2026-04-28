@@ -55,8 +55,10 @@
     /* Premium Card & Surface Colors */
     --card: 0 0% 100%;
     --card-foreground: 240 9% 15%;
-    --surface-luxury: 45 25% 96%;
-    --surface-champagne: 40 15% 94%;
+    --surface-luxury: 45 22% 95%;
+    --surface-champagne: 40 20% 91%;
+    /* Alternating section surface — warm ivory, ~7% below card white so cards pop */
+    --surface-alt: 38 18% 93%;
 
     /* Brand Primary - Elegant Dark Navy */
     --primary: 240 25% 15%;
@@ -129,72 +131,77 @@
   }
 }
 
-/* Dark theme overrides (apply .dark to <html> or <body>) */
+/* Dark theme — deep navy/charcoal: velvet jewelry box palette */
 .dark {
-  --background: 163 80% 9%;
-  --foreground: 0 0% 98%;
+  --background: 220 20% 6%;
+  --foreground: 40 20% 95%;
 
-  --lead-text: 40 25% 70%;
+  --lead-text: 43 55% 72%;
 
-  --card: 163 6% 8%;
-  --card-foreground: 0 0% 98%;
-  --surface-luxury: 163 80% 10%;
-  --surface-champagne: 163 7% 6%;
+  --card: 220 18% 9%;
+  --card-foreground: 40 20% 95%;
+  /* Dark surfaces — each value must stay BELOW --card (220 18% 9%) so cards float above */
+  --surface-luxury: 222 20% 10%;   /* nav strip: just above card, gives strip a subtle lift */
+  --surface-champagne: 220 22% 7%; /* mid-dark: between sections */
+  /* Section A (Diamond, Testimonials): rich midnight blue — velvet jewelry-box feel */
+  --surface-alt: 222 32% 8%;
 
-  /* Primary uses a deep teal (#06402B) tuned for HSL components */
-  --primary: 163 80% 19%;
-  --primary-foreground: 0 0% 98%;
-  --primary-light: 163 60% 18%;
+  /* Deep navy primary — brand-consistent with light mode navy */
+  --primary: 220 22% 20%;
+  --primary-foreground: 40 20% 95%;
+  --primary-light: 220 18% 28%;
 
-  --secondary: 40 25% 70%;
-  --secondary-foreground: 0 0% 98%;
-  --secondary-rich: 40 45% 55%;
+  /* Richer champagne gold in dark — metallics should glow */
+  --secondary: 43 62% 68%;
+  --secondary-foreground: 220 22% 10%;
+  --secondary-rich: 40 55% 58%;
 
-  --accent: 15 25% 88%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 15 40% 65%;
+  --accent-foreground: 220 22% 10%;
+  --accent-warm: 20 45% 60%;
 
-  --platinum: 220 10% 18%;
-  --platinum-dark: 220 10% 12%;
-  --gold: 40 60% 45%;
-  --rose-gold: 15 40% 18%;
+  --platinum: 220 10% 22%;
+  --platinum-dark: 220 10% 15%;
+  --gold: 43 78% 64%;
+  --rose-gold: 15 45% 55%;
 
-  --muted: 220 10% 10%;
-  --muted-foreground: 40 25% 40%;
-  --border: 220 8% 18%;
-  --input: 220 8% 14%;
-  --ring: 163 80% 30%;
+  --muted: 220 15% 12%;
+  --muted-foreground: 220 12% 55%;
+  --border: 220 15% 18%;
+  --input: 220 15% 13%;
+  --ring: 43 62% 60%;
 
-  --gradient-luxury: linear-gradient(135deg, hsl(163 8% 8%), hsl(163 6% 6%));
-  --gradient-champagne: linear-gradient(135deg, hsl(163 10% 10%), hsl(163 8% 8%));
-  --gradient-platinum: linear-gradient(135deg, hsl(220 10% 12%), hsl(220 8% 9%));
-  --gradient-hero: linear-gradient(135deg, hsl(163 8% 8%), hsl(0 0% 4%));
+  --gradient-luxury: linear-gradient(135deg, hsl(220 18% 9%), hsl(220 15% 7%));
+  --gradient-champagne: linear-gradient(135deg, hsl(40 20% 12%), hsl(220 18% 9%));
+  --gradient-platinum: linear-gradient(135deg, hsl(220 10% 15%), hsl(220 8% 10%));
+  --gradient-hero: linear-gradient(135deg, hsl(220 20% 6%), hsl(220 15% 4%));
 
-  --shadow-luxury: 0 6px 24px -4px hsl(163 80% 12% / 0.6);
-  --shadow-elegant: 0 10px 36px -8px hsl(163 80% 12% / 0.6);
-  --shadow-premium: 0 30px 80px -24px hsl(163 80% 12% / 0.7);
-  --shadow-card: 0 4px 12px -3px hsl(163 80% 12% / 0.6);
+  --shadow-luxury: 0 6px 24px -4px hsl(220 30% 3% / 0.7);
+  --shadow-elegant: 0 10px 40px -8px hsl(220 30% 3% / 0.75);
+  --shadow-premium: 0 30px 80px -24px hsl(220 30% 3% / 0.8);
+  --shadow-card: 0 4px 12px -3px hsl(220 30% 3% / 0.6);
 
   --transition-elegant: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   --radius: 0.75rem;
 
-  --sidebar-background: 163 6% 6%;
-  --sidebar-foreground: 0 0% 98%;
-  --sidebar-primary: 163 80% 12%;
-  --sidebar-primary-foreground: 0 0% 98%;
-  --sidebar-accent: 163 7% 7%;
-  --sidebar-accent-foreground: 0 0% 98%;
-  --sidebar-border: 163 8% 8%;
-  --sidebar-ring: 163 80% 40%;
+  --sidebar-background: 220 18% 7%;
+  --sidebar-foreground: 40 20% 92%;
+  --sidebar-primary: 220 22% 15%;
+  --sidebar-primary-foreground: 40 20% 95%;
+  --sidebar-accent: 220 15% 10%;
+  --sidebar-accent-foreground: 40 20% 92%;
+  --sidebar-border: 220 12% 15%;
+  --sidebar-ring: 43 62% 60%;
 
-  --second: 210 90% 20%;
-  --second-rich: 210 90% 30%;
+  --second: 220 35% 15%;
+  --second-rich: 220 50% 25%;
   --second-foreground: 0 0% 98%;
 
   /* Additional variables for compatibility */
-  --popover: 163 6% 8%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 220 18% 9%;
+  --popover-foreground: 40 20% 95%;
   --destructive: 0 62.8% 30.6%;
   --chart-1: 220 70% 50%;
   --chart-2: 160 60% 45%;
@@ -210,7 +217,8 @@
   }
 
   body {
-    @apply bg-background text-[hsl(var(--foreground))] font-sans antialiased;
+    @apply bg-background text-[hsl(var(--foreground))] antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
@@ -339,9 +347,23 @@
   background: linear-gradient(135deg, hsl(45, 86%, 50%), hsl(45, 90%, 45%));
 }
 
-* {
+html {
   scrollbar-width: thin;
   scrollbar-color: hsl(45, 59%, 68%) hsl(var(--card));
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: hsl(220, 20%, 6%);
+  border-left: 1px solid hsl(220, 15%, 12%);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, hsl(43, 62%, 55%), hsl(43, 70%, 45%));
+  border: 2px solid hsl(220, 20%, 6%);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, hsl(43, 70%, 62%), hsl(43, 78%, 52%));
 }
 
 /* Custom scrollbar for variant selector only */
@@ -563,5 +585,25 @@
         hsl(var(--muted)) 100%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* Marquee — infinite horizontal scroll */
+  @keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee {
+    animation: marquee var(--marquee-duration, 45s) linear infinite;
+  }
+
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+      animation: none;
+    }
   }
 }

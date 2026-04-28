@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import {
     ShoppingBag,
     User,
@@ -10,8 +10,10 @@ import {
     Menu,
     X,
     ChevronDown,
+    ChevronRight,
     Moon,
     Sun,
+    ArrowRight,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Input } from '@/components/ui/input';
@@ -31,18 +33,37 @@ interface HeaderProps {
 
 export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
     const router = useRouter();
-    const pathname = usePathname();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
-
+    const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showSearch, setShowSearch] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [expandedMobileSection, setExpandedMobileSection] = useState<string | null>(null);
+    const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    useEffect(() => { setMounted(true); }, []);
 
     useEffect(() => {
-        setMounted(true);
+        const onScroll = () => setScrolled(window.scrollY > 20);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
     }, []);
+
+    // Debounced open/close so moving from nav button → dropdown panel doesn't flicker
+    const openDropdown = (name: string) => {
+        if (closeTimer.current) clearTimeout(closeTimer.current);
+        setActiveDropdown(name);
+    };
+
+    const scheduleClose = () => {
+        closeTimer.current = setTimeout(() => setActiveDropdown(null), 150);
+    };
+
+    const cancelClose = () => {
+        if (closeTimer.current) clearTimeout(closeTimer.current);
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,22 +73,13 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
         setSearchQuery('');
     };
 
-    const toggleTheme = () => {
-        if (theme === 'dark') {
-            setTheme('light');
-        } else {
-            setTheme('dark');
-        }
-    };
+    const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
-    // Helper function to generate collection slug
     const getCollectionSlug = (category: string, item: string): string => {
         const base = category === 'engagement' ? 'engagement' : 'wedding';
-        const itemSlug = item.toLowerCase().replace(/\s+/g, '-');
-        return `${base}-${itemSlug}`;
+        return `${base}-${item.toLowerCase().replace(/\s+/g, '-')}`;
     };
 
-    // Diamond shop specific categories
     const engagementCategories = {
         'By Shape': ['Round', 'Princess', 'Emerald', 'Oval', 'Cushion', 'Pear'],
         'By Setting': ['Solitaire', 'Halo', 'Three Stone', 'Vintage', 'Modern'],
@@ -75,197 +87,133 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
     };
 
     const weddingCategories = {
-        "Women's": [
-            'Classic Bands',
-            'Diamond Bands',
-            'Eternity Rings',
-            'Curved Bands',
-        ],
-        "Men's": [
-            'Classic Bands',
-            'Diamond Bands',
-            'Modern Bands',
-            'Textured Bands',
-        ],
-        Sets: ['Matching Sets', 'Bridal Sets', 'Custom Sets'],
+        "Women's": ['Classic Bands', 'Diamond Bands', 'Eternity Rings', 'Curved Bands'],
+        "Men's": ['Classic Bands', 'Diamond Bands', 'Modern Bands', 'Textured Bands'],
+        'Sets': ['Matching Sets', 'Bridal Sets', 'Custom Sets'],
     };
 
     return (
-        <header className="w-full bg-[hsl(var(--card))] shadow-[var(--shadow-card)] sticky top-0 z-50">
-            {/* Main Header */}
-            <div className="">
-                <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
-                    {/* Header main row */}
-                    <div className="relative flex items-center justify-between gap-2 sm:gap-4">
-                        {/* Left: Mobile Menu & Logo */}
-                        <div className="flex items-center space-x-2 sm:space-x-3">
-                            {/* Mobile Menu Button */}
-                            <button
-                                onClick={() => setIsMobileMenuOpen(true)}
-                                className="lg:hidden p-2 hover:text-[hsl(var(--foreground))] rounded-lg transition-all duration-200 ease-out hover:scale-110 active:scale-95 cursor-pointer"
-                            >
-                                <Menu className="w-6 h-6 text-[hsl(var(--lead-text))]" />
-                            </button>
+        <header
+            className={`w-full sticky top-0 z-50 transition-all duration-300 ${scrolled
+                ? 'bg-[hsl(var(--card)/0.92)] backdrop-blur-md shadow-[var(--shadow-card)] border-b border-[hsl(var(--border)/0.5)]'
+                : 'bg-[hsl(var(--card))] border-b border-[hsl(var(--border))]'
+                }`}
+        >
+            {/* ── Main Header Row ──────────────────────────────────── */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+                <div className={`relative flex items-center justify-between transition-all duration-300 ${scrolled ? 'py-2.5 sm:py-3' : 'py-3.5 sm:py-4'}`}>
 
-                            {/* Logo — inline on mobile/tablet, centered on desktop */}
-                            <Link
-                                href="/"
-                                className="lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 flex items-center space-x-3"
-                            >
-                                <h1 className="text-nowrap font-luxury-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[hsl(var(--foreground))] leading-tight">
-                                    Ever & Always
-                                </h1>
-                            </Link>
-                        </div>
-
-                        {/* Right: Actions */}
-                        <div className="flex items-center gap-2 sm:gap-4 ml-auto sm:ml-0">
-                            {/* Search Button - Opens Modal */}
-                            <button
-                                onClick={() => setShowSearch(true)}
-                                className="p-2 hover:text-[hsl(var(--foreground))] rounded-lg transition-all duration-200 ease-out hover:scale-110 active:scale-95 cursor-pointer"
-                                aria-label="Search"
-                            >
-                                <Search className="w-5 h-5 text-[hsl(var(--lead-text))]" />
-                            </button>
-
-                            {/* Theme Toggle */}
-                            {mounted && (
-                                <button
-                                    onClick={toggleTheme}
-                                    aria-label="Toggle theme"
-                                    className="p-2 hover:text-[hsl(var(--foreground))] rounded-lg transition-all duration-200 ease-out hover:scale-110 active:scale-95 cursor-pointer"
-                                >
-                                    {theme === 'dark' ? (
-                                        <Sun className="w-5 h-5 text-[hsl(var(--lead-text))]" />
-                                    ) : (
-                                        <Moon className="w-5 h-5 text-[hsl(var(--lead-text))]" />
-                                    )}
-                                </button>
-                            )}
-
-                            {/* Profile */}
-                            <Link
-                                href={isSignedIn ? '/account' : '/sign-in'}
-                                className="p-2 hover:text-[hsl(var(--foreground))] rounded-lg transition-colors"
-                            >
-                                <User className="w-5 h-5 text-[hsl(var(--lead-text))]" />
-                            </Link>
-
-                            {/* Cart */}
-                            <Link
-                                href="/cart"
-                                className="p-2 hover:text-[hsl(var(--foreground))] rounded-lg transition-colors relative"
-                            >
-                                <ShoppingBag className="w-5 h-5 text-[hsl(var(--lead-text))]" />
-                                {cartQuantity > 0 && (
-                                    <div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-normal">
-                                        {cartQuantity}
-                                    </div>
-                                )}
-                            </Link>
-                        </div>
+                    {/* Left: Mobile Menu trigger */}
+                    <div className="flex items-center lg:w-1/3">
+                        <button
+                            onClick={() => setIsMobileMenuOpen(true)}
+                            className="lg:hidden p-2 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))]"
+                        >
+                            <Menu className="w-5 h-5" />
+                        </button>
                     </div>
 
+                    {/* Center: Logo */}
+                    <div className="flex-1 flex justify-center lg:flex-none lg:absolute lg:left-1/2 lg:-translate-x-1/2">
+                        <Link href="/" className="flex flex-col items-center group">
+                            <span className={`font-luxury-serif font-bold text-[hsl(var(--foreground))] leading-none tracking-tight transition-all duration-300 ${scrolled ? 'text-xl sm:text-2xl' : 'text-2xl sm:text-3xl'}`}>
+                                Ever &amp; Always
+                            </span>
+                            {!scrolled && (
+                                <span className="font-luxury-sans text-[0.6rem] tracking-[0.35em] uppercase text-[hsl(var(--secondary))] mt-0.5 opacity-80">
+                                    Fine Diamond Jewelry
+                                </span>
+                            )}
+                        </Link>
+                    </div>
+
+                    {/* Right: Icon Actions */}
+                    <div className="flex items-center gap-1 sm:gap-2 lg:w-1/3 justify-end">
+                        <button
+                            onClick={() => setShowSearch(true)}
+                            className="p-2 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))]"
+                            aria-label="Search"
+                        >
+                            <Search className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </button>
+
+                        {mounted && (
+                            <button
+                                onClick={toggleTheme}
+                                aria-label="Toggle theme"
+                                className="p-2 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 cursor-pointer text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))]"
+                            >
+                                {theme === 'dark' ? (
+                                    <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
+                                ) : (
+                                    <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
+                                )}
+                            </button>
+                        )}
+
+                        <Link
+                            href={isSignedIn ? '/account' : '/sign-in'}
+                            className="p-2 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))]"
+                        >
+                            <User className="w-4 h-4 sm:w-5 sm:h-5" />
+                        </Link>
+
+                        <Link
+                            href="/cart"
+                            className="p-2 rounded-lg transition-all duration-200 hover:scale-110 active:scale-95 relative text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))]"
+                        >
+                            <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5" />
+                            {cartQuantity > 0 && (
+                                <div className="absolute -top-0.5 -right-0.5 bg-[hsl(var(--secondary))] text-[hsl(var(--foreground))] rounded-full w-4 h-4 flex items-center justify-center text-[10px] font-semibold">
+                                    {cartQuantity}
+                                </div>
+                            )}
+                        </Link>
+                    </div>
                 </div>
             </div>
 
-            {/* Secondary Header - Navigation */}
-            <div className="hidden md:block border-t border-[hsl(var(--border))] bg-[hsl(var(--surface-luxury))]">
-                <div className="max-w-7xl mx-auto px-4">
+            {/* ── Navigation Strip ─────────────────────────────────── */}
+            {/* overflow-hidden is scoped to this strip only for the collapse animation.
+                Dropdown panels are rendered OUTSIDE this div (below) to escape clipping. */}
+            <div
+                className={`hidden md:block border-t border-[hsl(var(--border))] bg-[hsl(var(--surface-luxury))] overflow-hidden transition-all duration-300 ${scrolled ? 'max-h-0 border-transparent' : 'max-h-14'}`}
+            >
+                <div className="max-w-7xl mx-auto px-6">
                     <nav className="flex items-center justify-center space-x-8">
-                        {/* Engagement Rings Dropdown */}
+
+                        {/* Engagement Rings */}
                         <div
-                            className="relative group"
-                            onMouseEnter={() => setActiveDropdown('engagement')}
-                            onMouseLeave={() => setActiveDropdown(null)}
+                            onMouseEnter={() => openDropdown('engagement')}
+                            onMouseLeave={scheduleClose}
                         >
-                            <button className="flex items-center rounded-md hover:rounded-b-none space-x-4 px-2 py-1.5 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-normal transition-colors cursor-pointer">
+                            <button className="flex items-center gap-1.5 py-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-luxury-sans text-xs tracking-[0.12em] uppercase transition-colors duration-200 cursor-pointer">
                                 <span>Engagement Rings</span>
-                                <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === 'engagement' ? 'rotate-180 text-[hsl(var(--secondary))]' : ''}`} />
                             </button>
-
-                            {activeDropdown === 'engagement' && (
-                                <div className="absolute top-full left-0 w-96 bg-[hsl(var(--card))] shadow-2xl rounded-3xl z-50 rounded-tl-none animate-fade-in-scale" style={{ animationDuration: '200ms' }}>
-                                    <div className="p-6 grid grid-cols-2 gap-6">
-                                        {Object.entries(engagementCategories).map(
-                                            ([category, items]) => (
-                                                <div key={category}>
-                                                    <h3 className="font-semibold text-[hsl(var(--lead-text))] mb-3 text-sm uppercase tracking-wide">
-                                                        {category}
-                                                    </h3>
-                                                    <div className="space-y-2">
-                                                        {items.map((item) => (
-                                                            <Link
-                                                                key={item}
-                                                                href={`/collection/${getCollectionSlug('engagement', item)}`}
-                                                                className="block text-sm text-[hsl(var(--foreground))] hover:text-[hsl(var(--lead-text))] py-1 transition-colors"
-                                                                onClick={() => setActiveDropdown(null)}
-                                                            >
-                                                                {item}
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ),
-                                        )}
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
-                        {/* Wedding Rings Dropdown */}
+                        {/* Wedding Rings */}
                         <div
-                            className="relative group"
-                            onMouseEnter={() => setActiveDropdown('wedding')}
-                            onMouseLeave={() => setActiveDropdown(null)}
+                            onMouseEnter={() => openDropdown('wedding')}
+                            onMouseLeave={scheduleClose}
                         >
-                            <button className="flex items-center rounded-md hover:rounded-b-none space-x-4 px-2 py-1.5 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-normal transition-colors cursor-pointer">
+                            <button className="flex items-center gap-1.5 py-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-luxury-sans text-xs tracking-[0.12em] uppercase transition-colors duration-200 cursor-pointer">
                                 <span>Wedding Rings</span>
-                                <ChevronDown className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${activeDropdown === 'wedding' ? 'rotate-180 text-[hsl(var(--secondary))]' : ''}`} />
                             </button>
-
-                            {activeDropdown === 'wedding' && (
-                                <div className="absolute top-full left-0 w-96 bg-[hsl(var(--card))] shadow-2xl rounded-3xl z-50 rounded-tl-none animate-fade-in-scale" style={{ animationDuration: '200ms' }}>
-                                    <div className="p-6 grid grid-cols-2 gap-6">
-                                        {Object.entries(weddingCategories).map(
-                                            ([category, items]) => (
-                                                <div key={category}>
-                                                    <h3 className="font-semibold text-[hsl(var(--lead-text))] mb-3 text-sm uppercase tracking-wide">
-                                                        {category}
-                                                    </h3>
-                                                    <div className="space-y-2">
-                                                        {items.map((item) => (
-                                                            <Link
-                                                                key={item}
-                                                                href={`/collection/${getCollectionSlug('wedding', item)}`}
-                                                                className="block text-sm text-[hsl(var(--foreground))] hover:text-[hsl(var(--lead-text))] py-1 transition-colors"
-                                                                onClick={() => setActiveDropdown(null)}
-                                                            >
-                                                                {item}
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            ),
-                                        )}
-                                    </div>
-                                </div>
-                            )}
                         </div>
 
-                        {/* Custom Jewelry */}
                         <Link
                             href="/custom"
-                            className="py-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-normal transition-colors"
+                            className="py-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-luxury-sans text-xs tracking-[0.12em] uppercase transition-colors duration-200"
                         >
                             Custom Jewelry
                         </Link>
 
-                        {/* About */}
                         <Link
                             href="/about-us"
-                            className="py-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-normal transition-colors"
+                            className="py-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-luxury-sans text-xs tracking-[0.12em] uppercase transition-colors duration-200"
                         >
                             About Us
                         </Link>
@@ -273,7 +221,132 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                 </div>
             </div>
 
-            {/* Search Modal */}
+            {/* ── Engagement Mega Menu ─────────────────────────────── */}
+            {/* Rendered as a sibling of the nav strip, not inside overflow-hidden */}
+            {activeDropdown === 'engagement' && !scrolled && (
+                <div
+                    className="hidden md:block absolute top-full left-0 right-0 z-50 bg-[hsl(var(--card))] border-b border-[hsl(var(--border))] shadow-[var(--shadow-elegant)] animate-fade-in-scale"
+                    style={{ animationDuration: '160ms' }}
+                    onMouseEnter={cancelClose}
+                    onMouseLeave={scheduleClose}
+                >
+                    {/* Champagne gold hairline */}
+                    <div className="h-px bg-linear-to-r from-transparent via-[hsl(var(--secondary)/0.35)] to-transparent" />
+
+                    <div className="max-w-7xl mx-auto px-6 py-8">
+                        <div className="grid grid-cols-3 gap-12">
+                            {Object.entries(engagementCategories).map(([category, items]) => (
+                                <div key={category}>
+                                    <h3 className="font-luxury-sans font-semibold text-[hsl(var(--secondary))] mb-4 text-[10px] uppercase tracking-[0.28em]">
+                                        {category}
+                                    </h3>
+                                    <div className="space-y-0.5">
+                                        {items.map((item) => (
+                                            <Link
+                                                key={item}
+                                                href={`/collection/${getCollectionSlug('engagement', item)}`}
+                                                className="group/link flex items-center gap-0 py-1.5 text-sm text-[hsl(var(--foreground)/0.58)] hover:text-[hsl(var(--foreground))] transition-all duration-200 font-luxury-sans"
+                                                onClick={() => setActiveDropdown(null)}
+                                            >
+                                                <span className="w-0 group-hover/link:w-3 overflow-hidden transition-all duration-200 flex-shrink-0">
+                                                    <span className="block w-2 h-px bg-[hsl(var(--secondary))] mr-1" />
+                                                </span>
+                                                {item}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    <Link
+                                        href={`/collection/engagement-${category.toLowerCase().replace(/\s+/g, '-')}`}
+                                        className="inline-flex items-center gap-1 mt-5 text-[10px] uppercase tracking-[0.18em] text-[hsl(var(--secondary))] hover:text-[hsl(var(--secondary-rich))] transition-colors duration-200 font-luxury-sans"
+                                        onClick={() => setActiveDropdown(null)}
+                                    >
+                                        View All <ArrowRight className="w-3 h-3" />
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Footer row */}
+                        <div className="mt-8 pt-6 border-t border-[hsl(var(--border))] flex items-center justify-between">
+                            <p className="text-xs text-[hsl(var(--muted-foreground))] font-luxury-sans tracking-wide">
+                                Every ring crafted to last a lifetime — certified &amp; fully insured.
+                            </p>
+                            <Link
+                                href="/collection/engagement"
+                                onClick={() => setActiveDropdown(null)}
+                                className="inline-flex items-center gap-2 text-xs font-luxury-sans font-medium text-[hsl(var(--foreground)/0.75)] border border-[hsl(var(--border))] hover:border-[hsl(var(--secondary)/0.6)] hover:text-[hsl(var(--secondary))] px-5 py-2 rounded-lg transition-all duration-200"
+                            >
+                                Browse All Engagement Rings
+                                <ChevronRight className="w-3.5 h-3.5" />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Wedding Mega Menu ────────────────────────────────── */}
+            {activeDropdown === 'wedding' && !scrolled && (
+                <div
+                    className="hidden md:block absolute top-full left-0 right-0 z-50 bg-[hsl(var(--card))] border-b border-[hsl(var(--border))] shadow-[var(--shadow-elegant)] animate-fade-in-scale"
+                    style={{ animationDuration: '160ms' }}
+                    onMouseEnter={cancelClose}
+                    onMouseLeave={scheduleClose}
+                >
+                    {/* Champagne gold hairline */}
+                    <div className="h-px bg-linear-to-r from-transparent via-[hsl(var(--secondary)/0.35)] to-transparent" />
+
+                    <div className="max-w-7xl mx-auto px-6 py-8">
+                        <div className="grid grid-cols-3 gap-12">
+                            {Object.entries(weddingCategories).map(([category, items]) => (
+                                <div key={category}>
+                                    <h3 className="font-luxury-sans font-semibold text-[hsl(var(--secondary))] mb-4 text-[10px] uppercase tracking-[0.28em]">
+                                        {category}
+                                    </h3>
+                                    <div className="space-y-0.5">
+                                        {items.map((item) => (
+                                            <Link
+                                                key={item}
+                                                href={`/collection/${getCollectionSlug('wedding', item)}`}
+                                                className="group/link flex items-center gap-0 py-1.5 text-sm text-[hsl(var(--foreground)/0.58)] hover:text-[hsl(var(--foreground))] transition-all duration-200 font-luxury-sans"
+                                                onClick={() => setActiveDropdown(null)}
+                                            >
+                                                <span className="w-0 group-hover/link:w-3 overflow-hidden transition-all duration-200 flex-shrink-0">
+                                                    <span className="block w-2 h-px bg-[hsl(var(--secondary))] mr-1" />
+                                                </span>
+                                                {item}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    <Link
+                                        href={`/collection/wedding-${category.toLowerCase().replace(/\s+/g, '-')}`}
+                                        className="inline-flex items-center gap-1 mt-5 text-[10px] uppercase tracking-[0.18em] text-[hsl(var(--secondary))] hover:text-[hsl(var(--secondary-rich))] transition-colors duration-200 font-luxury-sans"
+                                        onClick={() => setActiveDropdown(null)}
+                                    >
+                                        View All <ArrowRight className="w-3 h-3" />
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Footer row */}
+                        <div className="mt-8 pt-6 border-t border-[hsl(var(--border))] flex items-center justify-between">
+                            <p className="text-xs text-[hsl(var(--muted-foreground))] font-luxury-sans tracking-wide">
+                                Celebrate your forever — ethically sourced, beautifully crafted.
+                            </p>
+                            <Link
+                                href="/collection/wedding"
+                                onClick={() => setActiveDropdown(null)}
+                                className="inline-flex items-center gap-2 text-xs font-luxury-sans font-medium text-[hsl(var(--foreground)/0.75)] border border-[hsl(var(--border))] hover:border-[hsl(var(--secondary)/0.6)] hover:text-[hsl(var(--secondary))] px-5 py-2 rounded-lg transition-all duration-200"
+                            >
+                                Browse All Wedding Rings
+                                <ChevronRight className="w-3.5 h-3.5" />
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── Search Modal ─────────────────────────────────────── */}
             <Dialog open={showSearch} onOpenChange={setShowSearch}>
                 <DialogContent className="sm:max-w-2xl bg-[hsl(var(--card))] border-[hsl(var(--border))]">
                     <DialogHeader>
@@ -283,17 +356,17 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                     </DialogHeader>
                     <form onSubmit={handleSearch} className="mt-4">
                         <div className="relative">
-                            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[hsl(var(--foreground))] opacity-60" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[hsl(var(--foreground))] opacity-60" />
                             <Input
                                 type="text"
                                 placeholder="Search diamonds, collections, rings..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-12 pr-4 py-6 text-lg font-luxury-sans
-                bg-[hsl(var(--background))] text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))]
-                border-2 border-[hsl(var(--border))] rounded-lg
-                focus-visible:ring-2 focus-visible:ring-[hsl(var(--primary))] focus-visible:ring-opacity-30
-                focus-visible:border-[hsl(var(--primary))]"
+                                    bg-[hsl(var(--background))] text-[hsl(var(--foreground))] placeholder:text-[hsl(var(--muted-foreground))]
+                                    border-2 border-[hsl(var(--border))] rounded-lg
+                                    focus-visible:ring-2 focus-visible:ring-[hsl(var(--primary))] focus-visible:ring-opacity-30
+                                    focus-visible:border-[hsl(var(--primary))]"
                                 autoFocus
                             />
                         </div>
@@ -301,26 +374,19 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                             <Button
                                 type="button"
                                 variant="ghost"
-                                onClick={() => {
-                                    setShowSearch(false);
-                                    setSearchQuery('');
-                                }}
+                                onClick={() => { setShowSearch(false); setSearchQuery(''); }}
                                 className="text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]"
                             >
                                 Cancel
                             </Button>
-                            <Button
-                                type="submit"
-                                className="btn-luxury"
-                                disabled={!searchQuery.trim()}
-                            >
+                            <Button type="submit" className="btn-luxury" disabled={!searchQuery.trim()}>
                                 Search
                             </Button>
                         </div>
                     </form>
                     <div className="mt-6 pt-6 border-t border-[hsl(var(--border))]">
-                        <p className="text-sm font-semibold text-[hsl(var(--foreground))] font-luxury-sans mb-3">
-                            Popular Searches:
+                        <p className="text-xs font-luxury-sans text-[hsl(var(--muted-foreground))] tracking-[0.15em] uppercase mb-3">
+                            Popular Searches
                         </p>
                         <div className="flex flex-wrap gap-2">
                             {['Round Diamond', 'Platinum Ring', 'Rose Gold', 'Solitaire', 'Halo Setting'].map((term) => (
@@ -332,12 +398,12 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                                         router.push(`/search?q=${encodeURIComponent(term)}`);
                                         setShowSearch(false);
                                     }}
-                                    className="px-4 py-2 text-sm rounded-full 
-                  bg-[hsl(var(--muted))] text-[hsl(var(--foreground))] 
-                  border border-[hsl(var(--border))] 
-                  hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))] 
-                  hover:border-[hsl(var(--primary))] 
-                  transition-all duration-200 font-luxury-sans font-medium cursor-pointer"
+                                    className="px-4 py-2 text-sm rounded-full
+                                        bg-[hsl(var(--muted))] text-[hsl(var(--foreground))]
+                                        border border-[hsl(var(--border))]
+                                        hover:bg-[hsl(var(--primary))] hover:text-[hsl(var(--primary-foreground))]
+                                        hover:border-[hsl(var(--primary))]
+                                        transition-all duration-200 font-luxury-sans cursor-pointer"
                                 >
                                     {term}
                                 </button>
@@ -347,119 +413,163 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                 </DialogContent>
             </Dialog>
 
-            {/* Mobile Menu */}
+            {/* ── Mobile Menu ──────────────────────────────────────── */}
             {isMobileMenuOpen && (
                 <div className="fixed inset-0 z-50 lg:hidden">
                     <div
-                        className="absolute inset-0 bg-black bg-opacity-50 animate-fade-in"
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fade-in"
                         onClick={() => setIsMobileMenuOpen(false)}
                     />
 
-                    <div className="absolute left-0 top-0 bottom-0 w-80 bg-[hsl(var(--card))] shadow-xl overflow-y-auto animate-slide-in-left">
-                        <div className="p-4 border-b border-[hsl(var(--border))]">
+                    <div className="absolute left-0 top-0 bottom-0 w-80 bg-[hsl(var(--card))] shadow-[var(--shadow-premium)] overflow-y-auto animate-slide-in-right">
+                        {/* Header */}
+                        <div className="p-5 border-b border-[hsl(var(--border))]">
                             <div className="flex items-center justify-between">
                                 <Link
                                     href="/"
-                                    className="flex items-center"
+                                    className="flex flex-col"
                                     onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                    <h1 className="font-luxury-serif text-2xl font-bold text-[hsl(var(--foreground))] leading-tight">
-                                        Ever & Always
-                                    </h1>
+                                    <span className="font-luxury-serif text-xl font-bold text-[hsl(var(--foreground))]">
+                                        Ever &amp; Always
+                                    </span>
+                                    <span className="font-luxury-sans text-[0.6rem] tracking-[0.3em] uppercase text-[hsl(var(--secondary))] mt-0.5">
+                                        Fine Diamond Jewelry
+                                    </span>
                                 </Link>
                                 <button
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className="p-2 hover:text-[hsl(var(--foreground))] rounded-lg cursor-pointer"
+                                    className="p-2 rounded-lg cursor-pointer text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))]"
                                 >
-                                    <X className="w-5 h-5 text-[hsl(var(--lead-text))]" />
+                                    <X className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>
 
-                        <div className="p-4">
-                            <nav className="space-y-1">
-                                <div className="font-semibold text-[hsl(var(--foreground))] px-4 py-2 text-sm uppercase tracking-wide">
-                                    Shop Categories
-                                </div>
+                        <div className="p-4 space-y-1">
+                            {/* Section label */}
+                            <p className="font-luxury-sans text-[hsl(var(--secondary))] px-3 py-2 text-[10px] uppercase tracking-[0.28em]">
+                                Shop Categories
+                            </p>
 
-                                {/* Engagement Rings Mobile */}
-                                <div className="border border-[hsl(var(--border))] rounded-lg">
-                                    <div className="px-4 py-3 font-normal text-[hsl(var(--foreground))]">
-                                        Engagement Rings
-                                    </div>
-                                    <div className="px-4 pb-3 space-y-2">
-                                        <div className="text-sm text-[hsl(var(--muted-foreground))] font-normal">
-                                            By Shape
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-1">
-                                            {engagementCategories['By Shape']
-                                                .slice(0, 4)
-                                                .map((shape) => (
-                                                    <Link
-                                                        key={shape}
-                                                        href={`/collection/${getCollectionSlug('engagement', shape)}`}
-                                                        onClick={() => setIsMobileMenuOpen(false)}
-                                                        className="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] py-1"
-                                                    >
-                                                        {shape}
-                                                    </Link>
-                                                ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Wedding Rings Mobile */}
-                                <div className="border border-[hsl(var(--border))] rounded-lg">
-                                    <div className="px-4 py-3 font-normal text-[hsl(var(--foreground))]">
-                                        Wedding Rings
-                                    </div>
-                                    <div className="px-4 pb-3 space-y-2">
-                                        <div className="text-sm text-[hsl(var(--muted-foreground))] font-normal">
-                                            Women's
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-1">
-                                            {weddingCategories["Women's"].slice(0, 4).map((item) => (
-                                                <Link
-                                                    key={item}
-                                                    href={`/collection/${getCollectionSlug('wedding', item)}`}
-                                                    onClick={() => setIsMobileMenuOpen(false)}
-                                                    className="text-sm text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] py-1"
-                                                >
-                                                    {item}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Other Collections */}
-                                {collections.map((collection) => (
-                                    <Link
-                                        key={collection.id}
-                                        href={`/collection/${collection.slug}`}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="block py-3 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-lg font-normal transition-colors"
-                                    >
-                                        {collection.name}
-                                    </Link>
-                                ))}
-
-                                <Link
-                                    href="/custom"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="block py-3 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-lg font-normal transition-colors"
+                            {/* Engagement Rings — accordion */}
+                            <div className="border border-[hsl(var(--border))] rounded-xl overflow-hidden">
+                                <button
+                                    onClick={() => setExpandedMobileSection(
+                                        expandedMobileSection === 'engagement' ? null : 'engagement'
+                                    )}
+                                    className="w-full flex items-center justify-between px-4 py-3.5 font-luxury-sans text-sm font-medium text-[hsl(var(--foreground))] cursor-pointer"
                                 >
-                                    Custom Jewelry
-                                </Link>
+                                    <span>Engagement Rings</span>
+                                    <ChevronDown className={`w-4 h-4 text-[hsl(var(--secondary))] transition-transform duration-200 ${expandedMobileSection === 'engagement' ? 'rotate-180' : ''}`} />
+                                </button>
 
-                                <Link
-                                    href="/about-us"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="block py-3 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-lg font-normal transition-colors"
+                                {expandedMobileSection === 'engagement' && (
+                                    <div className="px-4 pb-4 border-t border-[hsl(var(--border))] pt-3 space-y-4">
+                                        {Object.entries(engagementCategories).map(([category, items]) => (
+                                            <div key={category}>
+                                                <p className="text-[10px] text-[hsl(var(--secondary))] font-luxury-sans uppercase tracking-[0.22em] mb-1.5">
+                                                    {category}
+                                                </p>
+                                                <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                                                    {items.map((item) => (
+                                                        <Link
+                                                            key={item}
+                                                            href={`/collection/${getCollectionSlug('engagement', item)}`}
+                                                            onClick={() => setIsMobileMenuOpen(false)}
+                                                            className="text-sm text-[hsl(var(--foreground)/0.65)] hover:text-[hsl(var(--foreground))] py-0.5 font-luxury-sans transition-colors"
+                                                        >
+                                                            {item}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <Link
+                                            href="/collection/engagement"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[hsl(var(--secondary))] font-luxury-sans mt-1"
+                                        >
+                                            View All Engagement <ArrowRight className="w-3 h-3" />
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Wedding Rings — accordion */}
+                            <div className="border border-[hsl(var(--border))] rounded-xl overflow-hidden">
+                                <button
+                                    onClick={() => setExpandedMobileSection(
+                                        expandedMobileSection === 'wedding' ? null : 'wedding'
+                                    )}
+                                    className="w-full flex items-center justify-between px-4 py-3.5 font-luxury-sans text-sm font-medium text-[hsl(var(--foreground))] cursor-pointer"
                                 >
-                                    About Us
+                                    <span>Wedding Rings</span>
+                                    <ChevronDown className={`w-4 h-4 text-[hsl(var(--secondary))] transition-transform duration-200 ${expandedMobileSection === 'wedding' ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {expandedMobileSection === 'wedding' && (
+                                    <div className="px-4 pb-4 border-t border-[hsl(var(--border))] pt-3 space-y-4">
+                                        {Object.entries(weddingCategories).map(([category, items]) => (
+                                            <div key={category}>
+                                                <p className="text-[10px] text-[hsl(var(--secondary))] font-luxury-sans uppercase tracking-[0.22em] mb-1.5">
+                                                    {category}
+                                                </p>
+                                                <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                                                    {items.map((item) => (
+                                                        <Link
+                                                            key={item}
+                                                            href={`/collection/${getCollectionSlug('wedding', item)}`}
+                                                            onClick={() => setIsMobileMenuOpen(false)}
+                                                            className="text-sm text-[hsl(var(--foreground)/0.65)] hover:text-[hsl(var(--foreground))] py-0.5 font-luxury-sans transition-colors"
+                                                        >
+                                                            {item}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <Link
+                                            href="/collection/wedding"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[hsl(var(--secondary))] font-luxury-sans mt-1"
+                                        >
+                                            View All Wedding <ArrowRight className="w-3 h-3" />
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Flat links */}
+                            {collections.map((collection) => (
+                                <Link
+                                    key={collection.id}
+                                    href={`/collection/${collection.slug}`}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center justify-between py-3.5 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-xl font-luxury-sans text-sm transition-colors border border-transparent hover:border-[hsl(var(--border))]"
+                                >
+                                    {collection.name}
+                                    <ChevronRight className="w-4 h-4 opacity-40" />
                                 </Link>
-                            </nav>
+                            ))}
+
+                            <Link
+                                href="/custom"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center justify-between py-3.5 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-xl font-luxury-sans text-sm transition-colors border border-transparent hover:border-[hsl(var(--border))]"
+                            >
+                                Custom Jewelry
+                                <ChevronRight className="w-4 h-4 opacity-40" />
+                            </Link>
+
+                            <Link
+                                href="/about-us"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center justify-between py-3.5 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-xl font-luxury-sans text-sm transition-colors border border-transparent hover:border-[hsl(var(--border))]"
+                            >
+                                About Us
+                                <ChevronRight className="w-4 h-4 opacity-40" />
+                            </Link>
                         </div>
                     </div>
                 </div>

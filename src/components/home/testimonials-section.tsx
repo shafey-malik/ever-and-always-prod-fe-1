@@ -1,6 +1,6 @@
 import { Star, Quote } from 'lucide-react';
 import Image from 'next/image';
-import { Card } from '@/components/ui/card';
+import Link from 'next/link';
 
 const testimonials = [
   {
@@ -8,9 +8,10 @@ const testimonials = [
     name: 'Sarah Mitchell',
     location: 'New York, NY',
     rating: 5,
-    text: "The most beautiful ring I've ever seen! The team at Luxe Diamonds helped me find exactly what I was looking for. The craftsmanship is absolutely exceptional.",
+    text: "The most beautiful ring I've ever seen! The team at Ever and Always helped me find exactly what I was looking for. The craftsmanship is absolutely exceptional.",
     image:
       'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    featured: true,
   },
   {
     id: 2,
@@ -20,6 +21,7 @@ const testimonials = [
     text: 'Outstanding service from start to finish. They guided me through every step of choosing the perfect engagement ring. My fiancée absolutely loves it!',
     image:
       'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    featured: false,
   },
   {
     id: 3,
@@ -29,6 +31,7 @@ const testimonials = [
     text: 'The custom design process was incredible. They brought my vision to life perfectly. The attention to detail and quality is unmatched.',
     image:
       'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    featured: false,
   },
   {
     id: 4,
@@ -38,6 +41,7 @@ const testimonials = [
     text: 'Exceptional experience. The diamond quality is remarkable and the setting is flawless. Worth every penny for such a special moment.',
     image:
       'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    featured: false,
   },
 ];
 
@@ -76,134 +80,202 @@ const bestsellers = [
   },
 ];
 
-export function TestimonialsSection() {
+function TestimonialCard({
+  testimonial,
+  featured = false,
+}: {
+  testimonial: (typeof testimonials)[0];
+  featured?: boolean;
+}) {
   return (
-    <section className="py-20 bg-gradient-to-b from-[hsl(var(--background))] to-[hsl(var(--card))] overflow-x-hidden">
-      <div className="container mx-auto px-3 sm:px-6">
-        {/* Testimonials */}
-        <div className="mb-20">
-          <div className="text-center space-y-4 mb-12">
-            <h2 className="font-luxury-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[hsl(var(--foreground))] break-words">
+    <div
+      className={`bg-[hsl(var(--card))] rounded-2xl p-7 sm:p-8 flex flex-col gap-5 shadow-(--shadow-card) hover:shadow-(--shadow-elegant) transition-all duration-500 hover:-translate-y-1 ${
+        featured ? 'h-full' : ''
+      }`}
+      style={{ transitionTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)' }}
+    >
+      {/* Stars */}
+      <div className="flex gap-1">
+        {[...Array(testimonial.rating)].map((_, i) => (
+          <Star
+            key={i}
+            className="w-3.5 h-3.5 fill-[hsl(var(--secondary))] text-[hsl(var(--secondary))]"
+          />
+        ))}
+      </div>
+
+      {/* Quote mark */}
+      <Quote className={`text-[hsl(var(--secondary)/0.3)] ${featured ? 'w-8 h-8' : 'w-6 h-6'}`} />
+
+      {/* Text */}
+      <p
+        className={`text-[hsl(var(--foreground)/0.7)] font-luxury-sans leading-relaxed italic flex-1 ${
+          featured ? 'text-base sm:text-lg' : 'text-sm'
+        }`}
+      >
+        &ldquo;{testimonial.text}&rdquo;
+      </p>
+
+      {/* Divider */}
+      <div className="h-px bg-[hsl(var(--border)/0.6)]" />
+
+      {/* Author */}
+      <div className="flex items-center gap-4">
+        <div className="relative w-10 h-10 flex-shrink-0">
+          <Image
+            src={testimonial.image}
+            alt={testimonial.name}
+            width={40}
+            height={40}
+            className="rounded-full object-cover ring-1 ring-[hsl(var(--secondary)/0.4)] ring-offset-2 ring-offset-[hsl(var(--card))]"
+          />
+        </div>
+        <div>
+          <p className="font-luxury-sans font-semibold text-sm text-[hsl(var(--foreground))]">
+            {testimonial.name}
+          </p>
+          <p className="font-luxury-sans text-xs text-[hsl(var(--muted-foreground))]">
+            {testimonial.location}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TestimonialsSection() {
+  const featured = testimonials.find((t) => t.featured)!;
+  const rest = testimonials.filter((t) => !t.featured);
+
+  return (
+    <section className="py-20 sm:py-28 bg-[hsl(var(--surface-champagne))] dark:bg-[hsl(var(--surface-alt))] overflow-hidden">
+      <div className="container mx-auto px-6 sm:px-8 lg:px-12">
+
+        {/* ── Testimonials ── */}
+        <div className="mb-24 sm:mb-32">
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <div className="h-px w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
+              <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.35em] uppercase">
+                Stories
+              </span>
+              <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
+            </div>
+            <h2 className="font-luxury-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))]">
               What Our Clients Say
             </h2>
-            <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-lg max-w-2xl mx-auto">
-              Every ring tells a story. Here are some stories from our happy
-              couples.
+            <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-base max-w-md mx-auto leading-relaxed">
+              Every ring tells a story. Here are some from our happy couples.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {testimonials.map((testimonial) => (
-              <Card
-                key={testimonial.id}
-                className="card-luxury p-6 text-center space-y-4 transition-all duration-300 hover:shadow-xl hover:scale-105 dark:bg-[hsl(var(--card))] border-0"
-              >
-                <div className="relative">
-                  <Quote className="w-8 h-8 text-[hsl(var(--secondary))] mx-auto mb-4 opacity-80" />
-                </div>
+          {/* Asymmetric editorial grid: featured left, 2×2 right */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            {/* Featured testimonial — spans 2 columns */}
+            <div className="lg:col-span-2">
+              <TestimonialCard testimonial={featured} featured />
+            </div>
 
-                <div className="flex justify-center space-x-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="w-5 h-5 fill-[hsl(var(--lead-text))] text-[hsl(var(--lead-text))] transition-transform hover:scale-110"
-                    />
-                  ))}
-                </div>
-
-                <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm leading-relaxed dark:text-gray-300 italic">
-                  "{testimonial.text}"
-                </p>
-
-                <div className="pt-4 border-t border-[hsl(var(--border))] dark:border-slate-600">
-                  <div className="relative w-12 h-12 mx-auto mb-3">
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      width={48}
-                      height={48}
-                      className="rounded-full object-cover border-2 border-[hsl(var(--secondary))] shadow-md"
-                    />
-                  </div>
-                  <h4 className="font-luxury-sans font-semibold text-[hsl(var(--primary))] dark:text-white">
-                    {testimonial.name}
-                  </h4>
-                  <p className="text-[hsl(var(--muted-foreground))] text-xs font-luxury-sans dark:text-gray-400">
-                    {testimonial.location}
-                  </p>
-                </div>
-              </Card>
-            ))}
+            {/* Right: 2×2 stack */}
+            <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {rest.map((t) => (
+                <TestimonialCard key={t.id} testimonial={t} />
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Bestsellers */}
-        <div className="mt-32">
-          <div className="text-center space-y-6 mb-16">
-            <div className="inline-block">
-              <span className="text-[hsl(var(--secondary))] font-luxury-sans text-sm tracking-widest uppercase font-semibold">
+        {/* ── Bestsellers ── */}
+        <div>
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="flex items-center justify-center gap-3 mb-5">
+              <div className="h-px w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
+              <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.35em] uppercase">
                 Premium Collection
               </span>
+              <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
             </div>
-            <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-[hsl(var(--foreground))] leading-tight break-words">
-              Designer's Choice Collection
+            <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-tight">
+              Designer&apos;s Choice Collection
             </h2>
-            <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-lg max-w-2xl mx-auto leading-relaxed">
-              Our most sought-after designs, handpicked by our master jewelers
-              for their exceptional craftsmanship.
+            <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
+              Our most sought-after designs, handpicked by our master jewelers for their exceptional craftsmanship.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
-            {bestsellers.map((ring) => (
-              <Card
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+            {bestsellers.map((ring, index) => (
+              <div
                 key={ring.id}
-                className="group card-luxury overflow-hidden transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 dark:bg-[hsl(var(--card))] border-0"
+                className="group bg-[hsl(var(--card))] rounded-2xl overflow-hidden shadow-(--shadow-card) hover:shadow-(--shadow-elegant) transition-all duration-500 hover:-translate-y-2 cursor-pointer"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.23, 1, 0.32, 1)' }}
               >
-                <div className="relative overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-800 h-72">
+                {/* Image area with numbered watermark */}
+                <div className="relative overflow-hidden h-64 bg-linear-to-br from-[hsl(var(--muted)/0.5)] to-[hsl(var(--border)/0.3)]">
                   <Image
                     src={ring.image}
                     alt={ring.name}
                     fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-125"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="absolute top-4 right-4 bg-[hsl(var(--secondary))] text-black px-4 py-2 rounded-full font-luxury-sans font-bold text-sm opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+
+                  {/* Dark overlay on hover */}
+                  <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+
+                  {/* Numbered watermark */}
+                  <div className="absolute top-3 left-4 font-luxury-serif text-7xl font-bold text-white/[0.07] leading-none select-none pointer-events-none">
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
+
+                  {/* Bestseller badge — reveals on hover */}
+                  <div className="absolute top-4 right-4 bg-[hsl(var(--secondary))] text-[hsl(var(--foreground))] px-3 py-1 font-luxury-sans font-semibold text-[10px] tracking-[0.15em] uppercase opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0">
                     Bestseller
                   </div>
                 </div>
 
-                <div className="p-8 space-y-5">
-                  <div className="space-y-2">
-                    <h3 className="font-luxury-serif text-2xl font-semibold text-[hsl(var(--primary))] dark:text-white group-hover:text-[hsl(var(--secondary))] transition-colors">
+                {/* Card body */}
+                <div className="p-6 space-y-4">
+                  <div>
+                    <h3 className="font-luxury-serif text-xl font-semibold text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--secondary))] transition-colors duration-300">
                       {ring.name}
                     </h3>
-                    <div className="h-1 w-12 bg-gradient-to-r from-[hsl(var(--secondary))] to-transparent rounded-full"></div>
+                    <div className="h-px w-8 bg-linear-to-r from-[hsl(var(--secondary))] to-transparent mt-2" />
                   </div>
 
-                  <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm dark:text-gray-300 leading-relaxed">
+                  <p className="text-[hsl(var(--muted-foreground))] font-luxury-sans text-xs leading-relaxed">
                     {ring.description}
                   </p>
 
-                  <div className="flex items-center justify-between pt-2">
-                    <span className="font-luxury-sans font-bold text-xl text-[hsl(var(--lead-text))]">
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="font-luxury-sans font-bold text-lg text-[hsl(var(--lead-text))]">
                       {ring.price}
                     </span>
-                    <div className="text-xs text-[hsl(var(--muted-foreground))] dark:text-gray-400">
+                    <span className="text-[10px] text-[hsl(var(--muted-foreground))] font-luxury-sans tracking-wide uppercase">
                       In stock
-                    </div>
+                    </span>
                   </div>
 
-                  <div className="pt-4">
-                    <button className="btn-luxury w-full text-sm font-semibold py-3 rounded-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-1 active:translate-y-0 cursor-pointer">
-                      View Details →
-                    </button>
-                  </div>
+                  <button className="w-full text-xs tracking-[0.15em] uppercase font-light border border-[hsl(var(--foreground)/0.2)] text-[hsl(var(--foreground)/0.75)] hover:border-[hsl(var(--secondary))] hover:text-[hsl(var(--secondary))] py-2.5 transition-all duration-300 cursor-pointer rounded-sm">
+                    View Details
+                  </button>
                 </div>
-              </Card>
+              </div>
             ))}
           </div>
+
+          {/* Footer CTA */}
+          <div className="text-center mt-12 sm:mt-16">
+            <Link
+              href="/search"
+              className="inline-flex items-center gap-3 font-luxury-sans text-xs tracking-[0.25em] uppercase text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-300 group"
+            >
+              <span className="h-px w-8 bg-[hsl(var(--secondary)/0.5)] group-hover:w-12 transition-all duration-300" />
+              Browse All Collections
+              <span className="h-px w-8 bg-[hsl(var(--secondary)/0.5)] group-hover:w-12 transition-all duration-300" />
+            </Link>
+          </div>
         </div>
+
       </div>
     </section>
   );
