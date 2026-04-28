@@ -322,18 +322,13 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
 
         // Add payment to the order
         // Build the input object - only include metadata if it has values
-        const paymentInput: { method: string; metadata?: Record<string, unknown> } = {
-            method: paymentMethodCode,
-        };
-
-        if (Object.keys(metadata).length > 0) {
-            paymentInput.metadata = metadata;
-        }
-
         const result = await mutate(
             AddPaymentToOrderMutation,
             {
-                input: paymentInput,
+                input: {
+                    method: paymentMethodCode,
+                    metadata: Object.keys(metadata).length > 0 ? metadata : {},
+                },
             },
             { useAuthToken: true }
         );
