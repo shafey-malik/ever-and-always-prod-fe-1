@@ -22,8 +22,8 @@ const getCartQuantity = cache(async () => {
 
 export async function HeaderWrapper() {
   // Gracefully handle API errors during build (e.g., missing env vars or backend not available)
-  let collections = [];
-  let customer = null;
+  let collections: { id: string; name: string; slug: string }[] = [];
+  let customer: { id: string; firstName: string; lastName: string; emailAddress: string } | null = null;
   let cartQuantity = 0;
 
   try {
@@ -35,7 +35,7 @@ export async function HeaderWrapper() {
       getActiveCustomer().catch((error) => {
         // getActiveCustomer uses cookies() which may fail during build
         // This is expected and we'll just show as not signed in
-        if (error?.digest === 'DYNAMIC_SERVER_USAGE' || error?.message?.includes('cookies')) {
+        if ((error as any)?.digest === 'DYNAMIC_SERVER_USAGE' || (error as any)?.message?.includes('cookies')) {
           return null;
         }
         console.warn('Failed to fetch customer:', error);

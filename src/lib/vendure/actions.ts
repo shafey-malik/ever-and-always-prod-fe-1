@@ -17,7 +17,7 @@ export const getActiveCustomer = cache(async () => {
     } catch (error) {
         // Gracefully handle API errors during build (e.g., missing env vars or cookies() not available)
         // This is expected during static generation
-        if (error?.digest === 'DYNAMIC_SERVER_USAGE' || error?.message?.includes('cookies')) {
+        if ((error as any)?.digest === 'DYNAMIC_SERVER_USAGE' || (error as any)?.message?.includes('cookies')) {
             return null;
         }
         console.warn('Failed to fetch active customer:', error);

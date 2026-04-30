@@ -22,8 +22,8 @@ export function Pagination({currentPage, totalPages}: PaginationProps) {
 
     const getPageNumbers = () => {
         const delta = 2;
-        const range = [];
-        const rangeWithDots = [];
+        const range: number[] = [];
+        const rangeWithDots: (number | string)[] = [];
 
         for (let i = 1; i <= totalPages; i++) {
             if (
