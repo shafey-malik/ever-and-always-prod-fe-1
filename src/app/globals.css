@@ -597,7 +597,7 @@ html {
     animation: marquee var(--marquee-duration, 45s) linear infinite;
   }
 
-  .animate-marquee:hover {
+  .animate-marquee.paused {
     animation-play-state: paused;
   }
 

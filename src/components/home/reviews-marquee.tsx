@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { Star, Quote } from 'lucide-react';
 
@@ -111,6 +111,7 @@ function ReviewCard({ testimonial }: { testimonial: typeof testimonials[0] }) {
 
 export function ReviewsMarquee() {
   const trackRef = useRef<HTMLDivElement>(null);
+  const [paused, setPaused] = useState(false);
 
   return (
     <section className="py-20 sm:py-28 bg-[hsl(var(--background))] dark:bg-[hsl(var(--background))] overflow-hidden">
@@ -141,10 +142,11 @@ export function ReviewsMarquee() {
         {/* Right fade */}
         <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 sm:w-40 z-10 bg-linear-to-l from-[hsl(var(--background))] to-transparent" />
 
-        {/* Scrolling track */}
+        {/* Scrolling track — click to pause/resume */}
         <div
           ref={trackRef}
-          className="flex w-max animate-marquee"
+          onClick={() => setPaused((p) => !p)}
+          className={`flex w-max animate-marquee cursor-pointer ${paused ? 'paused' : ''}`}
           style={{ '--marquee-duration': '45s' } as React.CSSProperties}
         >
           {doubled.map((t, i) => (
