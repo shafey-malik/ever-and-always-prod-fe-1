@@ -82,9 +82,14 @@ export default async function PricePage({
     notFound();
   }
 
-  const productDataPromise = getPriceFilteredProducts(
-    searchParamsResolved
-  );
+  // Inject the page's price ceiling into searchParams so buildSearchInput
+  // switches to the large-page fetch needed for accurate client-side
+  // price filtering (this Vendure SearchInput has no server-side price filter).
+  const priceSearchParams = pricePage.maxPrice > 0
+    ? { ...searchParamsResolved, maxPrice: String(pricePage.maxPrice) }
+    : searchParamsResolved;
+
+  const productDataPromise = getPriceFilteredProducts(priceSearchParams);
 
   // Generate collection schema
   const collectionSchema = generateCollectionSchema({
@@ -119,7 +124,10 @@ export default async function PricePage({
                 <div className="h-64 animate-pulse bg-muted rounded-lg" />
               }
             >
-              <FacetFilters productDataPromise={productDataPromise} />
+              <FacetFilters
+                productDataPromise={productDataPromise}
+                maxPrice={pricePage.maxPrice > 0 ? pricePage.maxPrice : undefined}
+              />
             </Suspense>
           </aside>
 

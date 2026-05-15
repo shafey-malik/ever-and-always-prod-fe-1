@@ -1,28 +1,59 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useMemo, useState, use } from 'react';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
-import { ResultOf } from '@/graphql';
+import { ResultOf, readFragment } from '@/graphql';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { SearchProductsQuery } from "@/lib/vendure/queries";
+import { ProductCardFragment } from "@/lib/vendure/fragments";
 
 interface FacetFiltersProps {
     productDataPromise: Promise<{
         data: ResultOf<typeof SearchProductsQuery>;
         token?: string;
     }>;
+    /** Min price in major currency units. When set, counts are recomputed client-side. */
+    minPrice?: number;
+    /** Max price in major currency units. When set, counts are recomputed client-side. */
+    maxPrice?: number;
 }
 
-export function FacetFilters({ productDataPromise }: FacetFiltersProps) {
+export function FacetFilters({ productDataPromise, minPrice, maxPrice }: FacetFiltersProps) {
     const [isOpen, setIsOpen] = useState(false);
     const result = use(productDataPromise);
     const searchResult = result.data.search;
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const router = useRouter();
+
+    const priceFilterActive = minPrice !== undefined || maxPrice !== undefined;
+
+    // When a price filter is active, recompute facet counts from the items
+    // that pass the price filter so sidebar counts match the displayed grid.
+    const recomputedCounts = useMemo<Map<string, number> | null>(() => {
+        if (!priceFilterActive) return null;
+        const min = minPrice ?? 0;
+        const max = maxPrice ?? Number.POSITIVE_INFINITY;
+        const counts = new Map<string, number>();
+        for (const itemRef of searchResult.items) {
+            const item = readFragment(ProductCardFragment, itemRef);
+            const price = item.priceWithTax;
+            const cents =
+                price.__typename === 'PriceRange' ? price.min :
+                    price.__typename === 'SinglePrice' ? price.value :
+                        null;
+            if (cents == null) continue;
+            const dollars = cents / 100;
+            if (dollars < min || dollars > max) continue;
+            for (const fvId of item.facetValueIds) {
+                counts.set(fvId, (counts.get(fvId) ?? 0) + 1);
+            }
+        }
+        return counts;
+    }, [priceFilterActive, minPrice, maxPrice, searchResult.items]);
 
     // Group facet values by facet
     interface FacetGroup {
@@ -40,13 +71,27 @@ export function FacetFilters({ productDataPromise }: FacetFiltersProps) {
                 values: []
             };
         }
+        const count = recomputedCounts
+            ? (recomputedCounts.get(item.facetValue.id) ?? 0)
+            : item.count;
         acc[facetName].values.push({
             id: item.facetValue.id,
             name: item.facetValue.name,
-            count: item.count
+            count,
         });
         return acc;
     }, {});
+
+    // Hide facet values that drop to 0 when price filter is active —
+    // otherwise the sidebar fills with un-actionable rows.
+    if (priceFilterActive) {
+        for (const groupName of Object.keys(facetGroups)) {
+            facetGroups[groupName].values = facetGroups[groupName].values.filter(v => v.count > 0);
+            if (facetGroups[groupName].values.length === 0) {
+                delete facetGroups[groupName];
+            }
+        }
+    }
 
     const selectedFacets = searchParams.getAll('facets');
 

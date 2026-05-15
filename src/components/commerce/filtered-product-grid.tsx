@@ -1,13 +1,12 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, use } from 'react';
 import { ResultOf, readFragment } from '@/graphql';
 import { ProductCard } from './product-card';
 import { Pagination } from '@/components/shared/pagination';
 import { SortDropdown } from './sort-dropdown';
 import { SearchProductsQuery } from '@/lib/vendure/queries';
 import { ProductCardFragment } from '@/lib/vendure/fragments';
-import { use } from 'react';
 
 interface FilteredProductGridProps {
   productDataPromise: Promise<{
@@ -16,7 +15,9 @@ interface FilteredProductGridProps {
   }>;
   currentPage: number;
   take: number;
+  /** Min price in major currency units (dollars). Filter applied client-side. */
   minPrice?: number;
+  /** Max price in major currency units (dollars). Filter applied client-side. */
   maxPrice?: number;
 }
 
@@ -30,43 +31,48 @@ export function FilteredProductGrid({
   const result = use(productDataPromise);
   const searchResult = result.data.search;
 
-  // Filter products by price range on frontend
-  const filteredProducts = useMemo(() => {
-    if (!minPrice && !maxPrice) {
-      return searchResult.items;
+  const priceFilterActive = minPrice !== undefined || maxPrice !== undefined;
+
+  // When a price filter is active, the server returned a large unpaginated
+  // page (see PRICE_FILTER_FETCH_SIZE). Filter and paginate client-side and
+  // recompute totalItems so pagination stays correct.
+  const { displayItems, totalItems, totalPages } = useMemo(() => {
+    if (!priceFilterActive) {
+      return {
+        displayItems: searchResult.items,
+        totalItems: searchResult.totalItems,
+        totalPages: Math.ceil(searchResult.totalItems / take),
+      };
     }
 
-    const min = minPrice || 0;
-    const max = maxPrice || Infinity;
+    const min = minPrice ?? 0;
+    const max = maxPrice ?? Number.POSITIVE_INFINITY;
 
-    return searchResult.items.filter((productRef) => {
-      const product = readFragment(ProductCardFragment, productRef);
+    const filtered = searchResult.items.filter((itemRef) => {
+      const product = readFragment(ProductCardFragment, itemRef);
       const price = product.priceWithTax;
-      let productPrice: number;
-
+      let amountInCents: number;
       if (price.__typename === 'PriceRange') {
-        // Use the minimum price of the range
-        productPrice = price.min;
+        amountInCents = price.min;
       } else if (price.__typename === 'SinglePrice') {
-        productPrice = price.value;
+        amountInCents = price.value;
       } else {
         return false;
       }
-
-      // Convert from cents to dollars for comparison
-      const priceInDollars = productPrice / 100;
-      return priceInDollars >= min && priceInDollars <= max;
+      // Vendure prices are in minor currency units; convert to dollars.
+      const amount = amountInCents / 100;
+      return amount >= min && amount <= max;
     });
-  }, [searchResult.items, minPrice, maxPrice]);
 
-  const totalFilteredItems = filteredProducts.length;
-  const totalPages = Math.ceil(totalFilteredItems / take);
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * take,
-    currentPage * take
-  );
+    const start = (currentPage - 1) * take;
+    return {
+      displayItems: filtered.slice(start, start + take),
+      totalItems: filtered.length,
+      totalPages: Math.ceil(filtered.length / take),
+    };
+  }, [priceFilterActive, searchResult.items, searchResult.totalItems, minPrice, maxPrice, currentPage, take]);
 
-  if (filteredProducts.length === 0) {
+  if (totalItems === 0) {
     return (
       <div className="text-center py-12">
         <p className="text-muted-foreground">No products found matching your filters</p>
@@ -78,15 +84,15 @@ export function FilteredProductGrid({
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          {totalFilteredItems} {totalFilteredItems === 1 ? 'product' : 'products'}
+          {totalItems} {totalItems === 1 ? 'product' : 'products'}
         </p>
         <SortDropdown />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {paginatedProducts.map((product, i) => (
+        {displayItems.map((product, i) => (
           <div
-            key={'product-grid-item' + i}
+            key={readFragment(ProductCardFragment, product).productId}
             className="animate-fade-in-up"
             style={{
               animationDelay: `${Math.min(i * 50, 500)}ms`,
