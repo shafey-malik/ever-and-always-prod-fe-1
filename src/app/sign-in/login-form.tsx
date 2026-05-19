@@ -94,7 +94,8 @@ export function LoginForm({ redirectTo, oauthError }: LoginFormProps) {
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <CardContent className="space-y-4">
-                        {/* Google Sign In Button */}
+                        {/* Google Sign In disabled — backend OAuth flow removed.
+                            See backend/src/plugins/google-auth.plugin.ts (unwired).
                         <Button
                             type="button"
                             variant="outline"
@@ -134,6 +135,7 @@ export function LoginForm({ redirectTo, oauthError }: LoginFormProps) {
                                 </span>
                             </div>
                         </div>
+                        */}
                         <FormField
                             control={form.control}
                             name="username"
