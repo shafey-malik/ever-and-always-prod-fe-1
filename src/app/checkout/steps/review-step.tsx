@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Loader2, MapPin, Truck, CreditCard, Edit } from 'lucide-react';
 import { useCheckout } from '../checkout-provider';
@@ -14,6 +14,7 @@ interface ReviewStepProps {
 export default function ReviewStep({ onEditStep }: ReviewStepProps) {
   const { order, paymentMethods, selectedPaymentMethodCode, stripePaymentIntentId } = useCheckout();
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
 
   const selectedPaymentMethod = paymentMethods.find(
     (method) => method.code === selectedPaymentMethodCode
@@ -22,6 +23,10 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
   const [error, setError] = useState<string | null>(null);
 
   const handlePlaceOrder = async () => {
+    // Synchronous double-submit guard — runs before any state read so a
+    // second click during React's re-render window cannot get past here.
+    if (submittingRef.current) return;
+
     // Validate prerequisites
     if (!selectedPaymentMethodCode) {
       setError('Please select a payment method.');
@@ -45,9 +50,10 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
       return;
     }
 
+    submittingRef.current = true;
     setLoading(true);
     setError(null);
-    
+
     try {
       // For Stripe payments, pass the payment intent ID
       await placeOrderAction(selectedPaymentMethodCode, stripePaymentIntentId || undefined);
@@ -56,18 +62,19 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
     } catch (error) {
       // Check if this is a Next.js redirect (which is expected)
       if (error instanceof Error) {
-        const isRedirect = 
-          error.message.includes('NEXT_REDIRECT') || 
+        const isRedirect =
+          error.message.includes('NEXT_REDIRECT') ||
           (error as any).digest?.startsWith('NEXT_REDIRECT');
-        
+
         if (isRedirect) {
-          // This is a redirect, not an error - let it propagate
+          // Redirect path: keep submittingRef/loading set so the button
+          // stays disabled while the navigation unmounts this component.
           throw error;
         }
-        
+
         // Extract user-friendly error message
         let errorMessage = error.message || 'Failed to place order. Please try again.';
-        
+
         // Clean up technical error messages
         if (errorMessage.includes('Server Components render')) {
           if ((error as any).originalError) {
@@ -76,12 +83,14 @@ export default function ReviewStep({ onEditStep }: ReviewStepProps) {
             errorMessage = 'An error occurred while processing your order. Please try again.';
           }
         }
-        
+
         setError(errorMessage);
         setLoading(false);
+        submittingRef.current = false;
       } else {
         setError('An unexpected error occurred. Please try again.');
         setLoading(false);
+        submittingRef.current = false;
       }
     }
   };
