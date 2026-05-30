@@ -75,9 +75,9 @@ export default async function OrderDetailPage(props: PageProps<'/account/orders/
                         <CardContent>
                             <div className="space-y-4">
                                 {order.lines.map((line) => (
-                                    <div key={line.id} className="flex gap-4">
+                                    <div key={line.id} className="flex gap-3 sm:gap-4">
                                         <div
-                                            className="relative h-20 w-20 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
+                                            className="relative h-16 w-16 sm:h-20 sm:w-20 rounded-md overflow-hidden bg-gray-100 flex-shrink-0">
                                             {line.productVariant.product.featuredAsset && (
                                                 <Image
                                                     src={line.productVariant.product.featuredAsset.preview}
@@ -87,21 +87,21 @@ export default async function OrderDetailPage(props: PageProps<'/account/orders/
                                                 />
                                             )}
                                         </div>
-                                        <div className="flex-1">
+                                        <div className="flex-1 min-w-0">
                                             <Link
                                                 href={`/product/${line.productVariant.product.slug}`}
-                                                className="font-medium hover:underline"
+                                                className="font-medium hover:underline break-words"
                                             >
                                                 {line.productVariant.product.name}
                                             </Link>
                                             <p className="text-sm text-muted-foreground">
                                                 {line.productVariant.name}
                                             </p>
-                                            <p className="text-sm text-muted-foreground">
+                                            <p className="text-sm text-muted-foreground break-words">
                                                 SKU: {line.productVariant.sku}
                                             </p>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-right flex-shrink-0">
                                             <p className="font-medium">
                                                 <Price value={line.linePriceWithTax} currencyCode={order.currencyCode}/>
                                             </p>

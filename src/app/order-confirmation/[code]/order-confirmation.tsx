@@ -83,7 +83,7 @@ export async function OrderConfirmation({params}: PageProps<'/order-confirmation
                     </CardHeader>
                     <CardContent className="space-y-4">
                         {order.lines.map((line) => (
-                            <div key={line.id} className="flex gap-4 items-center">
+                            <div key={line.id} className="flex gap-3 sm:gap-4 items-center">
                                 {line.productVariant.product.featuredAsset && (
                                     <div className="flex-shrink-0">
                                         <Image
@@ -91,7 +91,7 @@ export async function OrderConfirmation({params}: PageProps<'/order-confirmation
                                             alt={line.productVariant.name}
                                             width={80}
                                             height={80}
-                                            className="rounded object-cover h-20 w-20 object-center"
+                                            className="rounded object-cover h-16 w-16 sm:h-20 sm:w-20 object-center"
                                         />
                                     </div>
                                 )}
@@ -102,12 +102,15 @@ export async function OrderConfirmation({params}: PageProps<'/order-confirmation
                                             {line.productVariant.name}
                                         </p>
                                     )}
+                                    <p className="text-sm text-muted-foreground sm:hidden mt-1">
+                                        Qty: {line.quantity}
+                                    </p>
                                 </div>
-                                <div className="text-center w-16">
+                                <div className="hidden sm:block text-center w-16">
                                     <p className="text-sm text-muted-foreground">Qty</p>
                                     <p className="font-medium">{line.quantity}</p>
                                 </div>
-                                <div className="text-right w-24">
+                                <div className="text-right w-auto sm:w-24 flex-shrink-0">
                                     <p className="font-semibold">
                                         <Price value={line.linePriceWithTax} currencyCode={order.currencyCode}/>
                                     </p>

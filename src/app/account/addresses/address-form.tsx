@@ -72,8 +72,8 @@ export function AddressForm({ countries, address, onSubmit, onCancel, isSubmitti
   return (
     <form onSubmit={handleSubmit(handleFormSubmit)}>
       <FieldGroup className="my-6">
-        <div className="grid grid-cols-2 gap-4">
-          <Field className="col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field className="sm:col-span-2">
             <FieldLabel htmlFor="fullName">Full Name *</FieldLabel>
             <Input
               id="fullName"
@@ -83,12 +83,12 @@ export function AddressForm({ countries, address, onSubmit, onCancel, isSubmitti
             <FieldError>{errors.fullName?.message}</FieldError>
           </Field>
 
-          <Field className="col-span-2">
+          <Field className="sm:col-span-2">
             <FieldLabel htmlFor="company">Company</FieldLabel>
             <Input id="company" {...register('company')} disabled={isSubmitting} />
           </Field>
 
-          <Field className="col-span-2">
+          <Field className="sm:col-span-2">
             <FieldLabel htmlFor="streetLine1">Street Address *</FieldLabel>
             <Input
               id="streetLine1"
@@ -98,7 +98,7 @@ export function AddressForm({ countries, address, onSubmit, onCancel, isSubmitti
             <FieldError>{errors.streetLine1?.message}</FieldError>
           </Field>
 
-          <Field className="col-span-2">
+          <Field className="sm:col-span-2">
             <FieldLabel htmlFor="streetLine2">Apartment, suite, etc.</FieldLabel>
             <Input id="streetLine2" {...register('streetLine2')} disabled={isSubmitting} />
           </Field>
@@ -151,7 +151,7 @@ export function AddressForm({ countries, address, onSubmit, onCancel, isSubmitti
             <FieldError>{errors.countryCode?.message}</FieldError>
           </Field>
 
-          <Field className="col-span-2">
+          <Field className="sm:col-span-2">
             <FieldLabel htmlFor="phoneNumber">Phone Number *</FieldLabel>
             <Input
               id="phoneNumber"

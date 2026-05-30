@@ -156,7 +156,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
             </label>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               onClick={handleSelectExistingAddress}
               disabled={!selectedAddressId || loading}
@@ -182,8 +182,8 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                   </DialogHeader>
 
                   <FieldGroup className="my-6">
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field className="col-span-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Field className="sm:col-span-2">
                         <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
                         <Input
                           id="fullName"
@@ -192,12 +192,12 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                         <FieldError>{errors.fullName?.message}</FieldError>
                       </Field>
 
-                      <Field className="col-span-2">
+                      <Field className="sm:col-span-2">
                         <FieldLabel htmlFor="company">Company</FieldLabel>
                         <Input id="company" {...register('company')} />
                       </Field>
 
-                      <Field className="col-span-2">
+                      <Field className="sm:col-span-2">
                         <FieldLabel htmlFor="streetLine1">Street Address *</FieldLabel>
                         <Input
                           id="streetLine1"
@@ -206,7 +206,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                         <FieldError>{errors.streetLine1?.message}</FieldError>
                       </Field>
 
-                      <Field className="col-span-2">
+                      <Field className="sm:col-span-2">
                         <FieldLabel htmlFor="streetLine2">Apartment, suite, etc.</FieldLabel>
                         <Input id="streetLine2" {...register('streetLine2')} />
                       </Field>
@@ -256,7 +256,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                         <FieldError>{errors.countryCode?.message}</FieldError>
                       </Field>
 
-                      <Field className="col-span-2">
+                      <Field className="sm:col-span-2">
                         <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
                         <Input
                           id="phoneNumber"
@@ -308,8 +308,8 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
               </DialogHeader>
 
               <FieldGroup className="my-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <Field className="col-span-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Field className="sm:col-span-2">
                     <FieldLabel htmlFor="fullName">Full Name</FieldLabel>
                     <Input
                       id="fullName"
@@ -318,12 +318,12 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                     <FieldError>{errors.fullName?.message}</FieldError>
                   </Field>
 
-                  <Field className="col-span-2">
+                  <Field className="sm:col-span-2">
                     <FieldLabel htmlFor="company">Company</FieldLabel>
                     <Input id="company" {...register('company')} />
                   </Field>
 
-                  <Field className="col-span-2">
+                  <Field className="sm:col-span-2">
                     <FieldLabel htmlFor="streetLine1">Street Address *</FieldLabel>
                     <Input
                       id="streetLine1"
@@ -332,7 +332,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                     <FieldError>{errors.streetLine1?.message}</FieldError>
                   </Field>
 
-                  <Field className="col-span-2">
+                  <Field className="sm:col-span-2">
                     <FieldLabel htmlFor="streetLine2">Apartment, suite, etc.</FieldLabel>
                     <Input id="streetLine2" {...register('streetLine2')} />
                   </Field>
@@ -382,7 +382,7 @@ export default function ShippingAddressStep({ onComplete }: ShippingAddressStepP
                     <FieldError>{errors.countryCode?.message}</FieldError>
                   </Field>
 
-                  <Field className="col-span-2">
+                  <Field className="sm:col-span-2">
                     <FieldLabel htmlFor="phoneNumber">Phone Number</FieldLabel>
                     <Input
                       id="phoneNumber"
