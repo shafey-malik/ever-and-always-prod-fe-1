@@ -10,7 +10,7 @@ import { Price } from '@/components/commerce/price';
 export default function OrderSummary() {
   const { order } = useCheckout();
   return (
-    <Card className="sticky top-4">
+    <Card className="lg:sticky lg:top-4">
       <CardHeader>
         <CardTitle>Order Summary</CardTitle>
       </CardHeader>

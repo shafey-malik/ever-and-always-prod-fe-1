@@ -71,7 +71,7 @@ export default function CheckoutFlow() {
           }}
           className="space-y-4"
         >
-          <AccordionItem value="shipping" className="border rounded-lg px-6">
+          <AccordionItem value="shipping" className="border rounded-lg px-4 sm:px-6">
             <AccordionTrigger className="hover:no-underline">
               <div className="flex items-center gap-3">
                 <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${
@@ -95,7 +95,7 @@ export default function CheckoutFlow() {
 
           <AccordionItem
             value="delivery"
-            className="border rounded-lg px-6"
+            className="border rounded-lg px-4 sm:px-6"
             disabled={!canAccessStep('delivery')}
           >
             <AccordionTrigger
@@ -124,7 +124,7 @@ export default function CheckoutFlow() {
 
           <AccordionItem
             value="payment"
-            className="border rounded-lg px-6"
+            className="border rounded-lg px-4 sm:px-6"
             disabled={!canAccessStep('payment')}
           >
             <AccordionTrigger
@@ -153,7 +153,7 @@ export default function CheckoutFlow() {
 
           <AccordionItem
             value="review"
-            className="border rounded-lg px-6"
+            className="border rounded-lg px-4 sm:px-6"
             disabled={!canAccessStep('review')}
           >
             <AccordionTrigger
