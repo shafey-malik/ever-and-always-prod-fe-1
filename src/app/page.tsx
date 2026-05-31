@@ -4,6 +4,7 @@ import { HeroCarousel } from "@/components/home/hero-carousel";
 import { DiamondSelector } from "@/components/home/diamond-selector";
 import { FilterSectionWrapper } from "@/components/home/filter-section-wrapper";
 import { DesignersCollection } from "@/components/home/designers-collection";
+import { CollectionsBanners } from "@/components/home/collections-banners";
 import { ReviewsMarquee } from "@/components/home/reviews-marquee";
 import { AnimatedSection } from "@/components/shared/animated-section";
 import { SITE_NAME, SITE_URL, buildCanonicalUrl } from "@/lib/metadata";
@@ -55,6 +56,10 @@ export default async function Home(_props: PageProps<'/'>) {
             </AnimatedSection>
 
             <AnimatedSection delay={0.4}>
+                <CollectionsBanners />
+            </AnimatedSection>
+
+            <AnimatedSection delay={0.45}>
                 <DesignersCollection />
             </AnimatedSection>
 
