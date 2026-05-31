@@ -66,41 +66,47 @@ const doubled = [...testimonials, ...testimonials];
 
 function ReviewCard({ testimonial }: { testimonial: typeof testimonials[0] }) {
   return (
-    <div className="flex-shrink-0 w-80 sm:w-96 bg-[hsl(var(--card))] rounded-2xl p-7 flex flex-col gap-4 shadow-(--shadow-card) mx-3">
+    <div className="relative shrink-0 w-[19rem] sm:w-96 bg-[hsl(var(--card))] rounded-2xl p-6 sm:p-7 flex flex-col gap-4 shadow-(--shadow-card) mx-2.5 sm:mx-3 border border-[hsl(var(--border)/0.5)] overflow-hidden">
+      {/* Gold corner accent */}
+      <span className="pointer-events-none absolute top-0 left-0 w-8 h-px bg-[hsl(var(--secondary)/0.7)]" />
+      <span className="pointer-events-none absolute top-0 left-0 w-px h-8 bg-[hsl(var(--secondary)/0.7)]" />
+      <span className="pointer-events-none absolute bottom-0 right-0 w-8 h-px bg-[hsl(var(--secondary)/0.7)]" />
+      <span className="pointer-events-none absolute bottom-0 right-0 w-px h-8 bg-[hsl(var(--secondary)/0.7)]" />
+
       {/* Stars */}
-      <div className="flex gap-1">
-        {[...Array(testimonial.rating)].map((_, i) => (
-          <Star key={i} className="w-3.5 h-3.5 fill-[hsl(var(--secondary))] text-[hsl(var(--secondary))]" />
-        ))}
+      <div className="flex items-center justify-between">
+        <div className="flex gap-1">
+          {[...Array(testimonial.rating)].map((_, i) => (
+            <Star key={i} className="w-3.5 h-3.5 fill-[hsl(var(--secondary))] text-[hsl(var(--secondary))]" />
+          ))}
+        </div>
+        <Quote className="w-7 h-7 text-[hsl(var(--secondary)/0.25)]" />
       </div>
 
-      {/* Quote icon */}
-      <Quote className="w-6 h-6 text-[hsl(var(--secondary)/0.3)]" />
-
       {/* Text */}
-      <p className="text-[hsl(var(--foreground)/0.7)] font-luxury-sans text-sm leading-relaxed italic flex-1">
+      <p className="text-[hsl(var(--foreground)/0.78)] font-luxury-serif text-[15px] sm:text-base leading-relaxed italic flex-1 font-light">
         &ldquo;{testimonial.text}&rdquo;
       </p>
 
       {/* Divider */}
-      <div className="h-px bg-[hsl(var(--border)/0.6)]" />
+      <div className="h-px bg-linear-to-r from-[hsl(var(--secondary)/0.4)] via-[hsl(var(--border)/0.6)] to-transparent" />
 
       {/* Author */}
       <div className="flex items-center gap-4">
-        <div className="relative w-10 h-10 shrink-0">
+        <div className="relative w-11 h-11 shrink-0">
           <Image
             src={testimonial.image}
             alt={testimonial.name}
-            width={40}
-            height={40}
-            className="rounded-full object-cover ring-1 ring-[hsl(var(--secondary)/0.4)] ring-offset-2 ring-offset-[hsl(var(--card))]"
+            width={44}
+            height={44}
+            className="rounded-full object-cover ring-1 ring-[hsl(var(--secondary)/0.5)] ring-offset-2 ring-offset-[hsl(var(--card))]"
           />
         </div>
-        <div>
-          <p className="font-luxury-sans font-semibold text-sm text-[hsl(var(--foreground))]">
+        <div className="min-w-0">
+          <p className="font-luxury-sans font-semibold text-sm text-[hsl(var(--foreground))] truncate">
             {testimonial.name}
           </p>
-          <p className="font-luxury-sans text-xs text-[hsl(var(--muted-foreground))]">
+          <p className="font-luxury-sans text-[10px] tracking-[0.2em] uppercase text-[hsl(var(--muted-foreground))] truncate">
             {testimonial.location}
           </p>
         </div>
@@ -114,8 +120,11 @@ export function ReviewsMarquee() {
   const [paused, setPaused] = useState(false);
 
   return (
-    <section className="py-20 sm:py-28 bg-[hsl(var(--background))] dark:bg-[hsl(var(--background))] overflow-hidden">
-      <div className="container mx-auto px-6 sm:px-8 lg:px-12 mb-12 sm:mb-16">
+    <section className="relative py-16 sm:py-28 bg-[hsl(var(--background))] dark:bg-[hsl(var(--background))] overflow-hidden">
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-160 h-80 bg-[hsl(var(--secondary)/0.04)] blur-3xl rounded-full" />
+
+      <div className="container mx-auto px-5 sm:px-8 lg:px-12 mb-10 sm:mb-16 relative">
 
         {/* Heading */}
         <div className="text-center">
@@ -126,10 +135,17 @@ export function ReviewsMarquee() {
             </span>
             <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
           </div>
-          <h2 className="font-luxury-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))]">
-            What Our Clients Say
+          <h2 className="font-luxury-serif text-[2rem] sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))] leading-[1.05] tracking-tight">
+            What Our{' '}
+            <span className="italic text-[hsl(var(--secondary-rich))] font-extralight">Clients</span>{' '}
+            Say
           </h2>
-          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-base max-w-md mx-auto leading-relaxed">
+          <div className="mt-5 mb-1 flex items-center justify-center gap-2.5">
+            <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
+            <span className="w-1.5 h-1.5 rotate-45 bg-[hsl(var(--secondary))]" />
+            <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
+          </div>
+          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-md mx-auto leading-relaxed font-light">
             Every ring tells a story. Here are some from our happy couples.
           </p>
         </div>
@@ -138,15 +154,15 @@ export function ReviewsMarquee() {
       {/* Marquee track — full-bleed, no container padding */}
       <div className="relative">
         {/* Left fade */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-24 sm:w-40 z-10 bg-linear-to-r from-[hsl(var(--background))] to-transparent" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-40 z-10 bg-linear-to-r from-[hsl(var(--background))] to-transparent" />
         {/* Right fade */}
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-24 sm:w-40 z-10 bg-linear-to-l from-[hsl(var(--background))] to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-40 z-10 bg-linear-to-l from-[hsl(var(--background))] to-transparent" />
 
         {/* Scrolling track — click to pause/resume */}
         <div
           ref={trackRef}
           onClick={() => setPaused((p) => !p)}
-          className={`flex w-max animate-marquee cursor-pointer ${paused ? 'paused' : ''}`}
+          className={`flex w-max animate-marquee cursor-pointer py-2 ${paused ? 'paused' : ''}`}
           style={{ '--marquee-duration': '45s' } as React.CSSProperties}
         >
           {doubled.map((t, i) => (

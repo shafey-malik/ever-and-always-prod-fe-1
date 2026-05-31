@@ -105,15 +105,15 @@ function FacetSelect({
 }) {
   if (values.length === 0) return null;
   return (
-    <div className="space-y-3">
-      <label className="font-luxury-sans text-sm font-semibold text-[hsl(var(--foreground))] block">
+    <div className="space-y-2.5">
+      <label className="font-luxury-sans text-[10px] sm:text-[11px] font-semibold tracking-[0.2em] uppercase text-[hsl(var(--foreground))] block">
         {FACET_LABELS[facetKey] ?? facetKey}
       </label>
       <Select
         value={selected}
         onValueChange={(value) => onChange(facetKey, value)}
       >
-        <SelectTrigger className="w-full bg-[hsl(var(--card))]">
+        <SelectTrigger className="w-full bg-[hsl(var(--card))] py-5 sm:py-4">
           <SelectValue placeholder={FACET_PLACEHOLDERS[facetKey] ?? 'Select'} />
         </SelectTrigger>
         <SelectContent className="bg-[hsl(var(--card))]">
@@ -181,9 +181,12 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
   ).length;
 
   return (
-    <section className="py-20 sm:py-28 bg-[hsl(var(--surface-alt))] dark:bg-[hsl(var(--background))] overflow-hidden">
-      <div className="container mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="text-center mb-12 sm:mb-16">
+    <section className="relative py-16 sm:py-28 bg-[hsl(var(--surface-alt))] dark:bg-[hsl(var(--background))] overflow-hidden">
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute top-10 right-0 w-[28rem] h-[28rem] rounded-full bg-[hsl(var(--secondary)/0.05)] blur-3xl" />
+
+      <div className="container mx-auto px-5 sm:px-8 lg:px-12 relative">
+        <div className="text-center mb-10 sm:mb-16">
           <div className="flex items-center justify-center gap-3 mb-5">
             <div className="h-px w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
             <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.35em] uppercase">
@@ -191,19 +194,35 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
             </span>
             <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
           </div>
-          <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))]">
-            Find Your Perfect Ring
+          <h2 className="font-luxury-serif text-[2rem] sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-[1.05] tracking-tight">
+            Find Your{' '}
+            <span className="italic text-[hsl(var(--secondary-rich))] font-extralight">Perfect</span>{' '}
+            Ring
           </h2>
-          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-base max-w-lg mx-auto leading-relaxed">
+          <div className="mt-5 mb-1 flex items-center justify-center gap-2.5">
+            <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
+            <span className="w-1.5 h-1.5 rotate-45 bg-[hsl(var(--secondary))]" />
+            <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
+          </div>
+          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-lg mx-auto leading-relaxed font-light">
             Use our advanced filters to discover the diamond ring that matches
             your vision and budget.
           </p>
         </div>
 
-        <Card className="bg-[hsl(var(--card))] rounded-2xl shadow-(--shadow-elegant) p-6 sm:p-10 max-w-6xl mx-auto border border-[hsl(var(--border)/0.5)] transition-none">
+        <Card className="relative bg-[hsl(var(--card))] rounded-2xl shadow-(--shadow-elegant) p-5 sm:p-10 max-w-6xl mx-auto border border-[hsl(var(--border)/0.5)] transition-none">
+          {/* Gold corner accents */}
+          <span className="pointer-events-none absolute top-0 left-0 w-10 h-px bg-[hsl(var(--secondary)/0.6)]" />
+          <span className="pointer-events-none absolute top-0 left-0 w-px h-10 bg-[hsl(var(--secondary)/0.6)]" />
+          <span className="pointer-events-none absolute top-0 right-0 w-10 h-px bg-[hsl(var(--secondary)/0.6)]" />
+          <span className="pointer-events-none absolute top-0 right-0 w-px h-10 bg-[hsl(var(--secondary)/0.6)]" />
+          <span className="pointer-events-none absolute bottom-0 left-0 w-10 h-px bg-[hsl(var(--secondary)/0.6)]" />
+          <span className="pointer-events-none absolute bottom-0 left-0 w-px h-10 bg-[hsl(var(--secondary)/0.6)]" />
+          <span className="pointer-events-none absolute bottom-0 right-0 w-10 h-px bg-[hsl(var(--secondary)/0.6)]" />
+          <span className="pointer-events-none absolute bottom-0 right-0 w-px h-10 bg-[hsl(var(--secondary)/0.6)]" />
 
           {/* Primary Filters */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-7">
             {primaryFacets.map(({ key, values }) => (
               <FacetSelect
                 key={key}
@@ -217,8 +236,8 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
 
           {/* Advanced Filters */}
           {hasAdvanced && showAdvanced && (
-            <div className="mt-8 pt-8 border-t border-[hsl(var(--border))]">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="mt-7 pt-7 sm:mt-8 sm:pt-8 border-t border-[hsl(var(--border))]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-7">
                 {advancedFacets.map(({ key, values }) => (
                   <FacetSelect
                     key={key}
@@ -233,15 +252,15 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
           )}
 
           {/* Price Range Slider */}
-          <div className="mt-8 pt-8 border-t border-[hsl(var(--border))]">
+          <div className="mt-7 pt-7 sm:mt-8 sm:pt-8 border-t border-[hsl(var(--border))]">
             <div className="max-w-2xl mx-auto">
               <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <label className="font-luxury-sans text-sm font-semibold text-[hsl(var(--foreground))]">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <label className="font-luxury-sans text-[11px] sm:text-sm font-semibold tracking-[0.18em] uppercase text-[hsl(var(--foreground))]">
                     Price Range
                   </label>
-                  <span className="font-luxury-sans text-sm text-[hsl(var(--muted-foreground))]">
-                    ${priceRange[0].toLocaleString()} – ${priceRange[1].toLocaleString()}
+                  <span className="font-luxury-serif font-light text-base sm:text-lg text-[hsl(var(--secondary-rich))]">
+                    ${priceRange[0].toLocaleString()} <span className="text-[hsl(var(--muted-foreground))] mx-1">—</span> ${priceRange[1].toLocaleString()}
                   </span>
                 </div>
                 <Slider
@@ -252,7 +271,7 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
                   step={100}
                   className="w-full"
                 />
-                <div className="flex justify-between text-xs text-[hsl(var(--muted-foreground))] font-luxury-sans">
+                <div className="flex justify-between text-[10px] sm:text-xs text-[hsl(var(--muted-foreground))] font-luxury-sans tracking-[0.15em] uppercase">
                   <span>$0</span>
                   <span>$100,000+</span>
                 </div>
@@ -261,13 +280,23 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-8 pt-8 border-t border-[hsl(var(--border))]">
-            <div className="flex flex-col sm:flex-row gap-3">
+          <div className="mt-7 pt-7 sm:mt-8 sm:pt-8 border-t border-[hsl(var(--border))]">
+            <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3">
+              {/* Primary — Search (first on mobile for thumb reach) */}
+              <button
+                className="order-1 sm:order-2 flex-1 flex items-center justify-center gap-2.5 border border-[hsl(var(--secondary))] bg-[hsl(var(--secondary)/0.08)] sm:bg-transparent text-[hsl(var(--secondary-rich))] sm:text-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))] hover:text-black py-4 sm:py-3.5 text-[11px] sm:text-xs tracking-[0.25em] sm:tracking-[0.2em] uppercase font-medium transition-all duration-400 cursor-pointer rounded-sm"
+                style={{ transitionTimingFunction: 'cubic-bezier(0.65, 0, 0.35, 1)' }}
+                onClick={navigateToSearch}
+              >
+                <Search className="w-4 h-4" />
+                Search Rings
+              </button>
+
               {/* Secondary — Advanced Filters */}
               {hasAdvanced && (
                 <button
                   type="button"
-                  className="flex items-center justify-center gap-2.5 border border-[hsl(var(--border))] text-[hsl(var(--foreground))] hover:border-[hsl(var(--secondary)/1)] hover:text-[hsl(var(--secondary))] px-6 py-3.5 text-xs tracking-[0.2em] uppercase font-light transition-all duration-300 cursor-pointer whitespace-nowrap"
+                  className="order-2 sm:order-1 flex items-center justify-center gap-2.5 border border-[hsl(var(--border))] text-[hsl(var(--foreground))] hover:border-[hsl(var(--secondary)/1)] hover:text-[hsl(var(--secondary))] px-6 py-3.5 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-light transition-all duration-300 cursor-pointer whitespace-nowrap rounded-sm"
                   onClick={() => setShowAdvanced((v) => !v)}
                 >
                   {showAdvanced ? (
@@ -285,22 +314,11 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
                   )}
                 </button>
               )}
-              {/* Primary — Search */}
-              <button
-                className="flex-1 flex items-center justify-center gap-2.5 border border-[hsl(var(--secondary)/1)] text-[hsl(var(--secondary))] hover:bg-[hsl(var(--secondary))] hover:text-black hover:border-[hsl(var(--secondary))] py-3.5 text-xs tracking-[0.2em] uppercase font-medium transition-all duration-400 cursor-pointer"
-                style={{ transitionTimingFunction: 'cubic-bezier(0.65, 0, 0.35, 1)' }}
-                onClick={navigateToSearch}
-              >
-                <Search className="w-4 h-4" />
-                Search Rings
-              </button>
-
-
 
               {/* Tertiary — Reset */}
               <button
                 type="button"
-                className="flex items-center justify-center gap-2 border border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] hover:border-[hsl(var(--border))] px-5 py-3.5 text-xs tracking-[0.2em] uppercase font-light transition-all duration-300 cursor-pointer"
+                className="order-3 flex items-center justify-center gap-2 border border-[hsl(var(--border))] text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] hover:border-[hsl(var(--border))] px-5 py-3.5 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-light transition-all duration-300 cursor-pointer rounded-sm"
                 onClick={resetFilters}
               >
                 <X className="w-4 h-4" />

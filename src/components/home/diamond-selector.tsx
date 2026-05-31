@@ -129,9 +129,12 @@ export function DiamondSelector() {
   };
 
   return (
-    <section className="py-12 sm:py-24 bg-[hsl(var(--surface-champagne))] dark:bg-[hsl(var(--surface-alt))] relative overflow-hidden">
+    <section className="py-16 sm:py-24 bg-[hsl(var(--surface-champagne))] dark:bg-[hsl(var(--surface-alt))] relative overflow-hidden">
 
-      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+      {/* Ambient glow */}
+      <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[40rem] h-[20rem] bg-[hsl(var(--secondary)/0.05)] blur-3xl rounded-full" />
+
+      <div className="container mx-auto px-5 sm:px-6 relative z-10">
 
         {/* Section heading */}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
@@ -142,19 +145,24 @@ export function DiamondSelector() {
             </span>
             <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
           </div>
-          <h2 className="font-luxury-serif text-3xl sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-tight">
+          <h2 className="font-luxury-serif text-[2rem] sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-[1.05] tracking-tight">
             Select Your{' '}
-            <span className="italic text-[hsl(var(--secondary))]">Diamond</span>{' '}
+            <span className="italic text-[hsl(var(--secondary-rich))] font-extralight">Diamond</span>{' '}
             Cut
           </h2>
-          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-sm sm:text-base max-w-lg mx-auto leading-relaxed px-2">
+          <div className="mt-5 mb-1 flex items-center justify-center gap-2.5">
+            <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
+            <span className="w-1.5 h-1.5 rotate-45 bg-[hsl(var(--secondary))]" />
+            <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
+          </div>
+          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-lg mx-auto leading-relaxed px-2 font-light">
             Each cut reflects light differently, creating its own unique sparkle
-            and character. Hover to discover your perfect match.
+            and character. Tap a shape to discover your perfect match.
           </p>
         </div>
 
         {/* Main layout: circle + info */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 sm:gap-16 lg:gap-20">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-10 sm:gap-16 lg:gap-20">
 
           {/* ── Circular selector ── */}
           <div className="relative w-72 h-72 sm:w-96 sm:h-96 shrink-0 mx-auto lg:mx-0">
@@ -295,33 +303,33 @@ export function DiamondSelector() {
                   <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.3em] uppercase">
                     Featured Cut
                   </span>
-                  <h3 className="font-luxury-serif text-3xl sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))] capitalize">
+                  <h3 className="font-luxury-serif text-[2rem] sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))] capitalize leading-tight">
                     {activeData.name}
                   </h3>
-                  <div className="h-1 w-20 bg-[hsl(var(--secondary))] rounded-full mx-auto lg:mx-0" />
+                  <div className="h-px w-16 sm:w-20 bg-linear-to-r from-[hsl(var(--secondary))] to-transparent mx-auto lg:mx-0" />
                 </div>
 
-                <div className="space-y-4 text-[hsl(var(--muted-foreground))] font-luxury-sans">
-                  <p className="text-sm sm:text-base leading-relaxed">
+                <div className="space-y-5 text-[hsl(var(--muted-foreground))] font-luxury-sans">
+                  <p className="text-[13px] sm:text-base leading-relaxed font-light">
                     {activeDesc.body}
                   </p>
-                  <ul className="space-y-2.5 text-sm">
+                  <ul className="space-y-3 text-[13px] sm:text-sm">
                     {activeDesc.traits.map((trait) => (
                       <li
                         key={trait}
                         className="flex items-center gap-3 justify-center lg:justify-start group"
                       >
-                        <span className="w-2 h-2 rounded-full bg-[hsl(var(--secondary))] shrink-0 group-hover:scale-150 transition-transform duration-300" />
+                        <span className="w-1.5 h-1.5 rotate-45 bg-[hsl(var(--secondary))] shrink-0 group-hover:scale-150 transition-transform duration-300" />
                         <span>{trait}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                <Link href={getCollectionLink(selectedDiamond)}>
-                  <button className="inline-flex items-center border border-[hsl(var(--foreground)/0.25)] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] hover:border-[hsl(var(--secondary))] px-8 py-3 text-xs tracking-[0.18em] uppercase font-light transition-all duration-400 cursor-pointer rounded-sm">
+                <Link href={getCollectionLink(selectedDiamond)} className="inline-block w-full sm:w-auto">
+                  <button className="group/btn inline-flex items-center justify-center w-full sm:w-auto border border-[hsl(var(--foreground)/0.2)] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--secondary))] hover:text-black hover:border-[hsl(var(--secondary))] px-7 sm:px-8 py-3.5 sm:py-3 text-[11px] sm:text-xs tracking-[0.2em] uppercase font-light transition-all duration-500 cursor-pointer rounded-sm">
                     View {activeData.name} Collection
-                    <span className="ml-2 text-[hsl(var(--secondary))]">→</span>
+                    <span className="ml-3 text-[hsl(var(--secondary))] group-hover/btn:text-black transition-all duration-500 group-hover/btn:translate-x-1">→</span>
                   </button>
                 </Link>
               </motion.div>
