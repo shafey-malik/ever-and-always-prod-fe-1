@@ -1,7 +1,30 @@
 import type { Metadata } from 'next';
 
 export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME || 'Ever and Always';
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://everandalways.com';
+
+// Resolve SITE_URL with environment-aware fallback so staging/preview deploys
+// don't broadcast the production canonical URL, and a missing env var on prod
+// doesn't silently bake `http://localhost:3001` into sitemap.xml / robots.txt.
+function resolveSiteUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (explicit && /^https?:\/\//.test(explicit)) return explicit.replace(/\/$/, '');
+
+  // Vercel auto-provides VERCEL_URL on every deploy (preview + production).
+  // Use it as a safe per-deploy fallback.
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+  if (vercelUrl) return `https://${vercelUrl}`;
+
+  // Last resort. Warn loudly so build logs surface the misconfiguration.
+  if (process.env.NODE_ENV === 'production') {
+    console.warn(
+      '[metadata] NEXT_PUBLIC_SITE_URL is not set and VERCEL_URL is unavailable. ' +
+      'Falling back to https://everandalways.com — sitemap/robots/OG URLs may be wrong.',
+    );
+  }
+  return 'https://everandalways.com';
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 /**
  * Truncate text to a maximum length, preserving word boundaries.
