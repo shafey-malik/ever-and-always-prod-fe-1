@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Check, Mail, Search, Sparkles, X, Loader2, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Mail, Search, Sparkles, X, Loader2, RotateCcw, ChevronsRight } from 'lucide-react';
 import { findMatchingRings, type MatchSummary } from '@/app/custom/actions';
 import {
     JOURNEY_FACET_ORDER,
@@ -169,21 +169,39 @@ export function RingJourney({ facetValues, onExit }: RingJourneyProps) {
         }));
     };
 
-    const goNext = () => {
-        if (!selectedForStep) return;
-        if (stepIndex < steps.length - 1) {
-            setStepIndex(stepIndex + 1);
-            setHovered(null);
-            return;
-        }
+    // Run the final match with whatever has been chosen so far
+    const finish = (sels: Record<string, Selection>) => {
         const ids = JOURNEY_FACET_ORDER
-            .map(k => selections[k]?.valueId)
+            .map(k => sels[k]?.valueId)
             .filter((v): v is string => Boolean(v));
         startTransition(async () => {
             const result = await findMatchingRings(ids);
             setMatches(result);
             setCompleted(true);
         });
+    };
+
+    // Advance, keeping any selection on this step (selection no longer required)
+    const goNext = () => {
+        if (stepIndex < steps.length - 1) {
+            setStepIndex(stepIndex + 1);
+            setHovered(null);
+            return;
+        }
+        finish(selections);
+    };
+
+    // Move on without choosing for this step — clears it, then advances
+    const goSkip = () => {
+        const next = { ...selections };
+        delete next[step.facetKey];
+        setSelections(next);
+        if (stepIndex < steps.length - 1) {
+            setStepIndex(stepIndex + 1);
+            setHovered(null);
+            return;
+        }
+        finish(next);
     };
 
     const goPrev = () => {
@@ -246,7 +264,7 @@ export function RingJourney({ facetValues, onExit }: RingJourneyProps) {
             <button
                 type="button"
                 onClick={goNext}
-                disabled={!selectedForStep || isPending}
+                disabled={isPending}
                 aria-label={isLast ? 'See your ring' : 'Next step'}
                 className="group absolute right-2 sm:right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-2 cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
             >
@@ -515,9 +533,9 @@ export function RingJourney({ facetValues, onExit }: RingJourneyProps) {
                     </AnimatePresence>
                 </div>
 
-                {/* Inline clear */}
-                {selectedForStep && (
-                    <div className="flex justify-center mt-5">
+                {/* Inline actions — skip (always available) + clear (when a value is chosen) */}
+                <div className="flex items-center justify-center gap-5 mt-5">
+                    {selectedForStep && (
                         <button
                             type="button"
                             onClick={clearStep}
@@ -526,8 +544,17 @@ export function RingJourney({ facetValues, onExit }: RingJourneyProps) {
                             <X className="w-3 h-3" />
                             Clear selection
                         </button>
-                    </div>
-                )}
+                    )}
+                    <button
+                        type="button"
+                        onClick={goSkip}
+                        disabled={isPending}
+                        className="inline-flex items-center gap-1.5 text-[10px] tracking-[0.2em] uppercase text-[hsl(var(--foreground)/0.6)] hover:text-[hsl(var(--secondary))] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        {isLast ? 'Skip & See Ring' : 'Skip This Step'}
+                        <ChevronsRight className="w-3.5 h-3.5" />
+                    </button>
+                </div>
             </div>
         </section>
     );

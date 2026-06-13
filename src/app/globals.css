@@ -48,7 +48,8 @@
 @layer base {
   :root {
     /* Core Brand Colors - Luxury Diamond Theme */
-    --background: 0 0% 99%;
+    /* Warm ivory instead of clinical white — reads "paper & velvet", not "screen" */
+    --background: 40 30% 98.6%;
     --foreground: 240 9% 15%;
 
     --lead-text: 40 45% 40%;
@@ -68,7 +69,9 @@
     /* Secondary - Champagne Gold */
     --secondary: 45 43% 64.5%;
     --secondary-foreground: 240 25% 15%;
-    --secondary-rich: 40 45% 75%;
+    /* Rich antique gold — used for italic emphasis words; deep enough to read
+       clearly on the ivory background */
+    --secondary-rich: 38 56% 45%;
 
     /* Accent - Rose Gold */
     --accent: 15 25% 88%;
@@ -81,11 +84,11 @@
     --gold: 40 60% 80%;
     --rose-gold: 15 40% 85%;
 
-    /* Neutral Grays - Sophisticated */
-    --muted: 240 5% 96%;
+    /* Neutral Grays - warmed slightly so edges feel like linen, not steel */
+    --muted: 40 12% 95.5%;
     --muted-foreground: 240 4% 45%;
-    --border: 240 6% 90%;
-    --input: 240 6% 95%;
+    --border: 40 10% 89%;
+    --input: 40 10% 94%;
     --ring: 240 25% 15%;
 
     /* Luxury Gradients */
@@ -216,9 +219,20 @@
     outline-color: hsl(var(--ring) / 0.5);
   }
 
+  html {
+    /* Remove the grey flash on mobile taps — links/buttons rely on their own active states */
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-background text-[hsl(var(--foreground))] antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  /* Champagne selection — small brand touch */
+  ::selection {
+    background: hsl(var(--secondary) / 0.35);
+    color: hsl(var(--foreground));
   }
 }
 
@@ -338,18 +352,19 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, hsl(45, 86%, 58%), hsl(45, 90%, 50%));
+  /* Muted champagne — matches --secondary instead of saturated yellow */
+  background: linear-gradient(135deg, hsl(45, 42%, 68%), hsl(43, 45%, 58%));
   border-radius: 5px;
   border: 2px solid hsl(0, 0%, 98%);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, hsl(45, 86%, 50%), hsl(45, 90%, 45%));
+  background: linear-gradient(135deg, hsl(45, 45%, 62%), hsl(43, 48%, 52%));
 }
 
 html {
   scrollbar-width: thin;
-  scrollbar-color: hsl(45, 59%, 68%) hsl(var(--card));
+  scrollbar-color: hsl(45, 42%, 64%) hsl(var(--card));
 }
 
 .dark ::-webkit-scrollbar-track {
@@ -585,6 +600,60 @@ html {
         hsl(var(--muted)) 100%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
+  }
+
+  /* ── Living-jewel motion (diamond showcase & ambient accents) ── */
+
+  /* Gentle levitation — gives static renders a GIF-like life */
+  @keyframes float-y {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-9px) rotate(2.5deg); }
+  }
+
+  .animate-float-y {
+    animation: float-y var(--float-duration, 6s) ease-in-out infinite;
+  }
+
+  /* Diagonal light sweep — the "sparkle pass" over a stone or card */
+  @keyframes glint {
+    0% { transform: translateX(-160%) skewX(-22deg); opacity: 0; }
+    12% { opacity: 1; }
+    45% { transform: translateX(240%) skewX(-22deg); opacity: 0; }
+    100% { transform: translateX(240%) skewX(-22deg); opacity: 0; }
+  }
+
+  .animate-glint {
+    animation: glint var(--glint-duration, 4.2s) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
+  /* Starlight twinkle for particle dots */
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.12; transform: scale(0.7); }
+    50% { opacity: 0.9; transform: scale(1.2); }
+  }
+
+  .animate-twinkle {
+    animation: twinkle var(--twinkle-duration, 3.4s) ease-in-out infinite;
+  }
+
+  /* Cinematic Ken Burns drift for imagery */
+  @keyframes slow-zoom {
+    from { transform: scale(1); }
+    to { transform: scale(1.09); }
+  }
+
+  .animate-slow-zoom {
+    animation: slow-zoom 14s ease-out infinite alternate;
+  }
+
+  /* Soft halo breathing behind showcased stones */
+  @keyframes halo-pulse {
+    0%, 100% { opacity: 0.35; transform: scale(0.92); }
+    50% { opacity: 0.7; transform: scale(1.06); }
+  }
+
+  .animate-halo-pulse {
+    animation: halo-pulse var(--halo-duration, 5s) ease-in-out infinite;
   }
 
   /* Marquee — infinite horizontal scroll */

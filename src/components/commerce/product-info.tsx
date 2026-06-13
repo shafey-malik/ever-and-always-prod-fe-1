@@ -5,10 +5,11 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { ShoppingCart, CheckCircle2 } from 'lucide-react';
+import { ShoppingCart, CheckCircle2, Heart } from 'lucide-react';
 import { addToCart } from '@/app/product/[slug]/actions';
 import { toast } from 'sonner';
 import { Price } from '@/components/commerce/price';
+import { useWishlist } from '@/lib/wishlist/wishlist-context';
 
 interface ProductInfoProps {
     product: {
@@ -45,14 +46,42 @@ interface ProductInfoProps {
         }>;
     };
     searchParams: { [key: string]: string | string[] | undefined };
+    slug: string;
+    image: string | null;
 }
 
-export function ProductInfo({ product, searchParams }: ProductInfoProps) {
+export function ProductInfo({ product, searchParams, slug, image }: ProductInfoProps) {
     const pathname = usePathname();
     const router = useRouter();
     const currentSearchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
     const [isAdded, setIsAdded] = useState(false);
+    const { isSaved, toggle } = useWishlist();
+    const saved = isSaved(slug);
+
+    const handleToggleWishlist = () => {
+        const price =
+            product.variants?.[0]?.priceWithTax != null
+                ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                      product.variants[0].priceWithTax / 100
+                  )
+                : undefined;
+        const nowSaved = toggle({
+            id: slug,
+            name: product.name,
+            href: `/product/${slug}`,
+            image,
+            price,
+        });
+        if (nowSaved) {
+            toast.success('Saved to your wishlist', {
+                description: product.name,
+                action: { label: 'View', onClick: () => { window.location.href = '/wishlist'; } },
+            });
+        } else {
+            toast('Removed from wishlist', { description: product.name });
+        }
+    };
 
     // Initialize selected options from URL
     const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(() => {
@@ -230,46 +259,64 @@ export function ProductInfo({ product, searchParams }: ProductInfoProps) {
             {/* Stock Status & Add to Cart */}
             <div className="space-y-4 pt-2 border-t border-[hsl(var(--lead-text))]/20">
                 {selectedVariant && (
-                    <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${isInStock ? 'bg-green-500' : 'bg-destructive'}`} />
-                        <span className={`text-sm font-medium ${isInStock ? 'text-green-600 dark:text-green-500' : 'text-destructive'}`}>
-                            {isInStock ? 'In Stock' : 'Out of Stock'}
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2">
+                            <div className={`w-2 h-2 rounded-full ${isInStock ? 'bg-green-500' : 'bg-destructive'}`} />
+                            <span className={`text-sm font-medium ${isInStock ? 'text-green-600 dark:text-green-500' : 'text-destructive'}`}>
+                                {isInStock ? 'In Stock' : 'Out of Stock'}
+                            </span>
+                        </div>
+                        <span className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">
+                            SKU <span className="font-mono font-medium text-foreground/70 normal-case tracking-normal">{selectedVariant.sku}</span>
                         </span>
                     </div>
                 )}
 
-                {/* Add to Cart Button */}
-                <Button
-                    size="lg"
-                    className="w-full h-12 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
-                    disabled={!canAddToCart || isPending}
-                    onClick={handleAddToCart}
-                >
-                    {isAdded ? (
-                        <>
-                            <CheckCircle2 className="mr-2 h-5 w-5" />
-                            Added to Cart
-                        </>
-                    ) : (
-                        <>
-                            <ShoppingCart className="mr-2 h-5 w-5" />
-                            {isPending
-                                ? 'Adding...'
-                                : !selectedVariant && product.optionGroups.length > 0
-                                    ? 'Select Options'
-                                    : !isInStock
-                                        ? 'Out of Stock'
-                                        : 'Add to Cart'}
-                        </>
-                    )}
-                </Button>
+                {/* Add to Cart + Wishlist */}
+                <div className="flex items-stretch gap-3">
+                    <Button
+                        size="lg"
+                        className="flex-1 h-12 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                        disabled={!canAddToCart || isPending}
+                        onClick={handleAddToCart}
+                    >
+                        {isAdded ? (
+                            <>
+                                <CheckCircle2 className="mr-2 h-5 w-5" />
+                                Added to Cart
+                            </>
+                        ) : (
+                            <>
+                                <ShoppingCart className="mr-2 h-5 w-5" />
+                                {isPending
+                                    ? 'Adding...'
+                                    : !selectedVariant && product.optionGroups.length > 0
+                                        ? 'Select Options'
+                                        : !isInStock
+                                            ? 'Out of Stock'
+                                            : 'Add to Cart'}
+                            </>
+                        )}
+                    </Button>
 
-                {/* SKU */}
-                {selectedVariant && (
-                    <div className="text-xs text-muted-foreground text-center pt-2">
-                        SKU: <span className="font-mono font-medium">{selectedVariant.sku}</span>
-                    </div>
-                )}
+                    <button
+                        type="button"
+                        onClick={handleToggleWishlist}
+                        aria-pressed={saved}
+                        aria-label={saved ? 'Remove from wishlist' : 'Save to wishlist'}
+                        title={saved ? 'Saved to wishlist' : 'Save to wishlist'}
+                        className={`group h-12 w-12 shrink-0 rounded-md border-2 flex items-center justify-center cursor-pointer transition-all duration-300 active:scale-95 ${
+                            saved
+                                ? 'border-[hsl(var(--secondary))] bg-[hsl(var(--secondary)/0.1)] text-[hsl(var(--secondary-rich))]'
+                                : 'border-[hsl(var(--lead-text))]/30 text-[hsl(var(--lead-text))] hover:border-[hsl(var(--secondary))] hover:text-[hsl(var(--secondary-rich))]'
+                        }`}
+                    >
+                        <Heart
+                            className={`h-5 w-5 transition-all duration-300 ${saved ? 'fill-[hsl(var(--secondary))] scale-110' : 'fill-transparent group-hover:scale-110'}`}
+                            strokeWidth={1.7}
+                        />
+                    </button>
+                </div>
             </div>
         </div>
     );

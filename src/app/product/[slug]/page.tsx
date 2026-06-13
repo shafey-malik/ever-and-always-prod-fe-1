@@ -3,6 +3,7 @@ import { query } from '@/lib/vendure/api';
 import { GetProductDetailQuery } from '@/lib/vendure/queries';
 import { ProductImageCarousel } from '@/components/commerce/product-image-carousel';
 import { ProductInfo } from '@/components/commerce/product-info';
+import { ProductDiamondGuide } from '@/components/commerce/product-diamond-guide';
 import { RelatedProducts } from '@/components/commerce/related-products';
 import {
     Accordion,
@@ -144,10 +145,24 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
 
                     {/* Right Column: Product Info */}
                     <div className="lg:pl-4">
-                        <ProductInfo product={product} searchParams={searchParamsResolved} />
+                        <ProductInfo
+                            product={product}
+                            searchParams={searchParamsResolved}
+                            slug={product.slug}
+                            image={product.assets?.[0]?.preview ?? null}
+                        />
                     </div>
                 </div>
             </div>
+
+            {/* Product-specific diamond education — facets live at both the
+                product level (shape, style, type) and the variant level (metal) */}
+            <ProductDiamondGuide
+                facetValues={[
+                    ...(product.facetValues ?? []),
+                    ...(product.variants?.flatMap((v) => v.facetValues ?? []) ?? []),
+                ]}
+            />
 
             {/* Product Benefits Section */}
             <section className="py-16 bg-muted/30 mt-12">

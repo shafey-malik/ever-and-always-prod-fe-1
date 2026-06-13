@@ -187,24 +187,24 @@ export function FilterSection({ facetValues = [] }: FilterSectionProps) {
 
       <div className="container mx-auto px-5 sm:px-8 lg:px-12 relative">
         <div className="text-center mb-10 sm:mb-16">
-          <div className="flex items-center justify-center gap-3 mb-5">
-            <div className="h-px w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
-            <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.35em] uppercase">
+          <div className="flex items-center justify-center gap-3 mb-4 sm:mb-5">
+            <div className="h-px w-8 sm:w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
+            <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.3em] sm:tracking-[0.35em] uppercase">
               Curate
             </span>
-            <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
+            <div className="h-px w-8 sm:w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
           </div>
-          <h2 className="font-luxury-serif text-[2rem] sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-[1.05] tracking-tight">
+          <h2 className="font-luxury-serif text-[1.75rem] sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-[1.15] sm:leading-[1.05] tracking-normal sm:tracking-tight text-balance max-w-[18rem] sm:max-w-none mx-auto">
             Find Your{' '}
-            <span className="italic text-[hsl(var(--secondary-rich))] font-extralight">Perfect</span>{' '}
+            <span className="italic font-light text-[hsl(var(--secondary-rich))]">Perfect</span>{' '}
             Ring
           </h2>
-          <div className="mt-5 mb-1 flex items-center justify-center gap-2.5">
+          <div className="mt-4 sm:mt-5 flex items-center justify-center gap-2.5">
             <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
             <span className="w-1.5 h-1.5 rotate-45 bg-[hsl(var(--secondary))]" />
             <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
           </div>
-          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-lg mx-auto leading-relaxed font-light">
+          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-[20rem] sm:max-w-lg mx-auto leading-relaxed font-light text-balance">
             Use our advanced filters to discover the diamond ring that matches
             your vision and budget.
           </p>

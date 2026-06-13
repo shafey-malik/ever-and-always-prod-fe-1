@@ -43,6 +43,23 @@ export const SearchProductsQuery = graphql(`
     }
 `, [ProductCardFragment]);
 
+export const GetAllFacetsQuery = graphql(`
+    query GetAllFacets {
+        facets(options: { take: 100 }) {
+            items {
+                id
+                name
+                code
+                values {
+                    id
+                    name
+                    code
+                }
+            }
+        }
+    }
+`);
+
 export const GetProductDetailQuery = graphql(`
     query GetProductDetail($slug: String!) {
         product(slug: $slug) {
@@ -50,6 +67,16 @@ export const GetProductDetailQuery = graphql(`
             name
             description
             slug
+            facetValues {
+                id
+                name
+                code
+                facet {
+                    id
+                    name
+                    code
+                }
+            }
             assets {
                 id
                 preview
@@ -70,6 +97,16 @@ export const GetProductDetailQuery = graphql(`
                         id
                         code
                         name
+                    }
+                }
+                facetValues {
+                    id
+                    name
+                    code
+                    facet {
+                        id
+                        name
+                        code
                     }
                 }
             }

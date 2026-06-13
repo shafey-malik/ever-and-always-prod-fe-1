@@ -5,7 +5,11 @@ import { DiamondSelector } from "@/components/home/diamond-selector";
 import { FilterSectionWrapper } from "@/components/home/filter-section-wrapper";
 import { DesignersCollection } from "@/components/home/designers-collection";
 import { CollectionsBanners } from "@/components/home/collections-banners";
+import { DiamondEducation } from "@/components/home/diamond-education";
+import { BespokeProcess } from "@/components/home/bespoke-process";
+import { AtelierPromise } from "@/components/home/atelier-promise";
 import { ReviewsMarquee } from "@/components/home/reviews-marquee";
+import { JournalTeaser } from "@/components/home/journal-teaser";
 import { AnimatedSection } from "@/components/shared/animated-section";
 import { SITE_NAME, SITE_URL, buildCanonicalUrl } from "@/lib/metadata";
 
@@ -43,11 +47,12 @@ export default async function Home(_props: PageProps<'/'>) {
     return (
         <div className="min-h-screen">
             <HeroCarousel />
-            <AnimatedSection delay={0.2}>
+
+            <AnimatedSection>
                 <DiamondSelector />
             </AnimatedSection>
 
-            <AnimatedSection delay={0.3}>
+            <AnimatedSection>
                 <Suspense
                     fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}
                 >
@@ -55,16 +60,32 @@ export default async function Home(_props: PageProps<'/'>) {
                 </Suspense>
             </AnimatedSection>
 
-            <AnimatedSection delay={0.4}>
+            <AnimatedSection>
                 <CollectionsBanners />
             </AnimatedSection>
 
-            <AnimatedSection delay={0.45}>
+            <AnimatedSection>
+                <DiamondEducation />
+            </AnimatedSection>
+
+            <AnimatedSection>
+                <BespokeProcess />
+            </AnimatedSection>
+
+            <AnimatedSection>
                 <DesignersCollection />
             </AnimatedSection>
 
-            <AnimatedSection delay={0.5}>
+            <AnimatedSection>
+                <AtelierPromise />
+            </AnimatedSection>
+
+            <AnimatedSection>
                 <ReviewsMarquee />
+            </AnimatedSection>
+
+            <AnimatedSection>
+                <JournalTeaser />
             </AnimatedSection>
         </div>
     );

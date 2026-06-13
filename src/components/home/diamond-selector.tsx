@@ -138,24 +138,24 @@ export function DiamondSelector() {
 
         {/* Section heading */}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
-          <div className="flex items-center justify-center gap-3 mb-5">
-            <div className="h-px w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
-            <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.35em] uppercase">
+          <div className="flex items-center justify-center gap-3 mb-4 sm:mb-5">
+            <div className="h-px w-8 sm:w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
+            <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.3em] sm:tracking-[0.35em] uppercase">
               Discover
             </span>
-            <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
+            <div className="h-px w-8 sm:w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
           </div>
-          <h2 className="font-luxury-serif text-[2rem] sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-[1.05] tracking-tight">
+          <h2 className="font-luxury-serif text-[1.75rem] sm:text-5xl lg:text-6xl font-light text-[hsl(var(--foreground))] leading-[1.15] sm:leading-[1.05] tracking-normal sm:tracking-tight text-balance max-w-[18rem] sm:max-w-none mx-auto">
             Select Your{' '}
-            <span className="italic text-[hsl(var(--secondary-rich))] font-extralight">Diamond</span>{' '}
+            <span className="italic font-light text-[hsl(var(--secondary-rich))]">Diamond</span>{' '}
             Cut
           </h2>
-          <div className="mt-5 mb-1 flex items-center justify-center gap-2.5">
+          <div className="mt-4 sm:mt-5 flex items-center justify-center gap-2.5">
             <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
             <span className="w-1.5 h-1.5 rotate-45 bg-[hsl(var(--secondary))]" />
             <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
           </div>
-          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-lg mx-auto leading-relaxed px-2 font-light">
+          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-[20rem] sm:max-w-lg mx-auto leading-relaxed font-light text-balance">
             Each cut reflects light differently, creating its own unique sparkle
             and character. Tap a shape to discover your perfect match.
           </p>

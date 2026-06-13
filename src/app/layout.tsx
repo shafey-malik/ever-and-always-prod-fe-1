@@ -5,6 +5,7 @@ import {Toaster} from "@/components/ui/sonner";
 import {Navbar} from "@/components/layout/navbar";
 import {Footer} from "@/components/layout/footer";
 import {ThemeProvider} from "@/components/providers/theme-provider";
+import {WishlistProvider} from "@/lib/wishlist/wishlist-context";
 import {SITE_NAME, SITE_URL} from "@/lib/metadata";
 import {generateOrganizationSchema, JsonLd} from "@/lib/seo/schema";
 
@@ -71,12 +72,14 @@ export default function RootLayout({children}: LayoutProps<'/'>) {
             >
                 <JsonLd data={organizationSchema} />
                 <ThemeProvider>
-                    <Navbar />
-                    <main className="page-enter">
-                        {children}
-                    </main>
-                    <Footer />
-                    <Toaster />
+                    <WishlistProvider>
+                        <Navbar />
+                        <main className="page-enter">
+                            {children}
+                        </main>
+                        <Footer />
+                        <Toaster />
+                    </WishlistProvider>
                 </ThemeProvider>
             </body>
         </html>

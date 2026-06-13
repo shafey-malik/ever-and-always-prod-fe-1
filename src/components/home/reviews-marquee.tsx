@@ -1,7 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
+import useEmblaCarousel from 'embla-carousel-react';
+import AutoScroll from 'embla-carousel-auto-scroll';
 import { Star, Quote } from 'lucide-react';
 
 const testimonials = [
@@ -61,12 +63,12 @@ const testimonials = [
   },
 ];
 
-// Duplicate the list so the marquee loops seamlessly
+// Duplicate the list so the loop has plenty of slides on ultra-wide screens
 const doubled = [...testimonials, ...testimonials];
 
 function ReviewCard({ testimonial }: { testimonial: typeof testimonials[0] }) {
   return (
-    <div className="relative shrink-0 w-[19rem] sm:w-96 bg-[hsl(var(--card))] rounded-2xl p-6 sm:p-7 flex flex-col gap-4 shadow-(--shadow-card) mx-2.5 sm:mx-3 border border-[hsl(var(--border)/0.5)] overflow-hidden">
+    <div className="relative h-full bg-[hsl(var(--card))] rounded-2xl p-6 sm:p-7 flex flex-col gap-4 shadow-(--shadow-card) border border-[hsl(var(--border)/0.5)] overflow-hidden">
       {/* Gold corner accent */}
       <span className="pointer-events-none absolute top-0 left-0 w-8 h-px bg-[hsl(var(--secondary)/0.7)]" />
       <span className="pointer-events-none absolute top-0 left-0 w-px h-8 bg-[hsl(var(--secondary)/0.7)]" />
@@ -99,6 +101,7 @@ function ReviewCard({ testimonial }: { testimonial: typeof testimonials[0] }) {
             alt={testimonial.name}
             width={44}
             height={44}
+            draggable={false}
             className="rounded-full object-cover ring-1 ring-[hsl(var(--secondary)/0.5)] ring-offset-2 ring-offset-[hsl(var(--card))]"
           />
         </div>
@@ -116,8 +119,34 @@ function ReviewCard({ testimonial }: { testimonial: typeof testimonials[0] }) {
 }
 
 export function ReviewsMarquee() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [paused, setPaused] = useState(false);
+  // Drifting marquee that is fully swipeable: drag to fling, hover to pause
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      dragFree: true,
+      align: 'start',
+      skipSnaps: true,
+    },
+    [
+      AutoScroll({
+        speed: 0.9,
+        startDelay: 150,
+        stopOnInteraction: false,
+        stopOnMouseEnter: true,
+        stopOnFocusIn: true,
+      }),
+    ]
+  );
+
+  // Respect reduced-motion: keep it swipeable but stop the auto drift
+  useEffect(() => {
+    if (!emblaApi) return;
+    const autoScroll = emblaApi.plugins()?.autoScroll;
+    if (!autoScroll) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      autoScroll.stop();
+    }
+  }, [emblaApi]);
 
   return (
     <section className="relative py-16 sm:py-28 bg-[hsl(var(--background))] dark:bg-[hsl(var(--background))] overflow-hidden">
@@ -128,47 +157,58 @@ export function ReviewsMarquee() {
 
         {/* Heading */}
         <div className="text-center">
-          <div className="flex items-center justify-center gap-3 mb-5">
-            <div className="h-px w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
-            <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.35em] uppercase">
+          <div className="flex items-center justify-center gap-3 mb-4 sm:mb-5">
+            <div className="h-px w-8 sm:w-10 bg-linear-to-r from-transparent to-[hsl(var(--secondary))]" />
+            <span className="font-luxury-sans text-[hsl(var(--secondary))] text-[10px] tracking-[0.3em] sm:tracking-[0.35em] uppercase">
               Stories
             </span>
-            <div className="h-px w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
+            <div className="h-px w-8 sm:w-10 bg-linear-to-l from-transparent to-[hsl(var(--secondary))]" />
           </div>
-          <h2 className="font-luxury-serif text-[2rem] sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))] leading-[1.05] tracking-tight">
+          <h2 className="font-luxury-serif text-[1.75rem] sm:text-4xl lg:text-5xl font-light text-[hsl(var(--foreground))] leading-[1.15] sm:leading-[1.05] tracking-normal sm:tracking-tight text-balance max-w-[18rem] sm:max-w-none mx-auto">
             What Our{' '}
-            <span className="italic text-[hsl(var(--secondary-rich))] font-extralight">Clients</span>{' '}
+            <span className="italic font-light text-[hsl(var(--secondary-rich))]">Clients</span>{' '}
             Say
           </h2>
-          <div className="mt-5 mb-1 flex items-center justify-center gap-2.5">
+          <div className="mt-4 sm:mt-5 flex items-center justify-center gap-2.5">
             <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
             <span className="w-1.5 h-1.5 rotate-45 bg-[hsl(var(--secondary))]" />
             <span className="w-1 h-1 rounded-full bg-[hsl(var(--secondary))]" />
           </div>
-          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-md mx-auto leading-relaxed font-light">
-            Every ring tells a story. Here are some from our happy couples.
+          <p className="mt-4 text-[hsl(var(--muted-foreground))] font-luxury-sans text-[13px] sm:text-base max-w-[20rem] sm:max-w-md mx-auto leading-relaxed font-light text-balance">
+            Every ring tells a story. Drift through a few — or swipe at your own pace.
           </p>
         </div>
       </div>
 
-      {/* Marquee track — full-bleed, no container padding */}
+      {/* Swipeable marquee track — full-bleed, no container padding */}
       <div className="relative">
         {/* Left fade */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-40 z-10 bg-linear-to-r from-[hsl(var(--background))] to-transparent" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 sm:w-40 z-10 bg-linear-to-r from-[hsl(var(--background))] to-transparent" />
         {/* Right fade */}
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-40 z-10 bg-linear-to-l from-[hsl(var(--background))] to-transparent" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 sm:w-40 z-10 bg-linear-to-l from-[hsl(var(--background))] to-transparent" />
 
-        {/* Scrolling track — click to pause/resume */}
         <div
-          ref={trackRef}
-          onClick={() => setPaused((p) => !p)}
-          className={`flex w-max animate-marquee cursor-pointer py-2 ${paused ? 'paused' : ''}`}
-          style={{ '--marquee-duration': '45s' } as React.CSSProperties}
+          ref={emblaRef}
+          className="overflow-hidden cursor-grab active:cursor-grabbing"
         >
-          {doubled.map((t, i) => (
-            <ReviewCard key={`${t.id}-${i}`} testimonial={t} />
-          ))}
+          <div className="flex -ml-5 sm:-ml-6 py-2 touch-pan-y select-none">
+            {doubled.map((t, i) => (
+              <div
+                key={`${t.id}-${i}`}
+                className="min-w-0 shrink-0 grow-0 basis-auto w-80 sm:w-102 pl-5 sm:pl-6"
+              >
+                <ReviewCard testimonial={t} />
+              </div>
+            ))}
+          </div>
         </div>
+      </div>
+
+      {/* Swipe hint — mobile only */}
+      <div className="mt-7 flex sm:hidden items-center justify-center gap-2.5 font-luxury-sans text-[10px] tracking-[0.3em] uppercase text-[hsl(var(--muted-foreground))]">
+        <span className="w-6 h-px bg-[hsl(var(--secondary)/0.5)]" />
+        Swipe to explore
+        <span className="w-6 h-px bg-[hsl(var(--secondary)/0.5)]" />
       </div>
     </section>
   );
