@@ -47,7 +47,9 @@ export default async function Home(_props: PageProps<'/'>) {
     return (
         <div className="min-h-screen">
             <HeroCarousel />
-
+            <AnimatedSection>
+                <CollectionsBanners />
+            </AnimatedSection>
             <AnimatedSection>
                 <DiamondSelector />
             </AnimatedSection>
@@ -58,10 +60,6 @@ export default async function Home(_props: PageProps<'/'>) {
                 >
                     <FilterSectionWrapper />
                 </Suspense>
-            </AnimatedSection>
-
-            <AnimatedSection>
-                <CollectionsBanners />
             </AnimatedSection>
 
             <AnimatedSection>
