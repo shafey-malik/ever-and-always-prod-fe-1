@@ -1,11 +1,8 @@
 import type { Metadata } from 'next';
-import { Calendar, Clock, Mail, Phone, MapPin, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Clock, Mail, Phone, MapPin, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { SITE_NAME } from '@/lib/metadata';
+import { ConsultationForm } from './consultation-form';
 
 export const metadata: Metadata = {
     title: 'Book a Consultation',
@@ -43,71 +40,7 @@ export default function ConsultationPage() {
                                     <CardTitle className="font-luxury-serif text-2xl">Schedule Your Appointment</CardTitle>
                                 </CardHeader>
                                 <CardContent>
-                                    <form className="space-y-6">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="firstName">First Name</Label>
-                                                <Input id="firstName" placeholder="John" required />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="lastName">Last Name</Label>
-                                                <Input id="lastName" placeholder="Doe" required />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <Label htmlFor="email">Email</Label>
-                                                <Input id="email" type="email" placeholder="john@example.com" required />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label htmlFor="phone">Phone</Label>
-                                                <Input id="phone" type="tel" placeholder="+1 (555) 123-4567" required />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="preferredDate">Preferred Date</Label>
-                                            <Input id="preferredDate" type="date" required />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="preferredTime">Preferred Time</Label>
-                                            <Input id="preferredTime" type="time" required />
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="interest">What are you interested in?</Label>
-                                            <select
-                                                id="interest"
-                                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                                required
-                                            >
-                                                <option value="">Select an option</option>
-                                                <option value="engagement-ring">Engagement Ring</option>
-                                                <option value="wedding-ring">Wedding Ring</option>
-                                                <option value="custom-jewelry">Custom Jewelry</option>
-                                                <option value="diamond-selection">Diamond Selection</option>
-                                                <option value="repair-service">Repair Service</option>
-                                                <option value="other">Other</option>
-                                            </select>
-                                        </div>
-
-                                        <div className="space-y-2">
-                                            <Label htmlFor="message">Message (Optional)</Label>
-                                            <Textarea
-                                                id="message"
-                                                placeholder="Tell us about your vision or any specific requirements..."
-                                                rows={5}
-                                                className="resize-none"
-                                            />
-                                        </div>
-
-                                        <Button type="submit" className="w-full btn-luxury">
-                                            <Calendar className="w-4 h-4 mr-2" />
-                                            Request Consultation
-                                        </Button>
-                                    </form>
+                                    <ConsultationForm />
                                 </CardContent>
                             </Card>
                         </div>
