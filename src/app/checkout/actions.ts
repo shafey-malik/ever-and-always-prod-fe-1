@@ -304,36 +304,30 @@ export async function placeOrder(paymentMethodCode: string, paymentIntentId?: st
             metadata.shouldErrorOnSettle = false;
         }
 
-        // Stripe payment method handler code as registered in the Vendure Stripe plugin.
-        // Use exact equality — the method code is 'stripe' (see stripe.handler.js).
-        // Avoid .includes() since this is a server action callable directly via HTTP:
-        // a crafted paymentMethodCode like 'x-stripe-y' must not bypass addPaymentToOrder.
-        const STRIPE_METHOD_CODE = 'stripe';
-        const isStripePayment = paymentMethodCode === STRIPE_METHOD_CODE;
-
-        // For Stripe payments, include the payment intent ID in metadata
-        if (paymentIntentId && isStripePayment) {
-            // Stripe PaymentIntent IDs always start with 'pi_'.
-            // Do NOT use a length fallback — any 21-char string would pass it.
+        // If a Stripe PaymentIntent ID is present it means the charge was already confirmed
+        // client-side via Stripe Elements. The gate is the ID format itself — Stripe
+        // PaymentIntent IDs always begin with 'pi_'. We intentionally do NOT key off the
+        // payment method code here because:
+        //   • PaymentMethod.code is set by the admin in the UI and can be anything
+        //     ('stripe-card', 'online-payment', etc.), not necessarily the string 'stripe'.
+        //   • PaymentMethodHandler.code ('stripe') is a different, internal field that is
+        //     not exposed to the storefront via eligiblePaymentMethods.
+        // Using the 'pi_' prefix is the only reliable, convention-free signal.
+        if (paymentIntentId !== undefined) {
+            // Validate format — Stripe PaymentIntent IDs always start with 'pi_'.
+            // Do NOT use a length fallback; any 21-char string would pass it.
             if (!paymentIntentId.startsWith('pi_')) {
                 throw new Error('Invalid payment confirmation. Please complete the payment again.');
             }
-            metadata.paymentIntentId = paymentIntentId;
-        }
-
-        // For Stripe payments with a confirmed payment intent, DO NOT call addPaymentToOrder
-        // from the shop API. The Stripe handler's createPayment() explicitly requires
-        // apiType === 'admin' — it is called by the Stripe webhook controller (admin context),
-        // not by the storefront. Calling it here causes:
-        //   "CreatePayment is not allowed for apiType 'shop'"
-        // Instead, redirect to order confirmation; the webhook will settle the payment.
-        if (isStripePayment && paymentIntentId) {
+            // Order code must be available for the redirect. If the earlier query failed
+            // and order is null we cannot proceed — surface a clear error rather than
+            // falling through to addPaymentToOrder, which would throw:
+            //   "CreatePayment is not allowed for apiType 'shop'"
             if (!order?.code) {
-                // Order code unavailable — cannot redirect. Surface a clear error
-                // rather than falling through to addPaymentToOrder (which would throw
-                // the shop-API guard error).
                 throw new Error('Unable to confirm order reference. Please contact support.');
             }
+            // The Stripe webhook controller calls addPaymentToOrder via admin context when
+            // the payment_intent.succeeded event arrives. Redirect now; webhook settles the order.
             updateTag('cart');
             updateTag('active-order');
             redirect(`/order-confirmation/${order.code}`);
