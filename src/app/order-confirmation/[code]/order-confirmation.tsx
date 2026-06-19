@@ -65,14 +65,23 @@ export async function OrderConfirmation({params}: PageProps<'/order-confirmation
        notFound();
     }
 
+    const isPaymentSettled = order.state === 'PaymentSettled' || order.state === 'PaymentAuthorized' ||
+        order.state === 'Shipped' || order.state === 'Delivered' || order.state === 'PartiallyShipped' ||
+        order.state === 'PartiallyDelivered';
+    const isPaymentPending = order.state === 'ArrangingPayment';
+
     return (
         <div className="container mx-auto px-4 py-8 sm:py-12">
             <div className="max-w-3xl mx-auto">
                 <div className="text-center mb-8">
-                    <CheckCircle2 className="h-16 w-16 text-green-500 mx-auto mb-4"/>
-                    <h1 className="text-3xl font-bold mb-2">Order Confirmed!</h1>
+                    <CheckCircle2 className={`h-16 w-16 mx-auto mb-4 ${isPaymentSettled ? 'text-green-500' : 'text-yellow-500'}`}/>
+                    <h1 className="text-3xl font-bold mb-2">
+                        {isPaymentSettled ? 'Order Confirmed!' : 'Payment Processing'}
+                    </h1>
                     <p className="text-muted-foreground">
-                        Thank you for your order. Your order number is
+                        {isPaymentPending
+                            ? 'Your payment is being processed. You will receive a confirmation email once complete. Your order number is '
+                            : 'Thank you for your order. Your order number is '}
                         <span className="font-semibold">{order.code}</span>
                     </p>
                 </div>
