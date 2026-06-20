@@ -121,6 +121,104 @@ export function customRingNotification(input: CustomRingNotificationInput): Emai
 }
 
 // ---------------------------------------------------------------------------
+// Cancellation request notification (sent TO the shop owner)
+// ---------------------------------------------------------------------------
+
+export interface CancellationRequestNotificationInput {
+    orderCode: string;
+    customerName: string;
+    customerEmail: string;
+    customerPhone: string;
+    orderDate: string;
+    orderTotal: string;
+    items: Array<{ name: string; quantity: number }>;
+}
+
+export function cancellationRequestNotification(input: CancellationRequestNotificationInput): EmailContent {
+    const heading = 'Order Cancellation Request';
+    const itemsList = input.items.map(i => `${i.name} × ${i.quantity}`).join('\n');
+
+    const fields: Array<[string, string | undefined | null]> = [
+        ['Customer', input.customerName],
+        ['Email', input.customerEmail],
+        ['Phone', input.customerPhone],
+        ['Order', `#${input.orderCode}`],
+        ['Order Date', input.orderDate],
+        ['Order Total', input.orderTotal],
+        ['Items', itemsList],
+    ];
+
+    return {
+        subject: `[Cancellation Request] Order #${input.orderCode} — ${input.customerName}`,
+        html: notificationHtml(heading, fields),
+        text: notificationText(heading, fields),
+    };
+}
+
+// ---------------------------------------------------------------------------
+// Cancellation auto-reply (sent TO the customer)
+// ---------------------------------------------------------------------------
+
+export interface CancellationAutoReplyInput {
+    name: string;
+    orderCode: string;
+}
+
+export function cancellationAutoReply({ name, orderCode }: CancellationAutoReplyInput): EmailContent {
+    const firstName = name.split(' ')[0]?.trim() || 'Valued Customer';
+    const subject = `We've received your cancellation request — ${SITE_NAME}`;
+
+    const text = `Dear ${firstName},
+
+Thank you for reaching out to us. We've received your cancellation request for Order #${orderCode}, and we sincerely appreciate you taking the time to contact us.
+
+Our team will carefully review your request and get in touch with you within 24–48 hours to discuss the details and explore the best possible outcome for you.
+
+Please know that your satisfaction is our utmost priority, and we will do everything we can to assist you. For personalised or custom-crafted pieces, our team will be happy to walk you through the available options and policies.
+
+If you have any additional questions in the meantime, please don't hesitate to reach out — we're always here to help.
+
+Warm regards,
+The ${SITE_NAME} Team
+
+This is an automated confirmation — our team will follow up with you personally.`;
+
+    const html = `<!doctype html>
+<html>
+  <body style="margin:0;padding:24px;background:#f5f1ea;font-family:Georgia,'Times New Roman',serif;color:#1f1a15;">
+    <div style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #e7ddcd;border-radius:12px;padding:32px;">
+      <p style="margin:0 0 16px;font-size:16px;">Dear ${escapeHtml(firstName)},</p>
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+        Thank you for reaching out to us. We have received your cancellation request for
+        <strong>Order #${escapeHtml(orderCode)}</strong>, and we sincerely appreciate you taking the time to contact us.
+      </p>
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+        Our team will carefully review your request and get in touch with you within
+        <strong>24&ndash;48 hours</strong> to discuss the details and explore the best possible
+        outcome for you.
+      </p>
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+        Please know that your satisfaction is our utmost priority, and we will do everything we can
+        to assist you. For personalised or custom-crafted pieces, our team will be happy to walk
+        you through the available options and policies.
+      </p>
+      <p style="margin:0 0 16px;font-size:15px;line-height:1.6;">
+        If you have any additional questions in the meantime, please don&rsquo;t hesitate to reach
+        out &mdash; we&rsquo;re always here to help.
+      </p>
+      <p style="margin:24px 0 4px;font-size:15px;">Warm regards,</p>
+      <p style="margin:0 0 20px;font-size:15px;color:#6b5d4f;">The ${escapeHtml(SITE_NAME)} Team</p>
+      <p style="margin:0;padding-top:16px;border-top:1px solid #e7ddcd;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9a8c7a;">
+        This is an automated confirmation &mdash; our team will follow up with you personally.
+      </p>
+    </div>
+  </body>
+</html>`;
+
+    return { subject, html, text };
+}
+
+// ---------------------------------------------------------------------------
 // Auto-reply template (sent TO the customer)
 // ---------------------------------------------------------------------------
 

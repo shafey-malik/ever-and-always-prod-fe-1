@@ -13,6 +13,10 @@ import {Price} from '@/components/commerce/price';
 import {OrderStatusBadge} from '@/components/commerce/order-status-badge';
 import {formatDate} from '@/lib/format';
 import Link from "next/link";
+import {CancelRequestDialog} from './cancel-request-dialog';
+
+// States where a cancellation request makes sense (paid but not yet fulfilled).
+const CANCELLATION_REQUESTABLE_STATES = ['PaymentAuthorized', 'PaymentSettled'] as const;
 
 type OrderDetailPageProps = PageProps<'/account/orders/[code]'>;
 
@@ -53,14 +57,22 @@ export default async function OrderDetailPage(props: PageProps<'/account/orders/
                         Back to Orders
                     </Link>
                 </Button>
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold">Order {order.code}</h1>
                         <p className="text-muted-foreground mt-1">
                             Placed on {formatDate(order.createdAt, 'long')}
                         </p>
                     </div>
-                    <OrderStatusBadge state={order.state}/>
+                    <div className="flex items-center gap-3 shrink-0">
+                        <OrderStatusBadge state={order.state}/>
+                        {(CANCELLATION_REQUESTABLE_STATES as readonly string[]).includes(order.state) && (
+                            <CancelRequestDialog
+                                orderCode={order.code}
+                                defaultPhone={order.shippingAddress?.phoneNumber}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
 
