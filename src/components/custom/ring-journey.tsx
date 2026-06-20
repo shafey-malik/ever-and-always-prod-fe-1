@@ -147,7 +147,7 @@ export function RingJourney({ facetValues, onExit }: RingJourneyProps) {
                     </p>
                     <button
                         onClick={onExit}
-                        className="inline-flex items-center gap-2 border border-[hsl(var(--border))] text-[hsl(var(--foreground))] px-6 py-3 text-xs tracking-[0.2em] uppercase font-light hover:border-[hsl(var(--secondary))] hover:text-[hsl(var(--secondary))] transition-all"
+                        className="inline-flex items-center gap-2 border border-[hsl(var(--border))] text-[hsl(var(--foreground))] px-6 py-3 text-xs tracking-[0.2em] uppercase font-light hover:border-[hsl(var(--secondary))] hover:text-[hsl(var(--secondary))] transition-all cursor-pointer"
                     >
                         <ArrowLeft className="w-3.5 h-3.5" /> Back
                     </button>

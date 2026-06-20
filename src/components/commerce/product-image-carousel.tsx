@@ -110,14 +110,14 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                         <>
                             <button
                                 onClick={goToPrevious}
-                                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-md hover:bg-black/80 text-white rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 z-10 shadow-lg"
+                                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-md hover:bg-black/80 text-white rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 z-10 shadow-lg cursor-pointer"
                                 aria-label="Previous image"
                             >
                                 <ChevronLeft className="h-5 w-5" />
                             </button>
                             <button
                                 onClick={goToNext}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-md hover:bg-black/80 text-white rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 z-10 shadow-lg"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/60 backdrop-blur-md hover:bg-black/80 text-white rounded-full p-2.5 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 z-10 shadow-lg cursor-pointer"
                                 aria-label="Next image"
                             >
                                 <ChevronRight className="h-5 w-5" />
@@ -149,7 +149,7 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                                             setCurrentIndex(index);
                                         }
                                     }}
-                                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-300 group/thumb ${
+                                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-300 group/thumb cursor-pointer ${
                                         isActive
                                             ? 'border-[hsl(var(--lead-text))]/40 shadow-lg ring-2 ring-[hsl(var(--lead-text))]/20 scale-[1.05]'
                                             : 'border-border/50 hover:border-[hsl(var(--lead-text))]/30 hover:scale-[1.02] shadow-sm'
@@ -196,7 +196,7 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                     <div className="relative w-full h-full flex items-center justify-center">
                         <button
                             onClick={() => setIsLightboxOpen(false)}
-                            className="absolute top-4 right-4 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full p-2.5 transition-all hover:scale-110 shadow-lg"
+                            className="absolute top-4 right-4 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full p-2.5 transition-all hover:scale-110 shadow-lg cursor-pointer"
                             aria-label="Close lightbox"
                         >
                             <X className="w-6 h-6" />
@@ -208,14 +208,14 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                                     <>
                                         <button
                                             onClick={goToPrevious}
-                                            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full p-3 transition-all hover:scale-110"
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full p-3 transition-all hover:scale-110 cursor-pointer"
                                             aria-label="Previous image"
                                         >
                                             <ChevronLeft className="w-6 h-6" />
                                         </button>
                                         <button
                                             onClick={goToNext}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full p-3 transition-all hover:scale-110"
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 z-50 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white rounded-full p-3 transition-all hover:scale-110 cursor-pointer"
                                             aria-label="Next image"
                                         >
                                             <ChevronRight className="w-6 h-6" />
