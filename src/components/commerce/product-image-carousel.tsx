@@ -140,7 +140,7 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                             const normalizedPreview = normalizeImageUrl(image.preview);
                             const thumbnailHasError = imageErrors.has(index);
                             const isActive = index === currentIndex;
-                            
+
                             return (
                                 <button
                                     key={image.id}
@@ -149,11 +149,10 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                                             setCurrentIndex(index);
                                         }
                                     }}
-                                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-300 group/thumb cursor-pointer ${
-                                        isActive
+                                    className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all duration-300 group/thumb cursor-pointer ${isActive
                                             ? 'border-[hsl(var(--lead-text))]/40 shadow-lg ring-2 ring-[hsl(var(--lead-text))]/20 scale-[1.05]'
                                             : 'border-border/50 hover:border-[hsl(var(--lead-text))]/30 hover:scale-[1.02] shadow-sm'
-                                    }`}
+                                        }`}
                                 >
                                     {normalizedPreview && !thumbnailHasError ? (
                                         <>
@@ -161,9 +160,8 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
                                                 src={normalizedPreview}
                                                 alt={`Thumbnail ${index + 1}`}
                                                 fill
-                                                className={`object-cover transition-all duration-300 ${
-                                                    isActive ? 'brightness-100' : 'brightness-90 group-hover/thumb:brightness-100'
-                                                }`}
+                                                className={`object-cover transition-all duration-300 ${isActive ? 'brightness-100' : 'brightness-90 group-hover/thumb:brightness-100'
+                                                    }`}
                                                 sizes="(max-width: 1024px) 25vw, 12.5vw"
                                                 onError={() => handleImageError(index)}
                                                 unoptimized={normalizedPreview.includes('my-shop.com')}
@@ -186,7 +184,7 @@ export function ProductImageCarousel({ images }: ProductImageCarouselProps) {
 
             {/* Lightbox Modal */}
             <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
-                <DialogContent 
+                <DialogContent
                     className="max-w-7xl w-full h-[90vh] p-0 bg-black/95 border-0 shadow-2xl"
                     showCloseButton={false}
                 >
