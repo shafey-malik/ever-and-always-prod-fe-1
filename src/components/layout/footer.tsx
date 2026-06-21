@@ -77,7 +77,7 @@ export async function Footer() {
                             Collections
                         </p>
                         <ul className="space-y-2.5 font-luxury-sans text-[13px] font-light">
-                            {collections.map((collection) => (
+                            {collections.slice(0, 5).map((collection) => (
                                 <li key={collection.id}>
                                     <Link
                                         href={`/collection/${collection.slug}`}
@@ -85,6 +85,32 @@ export async function Footer() {
                                     >
                                         <span className="w-0 group-hover:w-3 h-px bg-[hsl(var(--secondary))] mr-0 group-hover:mr-2 transition-all duration-300" />
                                         {collection.name}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Explore */}
+                    <div className="md:col-span-2 lg:col-span-2">
+                        <p className="font-luxury-sans text-[10px] tracking-[0.28em] uppercase text-[hsl(var(--secondary))] mb-5">
+                            Explore
+                        </p>
+                        <ul className="space-y-2.5 font-luxury-sans text-[13px] font-light">
+                            {[
+                                { href: '/engagement-rings', label: 'Engagement Rings' },
+                                { href: '/wedding-rings',    label: 'Wedding Rings'    },
+                                { href: '/custom',           label: 'Custom Jewelry'   },
+                                { href: '/search',           label: 'All Rings'        },
+                                { href: '/consultation',     label: 'Book a Visit'     },
+                            ].map((link) => (
+                                <li key={link.href}>
+                                    <Link
+                                        href={link.href}
+                                        className="group inline-flex items-center text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors duration-300"
+                                    >
+                                        <span className="w-0 group-hover:w-3 h-px bg-[hsl(var(--secondary))] mr-0 group-hover:mr-2 transition-all duration-300" />
+                                        {link.label}
                                     </Link>
                                 </li>
                             ))}
