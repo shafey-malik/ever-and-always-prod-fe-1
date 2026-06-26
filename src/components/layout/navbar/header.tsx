@@ -482,177 +482,177 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
             {/* Portaled to <body>: the header's backdrop-blur creates a containing
                 block that would otherwise trap this fixed overlay inside the header */}
             {mounted && createPortal(
-            <AnimatePresence>
-                {isMobileMenuOpen && (
-                    <div className="fixed inset-0 z-[60] lg:hidden">
-                        {/* Backdrop */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        />
+                <AnimatePresence>
+                    {isMobileMenuOpen && (
+                        <div className="fixed inset-0 z-[60] lg:hidden">
+                            {/* Backdrop */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                            />
 
-                        {/* Panel */}
-                        <motion.aside
-                            initial={{ x: '-100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '-100%' }}
-                            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            className="absolute left-0 top-0 bottom-0 w-[86vw] max-w-sm bg-[hsl(var(--card))] shadow-[var(--shadow-premium)] flex flex-col overscroll-contain"
-                        >
-                            {/* Gold hairline along the panel edge */}
-                            <span className="pointer-events-none absolute top-0 right-0 bottom-0 w-px bg-linear-to-b from-[hsl(var(--secondary)/0.6)] via-[hsl(var(--border))] to-transparent" />
-
-                            {/* Drawer header */}
-                            <div className="px-6 pt-5 pb-4 border-b border-[hsl(var(--border)/0.7)] flex items-center justify-between shrink-0">
-                                <Link
-                                    href="/"
-                                    className="flex flex-col"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                >
-                                    <span className="font-luxury-serif text-xl font-bold text-[hsl(var(--foreground))] leading-none">
-                                        Ever &amp; Always
-                                    </span>
-                                    <span className="font-luxury-sans text-[0.55rem] tracking-[0.3em] uppercase text-[hsl(var(--secondary))] mt-1.5">
-                                        Fine Diamond Jewelry
-                                    </span>
-                                </Link>
-                                <button
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    aria-label="Close menu"
-                                    className="p-2.5 -mr-1 rounded-full border border-[hsl(var(--border))] cursor-pointer text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] hover:border-[hsl(var(--secondary)/0.5)] active:scale-95 transition-all duration-200"
-                                >
-                                    <X className="w-4 h-4" />
-                                </button>
-                            </div>
-
-                            {/* Scrollable nav */}
-                            <motion.nav
-                                variants={drawerListVariants}
-                                initial="hidden"
-                                animate="show"
-                                className="flex-1 overflow-y-auto px-4 py-5 space-y-1"
+                            {/* Panel */}
+                            <motion.aside
+                                initial={{ x: '-100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '-100%' }}
+                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                                className="absolute left-0 top-0 bottom-0 w-[86vw] max-w-sm bg-[hsl(var(--card))] shadow-[var(--shadow-premium)] flex flex-col overscroll-contain"
                             >
-                                <motion.p
-                                    variants={drawerItemVariants}
-                                    className="font-luxury-sans text-[hsl(var(--secondary))] px-3 pb-2 text-[10px] uppercase tracking-[0.28em]"
+                                {/* Gold hairline along the panel edge */}
+                                <span className="pointer-events-none absolute top-0 right-0 bottom-0 w-px bg-linear-to-b from-[hsl(var(--secondary)/0.6)] via-[hsl(var(--border))] to-transparent" />
+
+                                {/* Drawer header */}
+                                <div className="px-6 pt-5 pb-4 border-b border-[hsl(var(--border)/0.7)] flex items-center justify-between shrink-0">
+                                    <Link
+                                        href="/"
+                                        className="flex flex-col"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    >
+                                        <span className="font-luxury-serif text-xl font-bold text-[hsl(var(--foreground))] leading-none">
+                                            Ever &amp; Always
+                                        </span>
+                                        <span className="font-luxury-sans text-[0.55rem] tracking-[0.3em] uppercase text-[hsl(var(--secondary))] mt-1.5">
+                                            Fine Diamond Jewelry
+                                        </span>
+                                    </Link>
+                                    <button
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        aria-label="Close menu"
+                                        className="p-2.5 -mr-1 rounded-full border border-[hsl(var(--border))] cursor-pointer text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] hover:border-[hsl(var(--secondary)/0.5)] active:scale-95 transition-all duration-200"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+
+                                {/* Scrollable nav */}
+                                <motion.nav
+                                    variants={drawerListVariants}
+                                    initial="hidden"
+                                    animate="show"
+                                    className="flex-1 overflow-y-auto px-4 py-5 space-y-1"
                                 >
-                                    Shop Categories
-                                </motion.p>
-
-                                {/* Engagement Rings — accordion */}
-                                <motion.div variants={drawerItemVariants} className="border border-[hsl(var(--border))] rounded-xl overflow-hidden">
-                                    <button
-                                        onClick={() => setExpandedMobileSection(
-                                            expandedMobileSection === 'engagement' ? null : 'engagement'
-                                        )}
-                                        className="w-full flex items-center justify-between px-4 py-3.5 font-luxury-sans text-sm font-medium text-[hsl(var(--foreground))] cursor-pointer"
+                                    <motion.p
+                                        variants={drawerItemVariants}
+                                        className="font-luxury-sans text-[hsl(var(--secondary))] px-3 pb-2 text-[10px] uppercase tracking-[0.28em]"
                                     >
-                                        <span>Engagement Rings</span>
-                                        <ChevronDown className={`w-4 h-4 text-[hsl(var(--secondary))] transition-transform duration-300 ${expandedMobileSection === 'engagement' ? 'rotate-180' : ''}`} />
-                                    </button>
+                                        Shop Categories
+                                    </motion.p>
 
-                                    <AnimatePresence initial={false}>
-                                        {expandedMobileSection === 'engagement' && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className="px-4 pb-4 border-t border-[hsl(var(--border))] pt-3 space-y-4">
-                                                    {Object.entries(engagementCategories).map(([category, items]) => (
-                                                        <div key={category}>
-                                                            <p className="text-[10px] text-[hsl(var(--secondary))] font-luxury-sans uppercase tracking-[0.22em] mb-1.5">
-                                                                {category}
-                                                            </p>
-                                                            <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-                                                                {items.map((item) => (
-                                                                    <Link
-                                                                        key={item}
-                                                                        href={`/collection/${getCollectionSlug('engagement', item)}`}
-                                                                        onClick={() => setIsMobileMenuOpen(false)}
-                                                                        className="text-sm text-[hsl(var(--foreground)/0.65)] hover:text-[hsl(var(--foreground))] py-1 font-luxury-sans transition-colors"
-                                                                    >
-                                                                        {item}
-                                                                    </Link>
-                                                                ))}
+                                    {/* Engagement Rings — accordion */}
+                                    <motion.div variants={drawerItemVariants} className="border border-[hsl(var(--border))] rounded-xl overflow-hidden">
+                                        <button
+                                            onClick={() => setExpandedMobileSection(
+                                                expandedMobileSection === 'engagement' ? null : 'engagement'
+                                            )}
+                                            className="w-full flex items-center justify-between px-4 py-3.5 font-luxury-sans text-sm font-medium text-[hsl(var(--foreground))] cursor-pointer"
+                                        >
+                                            <span>Engagement Rings</span>
+                                            <ChevronDown className={`w-4 h-4 text-[hsl(var(--secondary))] transition-transform duration-300 ${expandedMobileSection === 'engagement' ? 'rotate-180' : ''}`} />
+                                        </button>
+
+                                        <AnimatePresence initial={false}>
+                                            {expandedMobileSection === 'engagement' && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="px-4 pb-4 border-t border-[hsl(var(--border))] pt-3 space-y-4">
+                                                        {Object.entries(engagementCategories).map(([category, items]) => (
+                                                            <div key={category}>
+                                                                <p className="text-[10px] text-[hsl(var(--secondary))] font-luxury-sans uppercase tracking-[0.22em] mb-1.5">
+                                                                    {category}
+                                                                </p>
+                                                                <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                                                                    {items.map((item) => (
+                                                                        <Link
+                                                                            key={item}
+                                                                            href={`/collection/${getCollectionSlug('engagement', item)}`}
+                                                                            onClick={() => setIsMobileMenuOpen(false)}
+                                                                            className="text-sm text-[hsl(var(--foreground)/0.65)] hover:text-[hsl(var(--foreground))] py-1 font-luxury-sans transition-colors"
+                                                                        >
+                                                                            {item}
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ))}
-                                                    <Link
-                                                        href="/engagement-rings"
-                                                        onClick={() => setIsMobileMenuOpen(false)}
-                                                        className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[hsl(var(--secondary))] font-luxury-sans mt-1"
-                                                    >
-                                                        View All Engagement <ArrowRight className="w-3 h-3" />
-                                                    </Link>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </motion.div>
+                                                        ))}
+                                                        <Link
+                                                            href="/engagement-rings"
+                                                            onClick={() => setIsMobileMenuOpen(false)}
+                                                            className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[hsl(var(--secondary))] font-luxury-sans mt-1"
+                                                        >
+                                                            View All Engagement <ArrowRight className="w-3 h-3" />
+                                                        </Link>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </motion.div>
 
-                                {/* Wedding Rings — accordion */}
-                                <motion.div variants={drawerItemVariants} className="border border-[hsl(var(--border))] rounded-xl overflow-hidden">
-                                    <button
-                                        onClick={() => setExpandedMobileSection(
-                                            expandedMobileSection === 'wedding' ? null : 'wedding'
-                                        )}
-                                        className="w-full flex items-center justify-between px-4 py-3.5 font-luxury-sans text-sm font-medium text-[hsl(var(--foreground))] cursor-pointer"
-                                    >
-                                        <span>Wedding Rings</span>
-                                        <ChevronDown className={`w-4 h-4 text-[hsl(var(--secondary))] transition-transform duration-300 ${expandedMobileSection === 'wedding' ? 'rotate-180' : ''}`} />
-                                    </button>
+                                    {/* Wedding Rings — accordion */}
+                                    <motion.div variants={drawerItemVariants} className="border border-[hsl(var(--border))] rounded-xl overflow-hidden">
+                                        <button
+                                            onClick={() => setExpandedMobileSection(
+                                                expandedMobileSection === 'wedding' ? null : 'wedding'
+                                            )}
+                                            className="w-full flex items-center justify-between px-4 py-3.5 font-luxury-sans text-sm font-medium text-[hsl(var(--foreground))] cursor-pointer"
+                                        >
+                                            <span>Wedding Rings</span>
+                                            <ChevronDown className={`w-4 h-4 text-[hsl(var(--secondary))] transition-transform duration-300 ${expandedMobileSection === 'wedding' ? 'rotate-180' : ''}`} />
+                                        </button>
 
-                                    <AnimatePresence initial={false}>
-                                        {expandedMobileSection === 'wedding' && (
-                                            <motion.div
-                                                initial={{ height: 0, opacity: 0 }}
-                                                animate={{ height: 'auto', opacity: 1 }}
-                                                exit={{ height: 0, opacity: 0 }}
-                                                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                                                className="overflow-hidden"
-                                            >
-                                                <div className="px-4 pb-4 border-t border-[hsl(var(--border))] pt-3 space-y-4">
-                                                    {Object.entries(weddingCategories).map(([category, items]) => (
-                                                        <div key={category}>
-                                                            <p className="text-[10px] text-[hsl(var(--secondary))] font-luxury-sans uppercase tracking-[0.22em] mb-1.5">
-                                                                {category}
-                                                            </p>
-                                                            <div className="grid grid-cols-2 gap-x-2 gap-y-1">
-                                                                {items.map((item) => (
-                                                                    <Link
-                                                                        key={item}
-                                                                        href={`/collection/${getCollectionSlug('wedding', item)}`}
-                                                                        onClick={() => setIsMobileMenuOpen(false)}
-                                                                        className="text-sm text-[hsl(var(--foreground)/0.65)] hover:text-[hsl(var(--foreground))] py-1 font-luxury-sans transition-colors"
-                                                                    >
-                                                                        {item}
-                                                                    </Link>
-                                                                ))}
+                                        <AnimatePresence initial={false}>
+                                            {expandedMobileSection === 'wedding' && (
+                                                <motion.div
+                                                    initial={{ height: 0, opacity: 0 }}
+                                                    animate={{ height: 'auto', opacity: 1 }}
+                                                    exit={{ height: 0, opacity: 0 }}
+                                                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                                                    className="overflow-hidden"
+                                                >
+                                                    <div className="px-4 pb-4 border-t border-[hsl(var(--border))] pt-3 space-y-4">
+                                                        {Object.entries(weddingCategories).map(([category, items]) => (
+                                                            <div key={category}>
+                                                                <p className="text-[10px] text-[hsl(var(--secondary))] font-luxury-sans uppercase tracking-[0.22em] mb-1.5">
+                                                                    {category}
+                                                                </p>
+                                                                <div className="grid grid-cols-2 gap-x-2 gap-y-1">
+                                                                    {items.map((item) => (
+                                                                        <Link
+                                                                            key={item}
+                                                                            href={`/collection/${getCollectionSlug('wedding', item)}`}
+                                                                            onClick={() => setIsMobileMenuOpen(false)}
+                                                                            className="text-sm text-[hsl(var(--foreground)/0.65)] hover:text-[hsl(var(--foreground))] py-1 font-luxury-sans transition-colors"
+                                                                        >
+                                                                            {item}
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    ))}
-                                                    <Link
-                                                        href="/wedding-rings"
-                                                        onClick={() => setIsMobileMenuOpen(false)}
-                                                        className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[hsl(var(--secondary))] font-luxury-sans mt-1"
-                                                    >
-                                                        View All Wedding <ArrowRight className="w-3 h-3" />
-                                                    </Link>
-                                                </div>
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </motion.div>
+                                                        ))}
+                                                        <Link
+                                                            href="/wedding-rings"
+                                                            onClick={() => setIsMobileMenuOpen(false)}
+                                                            className="inline-flex items-center gap-1 text-[10px] uppercase tracking-[0.15em] text-[hsl(var(--secondary))] font-luxury-sans mt-1"
+                                                        >
+                                                            View All Wedding <ArrowRight className="w-3 h-3" />
+                                                        </Link>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
+                                    </motion.div>
 
-                                {/* Flat links */}
-                                {collections.map((collection) => (
+                                    {/* Flat links */}
+                                    {/* {collections.map((collection) => (
                                     <motion.div key={collection.id} variants={drawerItemVariants}>
                                         <Link
                                             href={`/collection/${collection.slug}`}
@@ -663,82 +663,82 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                                             <ChevronRight className="w-4 h-4 opacity-40" />
                                         </Link>
                                     </motion.div>
-                                ))}
+                                ))} */}
 
-                                <motion.div variants={drawerItemVariants}>
-                                    <Link
-                                        href="/custom"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="flex items-center justify-between py-3.5 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-xl font-luxury-sans text-sm transition-colors border border-transparent hover:border-[hsl(var(--border))]"
-                                    >
-                                        Custom Jewelry
-                                        <ChevronRight className="w-4 h-4 opacity-40" />
-                                    </Link>
-                                </motion.div>
-
-                                <motion.div variants={drawerItemVariants}>
-                                    <Link
-                                        href="/about-us"
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="flex items-center justify-between py-3.5 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-xl font-luxury-sans text-sm transition-colors border border-transparent hover:border-[hsl(var(--border))]"
-                                    >
-                                        About Us
-                                        <ChevronRight className="w-4 h-4 opacity-40" />
-                                    </Link>
-                                </motion.div>
-                            </motion.nav>
-
-                            {/* Drawer footer */}
-                            <motion.div
-                                initial={{ opacity: 0, y: 12 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.35, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                                className="shrink-0 border-t border-[hsl(var(--border)/0.7)] bg-[hsl(var(--surface-luxury))] px-5 pt-4 pb-[calc(1.1rem+env(safe-area-inset-bottom))] space-y-3"
-                            >
-                                <Link
-                                    href="/consultation"
-                                    onClick={() => setIsMobileMenuOpen(false)}
-                                    className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl bg-[hsl(var(--primary))] text-[hsl(var(--secondary))] font-luxury-sans text-[11px] tracking-[0.2em] uppercase active:scale-[0.98] transition-transform duration-200"
-                                >
-                                    <Calendar className="w-3.5 h-3.5" />
-                                    Book a Private Consultation
-                                </Link>
-
-                                <div className="flex items-center gap-2.5">
-                                    <Link
-                                        href={isSignedIn ? '/account' : '/sign-in'}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[hsl(var(--border))] text-[hsl(var(--foreground)/0.8)] font-luxury-sans text-xs active:scale-[0.98] transition-transform duration-200"
-                                    >
-                                        <User className="w-3.5 h-3.5 text-[hsl(var(--secondary))]" />
-                                        {isSignedIn ? 'My Account' : 'Sign In'}
-                                    </Link>
-                                    {mounted && (
-                                        <button
-                                            onClick={toggleTheme}
-                                            aria-label="Toggle theme"
-                                            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[hsl(var(--border))] text-[hsl(var(--foreground)/0.8)] font-luxury-sans text-xs cursor-pointer active:scale-[0.98] transition-transform duration-200"
+                                    <motion.div variants={drawerItemVariants}>
+                                        <Link
+                                            href="/custom"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="flex items-center justify-between py-3.5 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-xl font-luxury-sans text-sm transition-colors border border-transparent hover:border-[hsl(var(--border))]"
                                         >
-                                            {theme === 'dark' ? (
-                                                <>
-                                                    <Sun className="w-3.5 h-3.5 text-[hsl(var(--secondary))]" />
-                                                    Light Mode
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Moon className="w-3.5 h-3.5 text-[hsl(var(--secondary))]" />
-                                                    Dark Mode
-                                                </>
-                                            )}
-                                        </button>
-                                    )}
-                                </div>
-                            </motion.div>
-                        </motion.aside>
-                    </div>
-                )}
-            </AnimatePresence>,
-            document.body
+                                            Custom Jewelry
+                                            <ChevronRight className="w-4 h-4 opacity-40" />
+                                        </Link>
+                                    </motion.div>
+
+                                    <motion.div variants={drawerItemVariants}>
+                                        <Link
+                                            href="/about-us"
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="flex items-center justify-between py-3.5 px-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] rounded-xl font-luxury-sans text-sm transition-colors border border-transparent hover:border-[hsl(var(--border))]"
+                                        >
+                                            About Us
+                                            <ChevronRight className="w-4 h-4 opacity-40" />
+                                        </Link>
+                                    </motion.div>
+                                </motion.nav>
+
+                                {/* Drawer footer */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 12 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.35, duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                                    className="shrink-0 border-t border-[hsl(var(--border)/0.7)] bg-[hsl(var(--surface-luxury))] px-5 pt-4 pb-[calc(1.1rem+env(safe-area-inset-bottom))] space-y-3"
+                                >
+                                    <Link
+                                        href="/consultation"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2.5 w-full py-3.5 rounded-xl bg-[hsl(var(--primary))] text-[hsl(var(--secondary))] font-luxury-sans text-[11px] tracking-[0.2em] uppercase active:scale-[0.98] transition-transform duration-200"
+                                    >
+                                        <Calendar className="w-3.5 h-3.5" />
+                                        Book a Private Consultation
+                                    </Link>
+
+                                    <div className="flex items-center gap-2.5">
+                                        <Link
+                                            href={isSignedIn ? '/account' : '/sign-in'}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[hsl(var(--border))] text-[hsl(var(--foreground)/0.8)] font-luxury-sans text-xs active:scale-[0.98] transition-transform duration-200"
+                                        >
+                                            <User className="w-3.5 h-3.5 text-[hsl(var(--secondary))]" />
+                                            {isSignedIn ? 'My Account' : 'Sign In'}
+                                        </Link>
+                                        {mounted && (
+                                            <button
+                                                onClick={toggleTheme}
+                                                aria-label="Toggle theme"
+                                                className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border border-[hsl(var(--border))] text-[hsl(var(--foreground)/0.8)] font-luxury-sans text-xs cursor-pointer active:scale-[0.98] transition-transform duration-200"
+                                            >
+                                                {theme === 'dark' ? (
+                                                    <>
+                                                        <Sun className="w-3.5 h-3.5 text-[hsl(var(--secondary))]" />
+                                                        Light Mode
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Moon className="w-3.5 h-3.5 text-[hsl(var(--secondary))]" />
+                                                        Dark Mode
+                                                    </>
+                                                )}
+                                            </button>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            </motion.aside>
+                        </div>
+                    )}
+                </AnimatePresence>,
+                document.body
             )}
         </header>
     );
