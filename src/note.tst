@@ -1,0 +1,5 @@
+- User journey (address, trust)
+- User tracker (product page 30 sec)
+- Express/non-express
+- life time warraney
+- privacy policy

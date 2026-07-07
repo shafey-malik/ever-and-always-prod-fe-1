@@ -56,7 +56,7 @@ const drawerItemVariants: Variants = {
 export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
     const router = useRouter();
     const { theme, setTheme } = useTheme();
-    const { count: wishlistCount, hydrated: wishlistHydrated } = useWishlist();
+    const { count: wishlistCount } = useWishlist();
     const [mounted, setMounted] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -219,7 +219,7 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
 
                         <Link href="/wishlist" className={`relative ${iconBtn}`} aria-label="Wishlist">
                             <Heart className="w-5 h-5" />
-                            {wishlistHydrated && wishlistCount > 0 && (
+                            {mounted && wishlistCount > 0 && (
                                 <span className="absolute top-0.5 right-0.5 bg-[hsl(var(--secondary))] text-[hsl(var(--secondary-foreground))] rounded-full min-w-4 h-4 px-0.5 flex items-center justify-center text-[10px] font-semibold leading-none shadow-sm">
                                     {wishlistCount}
                                 </span>

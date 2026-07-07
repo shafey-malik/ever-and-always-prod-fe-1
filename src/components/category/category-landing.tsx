@@ -30,20 +30,68 @@ function collectionHref(slug: string) {
   return `/collection/${slug}`;
 }
 
+const goldLine = 'bg-[hsl(var(--secondary)/0.6)] transition-all duration-500';
+
+function TileArt({
+  item,
+  className = '',
+  fit = 'cover',
+  rounded = false,
+}: {
+  item: CategoryItem;
+  className?: string;
+  fit?: 'cover' | 'contain';
+  rounded?: boolean;
+}) {
+  const src = item.image;
+  if (!src) return null;
+
+  const radius = rounded ? 'rounded-lg' : '';
+
+  return (
+    <div className={`relative overflow-hidden ${radius} ${className}`}>
+      <img
+        src={src}
+        alt=""
+        className={`absolute inset-0 h-full w-full object-center ${radius} ${fit === 'contain' ? 'object-contain p-1' : 'object-cover'}`}
+      />
+    </div>
+  );
+}
+
+function CollectionTileRing({ item }: { item: CategoryItem }) {
+  if (!item.image) return null;
+
+  return (
+    <div className="pointer-events-none relative lg:absolute lg:top-5 lg:right-5 z-0 w-full lg:w-28 xl:w-32 aspect-[4/3] lg:aspect-[5/4] transition-all duration-500 group-hover:scale-[1.02]">
+      <div className="relative h-full w-full overflow-hidden rounded-lg bg-linear-to-br from-[hsl(var(--muted)/0.25)] via-[hsl(var(--muted)/0.08)] to-transparent ring-1 ring-[hsl(var(--border)/0.45)] shadow-sm transition-all duration-500 group-hover:ring-[hsl(var(--secondary)/0.4)] group-hover:shadow-md">
+        <TileArt item={item} fit="cover" rounded className="h-full w-full" />
+        {/* Subtle dark corner — helps gold accents read over the photo */}
+        <span className="pointer-events-none absolute bottom-0 right-0 z-[9] w-14 h-14 bg-linear-to-tl from-black/30 via-black/10 to-transparent" />
+        {/* Gold corner accents — mirrors card top-left; clipped by rounded-lg overflow */}
+        <span className={`pointer-events-none absolute bottom-0 right-0 z-10 w-7 h-px ${goldLine} group-hover:w-12`} />
+        <span className={`pointer-events-none absolute bottom-0 right-0 z-10 w-px h-7 ${goldLine} group-hover:h-12`} />
+      </div>
+    </div>
+  );
+}
+
 /* ── Card renderers per group kind ── */
 
 function StyleCard({ item }: { item: CategoryItem }) {
   return (
     <Link
       href={collectionHref(item.slug)}
-      className="group relative flex flex-col justify-between gap-6 rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 sm:p-6 shadow-(--shadow-card) hover:shadow-(--shadow-elegant) hover:-translate-y-1 transition-all duration-500 overflow-hidden"
+      className="group relative flex flex-col h-full rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-4 sm:p-5 lg:p-6 shadow-(--shadow-card) hover:shadow-(--shadow-elegant) hover:-translate-y-1 transition-all duration-500 overflow-hidden"
       style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
     >
-      {/* Gold corner accents */}
-      <span className="pointer-events-none absolute top-0 left-0 w-7 h-px bg-[hsl(var(--secondary)/0.6)] transition-all duration-500 group-hover:w-12" />
-      <span className="pointer-events-none absolute top-0 left-0 w-px h-7 bg-[hsl(var(--secondary)/0.6)] transition-all duration-500 group-hover:h-12" />
+      <CollectionTileRing item={item} />
 
-      <div>
+      {/* Gold corner accents */}
+      <span className={`pointer-events-none absolute top-0 left-0 w-7 h-px ${goldLine} group-hover:w-12`} />
+      <span className={`pointer-events-none absolute top-0 left-0 w-px h-7 ${goldLine} group-hover:h-12`} />
+
+      <div className="relative z-10 flex flex-col grow pt-5 lg:pt-0 lg:pr-32 xl:pr-40">
         <h3 className="font-luxury-serif text-lg sm:text-xl font-medium leading-snug text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--secondary-rich))] transition-colors duration-300">
           {item.name}
         </h3>
@@ -52,12 +100,11 @@ function StyleCard({ item }: { item: CategoryItem }) {
             {item.note}
           </p>
         )}
+        <span className="mt-auto pt-5 inline-flex items-center gap-2 font-luxury-sans text-[10px] tracking-[0.22em] uppercase text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--secondary-rich))] transition-colors duration-300">
+          Explore
+          <ArrowRight className="w-3.5 h-3.5 text-[hsl(var(--secondary))] transition-transform duration-500 group-hover:translate-x-1" />
+        </span>
       </div>
-
-      <span className="inline-flex items-center gap-2 font-luxury-sans text-[10px] tracking-[0.22em] uppercase text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--secondary-rich))] transition-colors duration-300">
-        Explore
-        <ArrowRight className="w-3.5 h-3.5 text-[hsl(var(--secondary))] transition-transform duration-500 group-hover:translate-x-1" />
-      </span>
     </Link>
   );
 }
@@ -66,16 +113,19 @@ function ShapeCard({ item }: { item: CategoryItem }) {
   const img = SHAPE_IMAGES[item.name.toLowerCase()];
   return (
     <Link href={collectionHref(item.slug)} className="group flex flex-col items-center gap-3 cursor-pointer">
-      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-linear-to-br from-white via-slate-50 to-slate-200 ring-1 ring-[hsl(var(--secondary)/0.25)] shadow-md flex items-center justify-center transition-all duration-500 group-hover:ring-[hsl(var(--secondary)/0.7)] group-hover:shadow-lg group-hover:-translate-y-1">
+      <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-linear-to-br from-white via-slate-50 to-slate-200 ring-1 ring-[hsl(var(--secondary)/0.25)] shadow-md flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:ring-[hsl(var(--secondary)/0.7)] group-hover:shadow-lg group-hover:-translate-y-1">
         {/* light glint */}
         <span className="pointer-events-none absolute inset-y-0 w-1/3 bg-linear-to-r from-transparent via-white/70 to-transparent animate-glint rounded-full" />
+        <div className="absolute inset-0 rounded-full overflow-hidden">
+          <TileArt item={item} className="h-full w-full rounded-full" />
+        </div>
         {img ? (
-          <Image src={img} alt={item.name} width={56} height={56} className="w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow transition-transform duration-500 group-hover:scale-110" />
+          <Image src={img} alt={item.name} width={56} height={56} className="relative z-10 w-12 h-12 sm:w-14 sm:h-14 object-contain drop-shadow transition-transform duration-500 group-hover:scale-110" />
         ) : (
-          <Gem className="w-9 h-9 text-[hsl(var(--secondary-rich))] transition-transform duration-500 group-hover:scale-110" strokeWidth={1.2} />
+          <Gem className="relative z-10 w-9 h-9 text-[hsl(var(--secondary-rich))] transition-transform duration-500 group-hover:scale-110" strokeWidth={1.2} />
         )}
       </div>
-      <span className="font-luxury-sans text-xs tracking-[0.1em] text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--secondary-rich))] transition-colors duration-300">
+      <span className="font-luxury-sans text-xs tracking-widest text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--secondary-rich))] transition-colors duration-300">
         {item.name}
       </span>
     </Link>
@@ -86,10 +136,12 @@ function MetalCard({ item }: { item: CategoryItem }) {
   return (
     <Link href={collectionHref(item.slug)} className="group flex flex-col items-center gap-3 cursor-pointer">
       <span
-        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full ring-1 ring-[hsl(var(--border))] shadow-md transition-all duration-500 group-hover:ring-2 group-hover:ring-[hsl(var(--secondary)/0.6)] group-hover:-translate-y-1 group-hover:shadow-lg"
+        className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden shadow-md transition-all duration-500 group-hover:-translate-y-1 group-hover:shadow-lg"
         style={{ background: metalSwatch(item.name) }}
-      />
-      <span className="font-luxury-sans text-[11px] sm:text-xs tracking-[0.08em] text-center text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--secondary-rich))] transition-colors duration-300 max-w-[7rem] leading-tight">
+      >
+        <TileArt item={item} className="absolute inset-0 rounded-full" />
+      </span>
+      <span className="font-luxury-sans text-[11px] sm:text-xs tracking-[0.08em] text-center text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--secondary-rich))] transition-colors duration-300 max-w-28 leading-tight">
         {item.name}
       </span>
     </Link>
@@ -111,6 +163,9 @@ function PriceCard({ item, index }: { item: CategoryItem; index: number }) {
         <span className="font-luxury-serif text-lg sm:text-xl font-light text-[hsl(var(--foreground))] group-hover:text-[hsl(var(--secondary-rich))] transition-colors duration-300">
           {item.name}
         </span>
+      </div>
+      <div className="relative h-16 w-16 shrink-0 rounded-full overflow-hidden">
+        <TileArt item={item} className="h-full w-full rounded-full" />
       </div>
       <ArrowRight className="w-4 h-4 text-[hsl(var(--secondary))] transition-transform duration-500 group-hover:translate-x-1 shrink-0" />
     </Link>
@@ -239,11 +294,10 @@ export function CategoryLanding({ config }: { config: RingCategoryConfig }) {
                 key={g.id}
                 type="button"
                 onClick={() => scrollToGroup(g.id)}
-                className={`shrink-0 px-4 py-2 rounded-full font-luxury-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap transition-all duration-300 cursor-pointer ${
-                  activeId === g.id
-                    ? 'bg-[hsl(var(--primary))] text-[hsl(var(--secondary))] shadow-sm'
-                    : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]'
-                }`}
+                className={`shrink-0 px-4 py-2 rounded-full font-luxury-sans text-[11px] tracking-[0.12em] uppercase whitespace-nowrap transition-all duration-300 cursor-pointer ${activeId === g.id
+                  ? 'bg-[hsl(var(--primary))] text-[hsl(var(--secondary))] shadow-sm'
+                  : 'text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] hover:bg-[hsl(var(--muted))]'
+                  }`}
               >
                 {g.label}
               </button>
@@ -299,7 +353,7 @@ export function CategoryLanding({ config }: { config: RingCategoryConfig }) {
 
       {/* ── Footer CTA ── */}
       <section className="relative py-16 sm:py-24 bg-[hsl(var(--surface-champagne))] dark:bg-[hsl(var(--surface-alt))] overflow-hidden">
-        <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-[40rem] h-56 bg-[hsl(var(--secondary)/0.06)] blur-3xl rounded-full" />
+        <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-160 h-56 bg-[hsl(var(--secondary)/0.06)] blur-3xl rounded-full" />
         <div className="container mx-auto px-5 sm:px-8 lg:px-12 relative text-center max-w-2xl">
           <h2 className="font-luxury-serif text-[1.6rem] sm:text-4xl font-light text-[hsl(var(--foreground))] leading-tight text-balance">
             Not sure where to{' '}

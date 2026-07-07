@@ -12,6 +12,7 @@ export interface CategoryItem {
   name: string;
   note?: string;
   slug: string;
+  image?: string;
 }
 
 export interface CategoryGroup {
@@ -33,6 +34,14 @@ export interface RingCategoryConfig {
   groups: CategoryGroup[];
 }
 
+/** Public folder path for collection tile ring images — change here to relocate assets. */
+export const COLLECTION_TILE_IMAGE_DIR = '/collection-tiles';
+
+/** Resolve a tile image filename (or path) against {@link COLLECTION_TILE_IMAGE_DIR}. */
+export function collectionTileImage(filename: string): string {
+  return filename.startsWith('/') ? filename : `${COLLECTION_TILE_IMAGE_DIR}/${filename}`;
+}
+
 const slugify = (s: string) =>
   s
     .normalize('NFD') // decompose accents so é → e + mark, then drop the mark below
@@ -42,22 +51,24 @@ const slugify = (s: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
-/** Build items from raw names; text in (parentheses) becomes a small note. */
-function build(base: string, names: string[]): CategoryItem[] {
-  return names.map((raw) => {
-    const m = raw.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
-    const name = (m ? m[1] : raw).trim();
-    const note = m ? m[2].trim() : undefined;
-    return { name, note, slug: `${base}-${slugify(name)}` };
-  });
+type CategoryItemInput = { name: string; note?: string; image: string };
+
+/** Build items; each entry must include a configurable `image` filename or path. */
+function build(base: string, names: CategoryItemInput[]): CategoryItem[] {
+  return names.map((raw) => ({
+    name: raw.name,
+    note: raw.note,
+    slug: `${base}-${slugify(raw.name)}`,
+    image: collectionTileImage(raw.image),
+  }));
 }
 
 const priceItems = (base: string): CategoryItem[] => [
-  { name: 'Under $1,000', slug: `${base}-under-1000` },
-  { name: '$1,000 – $2,500', slug: `${base}-1000-2500` },
-  { name: '$2,500 – $5,000', slug: `${base}-2500-5000` },
-  { name: '$5,000 – $10,000', slug: `${base}-5000-10000` },
-  { name: '$10,000 & Above', slug: `${base}-10000-plus` },
+  { name: 'Under $1,000', slug: `${base}-under-1000`, image: collectionTileImage('under-1000.png') },
+  { name: '$1,000 – $2,500', slug: `${base}-1000-2500`, image: collectionTileImage('1000-2500.png') },
+  { name: '$2,500 – $5,000', slug: `${base}-2500-5000`, image: collectionTileImage('2500-5000.png') },
+  { name: '$5,000 – $10,000', slug: `${base}-5000-10000`, image: collectionTileImage('5000-10000.png') },
+  { name: '$10,000 & Above', slug: `${base}-10000-plus`, image: collectionTileImage('10000-plus.png') },
 ];
 
 export const engagementCategory: RingCategoryConfig = {
@@ -76,17 +87,17 @@ export const engagementCategory: RingCategoryConfig = {
       caption: 'The silhouette that tells your story.',
       kind: 'card',
       items: build('engagement', [
-        'Solitaire',
-        'Halo',
-        'Hidden Halo',
-        'Double Halo',
-        'Three Stone',
-        'Pavé',
-        'Vintage / Antique',
-        'Modern / Minimalist',
-        'Nature-Inspired',
-        'Geometric / Architectural',
-        'Cluster',
+        { name: 'Solitaire', image: 'A1.png' },
+        { name: 'Halo', image: 'A2.png' },
+        { name: 'Hidden Halo', image: 'A3.png' },
+        { name: 'Double Halo', image: 'A4.png' },
+        { name: 'Three Stone', image: 'A5.png' },
+        { name: 'Pavé', image: 'A6.png' },
+        { name: 'Vintage / Antique', image: 'A7.png' },
+        { name: 'Modern / Minimalist', image: 'A8.png' },
+        { name: 'Nature-Inspired', image: 'A9.png' },
+        { name: 'Geometric / Architectural', image: 'A10.png' },
+        { name: 'Cluster', image: 'A11.png' },
       ]),
     },
     {
@@ -95,15 +106,15 @@ export const engagementCategory: RingCategoryConfig = {
       caption: 'How the light meets the stone.',
       kind: 'card',
       items: build('engagement', [
-        'Prong Setting (4-prong, 6-prong, double prong)',
-        'Bezel Setting',
-        'Tension Setting',
-        'Channel Setting',
-        'Bar Setting',
-        'Flush (Gypsy) Setting',
-        'Cathedral Setting',
-        'Trellis Setting',
-        'East-West Setting',
+        { name: 'Prong Setting', note: '4-prong, 6-prong, double prong', image: 'B1.png' },
+        { name: 'Bezel Setting', image: 'B2.png' },
+        { name: 'Tension Setting', image: 'B3.png' },
+        { name: 'Channel Setting', image: 'B4.png' },
+        { name: 'Bar Setting', image: 'B5.png' },
+        { name: 'Flush (Gypsy) Setting', image: 'B6.png' },
+        { name: 'Cathedral Setting', image: 'B7.png' },
+        { name: 'Trellis Setting', image: 'B8.png' },
+        { name: 'East-West Setting', image: 'B9.png' },
       ]),
     },
     {
@@ -112,15 +123,15 @@ export const engagementCategory: RingCategoryConfig = {
       caption: 'The line that wraps the finger.',
       kind: 'card',
       items: build('engagement', [
-        'Straight Band',
-        'Tapered Band',
-        'Knife Edge Band',
-        'Split Shank',
-        'Twisted / Braided Band',
-        'Infinity Band',
-        'Euro Shank',
-        'Thick Band',
-        'Thin Band',
+        { name: 'Straight Band', image: 'C1.png' },
+        { name: 'Tapered Band', image: 'C2.png' },
+        { name: 'Knife Edge Band', image: 'C3.png' },
+        { name: 'Split Shank', image: 'C4.png' },
+        { name: 'Twisted / Braided Band', image: 'C5.png' },
+        { name: 'Infinity Band', image: 'C6.png' },
+        { name: 'Euro Shank', image: 'C7.png' },
+        { name: 'Thick Band', image: 'C8.png' },
+        { name: 'Thin Band', image: 'C9.png' },
       ]),
     },
     {
@@ -129,16 +140,16 @@ export const engagementCategory: RingCategoryConfig = {
       caption: 'Begin with the cut that speaks to you.',
       kind: 'shape',
       items: build('engagement', [
-        'Round',
-        'Princess',
-        'Cushion',
-        'Oval',
-        'Emerald',
-        'Pear',
-        'Radiant',
-        'Asscher',
-        'Marquise',
-        'Heart',
+        { name: 'Round', image: '' },
+        { name: 'Princess', image: '' },
+        { name: 'Cushion', image: '' },
+        { name: 'Oval', image: '' },
+        { name: 'Emerald', image: '' },
+        { name: 'Pear', image: '' },
+        { name: 'Radiant', image: '' },
+        { name: 'Asscher', image: '' },
+        { name: 'Marquise', image: '' },
+        { name: 'Heart', image: '' },
       ]),
     },
     {
@@ -147,14 +158,14 @@ export const engagementCategory: RingCategoryConfig = {
       caption: 'Set the tone in gold or platinum.',
       kind: 'metal',
       items: build('engagement', [
-        '10K White Gold',
-        '14K White Gold',
-        '10K Yellow Gold',
-        '14K Yellow Gold',
-        '10K Rose Gold',
-        '14K Rose Gold',
-        'Platinum',
-        'Two-Tone Gold',
+        { name: '10K White Gold', image: '' },
+        { name: '14K White Gold', image: '' },
+        { name: '10K Yellow Gold', image: '' },
+        { name: '14K Yellow Gold', image: '' },
+        { name: '10K Rose Gold', image: '' },
+        { name: '14K Rose Gold', image: '' },
+        { name: 'Platinum', image: '' },
+        { name: 'Two-Tone Gold', image: '' },
       ]),
     },
     {
@@ -183,10 +194,10 @@ export const weddingCategory: RingCategoryConfig = {
       caption: 'Bands for every hand.',
       kind: 'card',
       items: build('wedding', [
-        "Women's Wedding Bands",
-        "Men's Wedding Bands",
-        'Unisex Bands',
-        'Couple Matching Bands',
+        { name: "Women's Wedding Bands", image: 'D1.png' },
+        { name: "Men's Wedding Bands", image: 'D2.png' },
+        { name: 'Unisex Bands', image: 'D3.png' },
+        { name: 'Couple Matching Bands', image: 'D4.png' },
       ]),
     },
     {
@@ -195,14 +206,14 @@ export const weddingCategory: RingCategoryConfig = {
       caption: 'From the classic to the unexpected.',
       kind: 'card',
       items: build('wedding', [
-        'Classic Bands',
-        'Diamond Bands',
-        'Eternity Bands (Full Eternity)',
-        'Half Eternity Bands',
-        'Stackable Bands',
-        'Minimalist Bands',
-        'Vintage Bands',
-        'Enhancers',
+        { name: 'Classic Bands', image: 'E1.png' },
+        { name: 'Diamond Bands', image: 'E2.png' },
+        { name: 'Eternity Bands', note: 'Full Eternity', image: 'E3.png' },
+        { name: 'Half Eternity Bands', image: 'E4.png' },
+        { name: 'Stackable Bands', image: 'E5.png' },
+        { name: 'Minimalist Bands', image: 'E6.png' },
+        { name: 'Vintage Bands', image: 'E7.png' },
+        { name: 'Enhancers', image: 'E8.png' },
       ]),
     },
     {
@@ -211,11 +222,11 @@ export const weddingCategory: RingCategoryConfig = {
       caption: 'How the diamonds are held.',
       kind: 'card',
       items: build('wedding', [
-        'Pavé Bands',
-        'Channel Set Bands',
-        'Bezel Set Bands',
-        'Bar Set Bands',
-        'Flush Set Bands',
+        { name: 'Pavé Bands', image: 'F1.png' },
+        { name: 'Channel Set Bands', image: 'F2.png' },
+        { name: 'Bezel Set Bands', image: 'F3.png' },
+        { name: 'Bar Set Bands', image: 'F4.png' },
+        { name: 'Flush Set Bands', image: 'F5.png' },
       ]),
     },
     {
@@ -224,12 +235,12 @@ export const weddingCategory: RingCategoryConfig = {
       caption: 'Comfort, contour and character.',
       kind: 'card',
       items: build('wedding', [
-        'Straight',
-        'Knife Edge',
-        'Domed',
-        'Flat',
-        'Comfort Fit',
-        'Braided / Twisted',
+        { name: 'Straight', image: 'G1.png' },
+        { name: 'Knife Edge', image: 'G2.png' },
+        { name: 'Domed', image: 'G3.png' },
+        { name: 'Flat', image: 'G4.png' },
+        { name: 'Comfort Fit', image: 'G5.png' },
+        { name: 'Braided / Twisted', image: 'G6.png' },
       ]),
     },
     {
@@ -238,11 +249,11 @@ export const weddingCategory: RingCategoryConfig = {
       caption: 'Set the tone in gold or platinum.',
       kind: 'metal',
       items: build('wedding', [
-        'White Gold',
-        'Yellow Gold',
-        'Rose Gold',
-        'Platinum',
-        'Two-Tone',
+        { name: 'White Gold', image: '' },
+        { name: 'Yellow Gold', image: '' },
+        { name: 'Rose Gold', image: '' },
+        { name: 'Platinum', image: '' },
+        { name: 'Two-Tone', image: '' },
       ]),
     },
   ],
