@@ -8,6 +8,7 @@ import {ThemeProvider} from "@/components/providers/theme-provider";
 import {WishlistProvider} from "@/lib/wishlist/wishlist-context";
 import {SITE_NAME, SITE_URL} from "@/lib/metadata";
 import {generateOrganizationSchema, JsonLd} from "@/lib/seo/schema";
+import {WelcomePopup} from "@/components/shared/welcome-popup";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -78,6 +79,7 @@ export default function RootLayout({children}: LayoutProps<'/'>) {
                             {children}
                         </main>
                         <Footer />
+                        <WelcomePopup />
                         <Toaster />
                     </WishlistProvider>
                 </ThemeProvider>

@@ -46,14 +46,36 @@ function DialogOverlay({
   )
 }
 
+function hasDialogTitle(children: React.ReactNode): boolean {
+  return React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) {
+      return false
+    }
+
+    if (child.type === DialogTitle) {
+      return true
+    }
+
+    if (child.type === React.Fragment) {
+      return hasDialogTitle(child.props.children)
+    }
+
+    return false
+  })
+}
+
 function DialogContent({
   className,
   children,
   showCloseButton = true,
+  title = "Dialog",
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  title?: string
 }) {
+  const shouldRenderHiddenTitle = !hasDialogTitle(children)
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -65,6 +87,7 @@ function DialogContent({
         )}
         {...props}
       >
+        {shouldRenderHiddenTitle && <DialogTitle className="sr-only">{title}</DialogTitle>}
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close
