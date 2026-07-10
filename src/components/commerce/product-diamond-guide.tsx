@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { resolveImageSrc } from '@/lib/cloudinary';
 import {
   Gem,
   Sparkles,
@@ -406,11 +407,10 @@ export function ProductDiamondGuide({ facetValues }: ProductDiamondGuideProps) {
                 type="button"
                 onClick={() => setActive(i)}
                 aria-pressed={active === i}
-                className={`group flex items-center gap-2 pl-2.5 pr-4 py-2 rounded-full cursor-pointer transition-all duration-300 active:scale-95 ${
-                  active === i
+                className={`group flex items-center gap-2 pl-2.5 pr-4 py-2 rounded-full cursor-pointer transition-all duration-300 active:scale-95 ${active === i
                     ? 'bg-[hsl(var(--primary))] shadow-md'
                     : 'bg-[hsl(var(--card))] border border-[hsl(var(--border))] hover:border-[hsl(var(--secondary)/0.5)]'
-                }`}
+                  }`}
               >
                 <span className={`w-6 h-6 rounded-full flex items-center justify-center ${active === i ? 'text-[hsl(var(--secondary))]' : 'text-[hsl(var(--secondary-rich))]'}`}>
                   <span className="scale-75">{facetIcon(s.facetCode)}</span>

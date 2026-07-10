@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "upload:cloudinary": "node scripts/upload-cloudinary-assets.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -42,8 +43,10 @@
     "@types/nodemailer": "^8.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cloudinary": "^2.1.0",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^17.0.2",
     "embla-carousel-auto-scroll": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
     "framer-motion": "^11.11.17",

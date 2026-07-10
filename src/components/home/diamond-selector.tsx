@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { resolveImageSrc } from '@/lib/cloudinary';
 
 /**
  * Thumbnail positions computed on a perfect hexagonal circle.
@@ -192,7 +193,7 @@ export function DiamondSelector() {
                   className="relative z-10"
                 >
                   <Image
-                    src={activeData.centralImg}
+                    src={resolveImageSrc(activeData.centralImg) || activeData.centralImg}
                     alt={activeData.name}
                     width={160}
                     height={160}
@@ -216,9 +217,8 @@ export function DiamondSelector() {
                   onClick={() => handleSelect(diamond.id)}
                   onMouseEnter={() => setHoveredDiamond(diamond.id)}
                   onMouseLeave={() => setHoveredDiamond(null)}
-                  className={`absolute w-14 h-14 sm:w-20 sm:h-20 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${
-                    isActive ? 'z-50' : 'z-10'
-                  }`}
+                  className={`absolute w-14 h-14 sm:w-20 sm:h-20 rounded-full transition-all duration-300 flex items-center justify-center cursor-pointer ${isActive ? 'z-50' : 'z-10'
+                    }`}
                   style={{
                     top: diamond.position.top,
                     left: diamond.position.left,
@@ -250,31 +250,28 @@ export function DiamondSelector() {
 
                   {/* Button face — white bg keeps black images visible; gold gradient when active */}
                   <div
-                    className={`absolute inset-0 rounded-full transition-all duration-300 ${
-                      isActive
+                    className={`absolute inset-0 rounded-full transition-all duration-300 ${isActive
                         ? `bg-linear-to-br ${diamond.color} shadow-2xl`
                         : 'bg-white shadow-lg hover:shadow-xl border border-[hsl(var(--secondary)/0.18)]'
-                    }`}
+                      }`}
                   />
 
                   {/* Diamond shape image */}
                   <Image
-                    src={diamond.img}
+                    src={resolveImageSrc(diamond.img) || diamond.img}
                     alt={diamond.name}
                     width={48}
                     height={48}
-                    className={`w-8 h-8 sm:w-12 sm:h-12 object-contain relative z-10 transition-transform duration-300 ${
-                      isActive ? 'scale-110' : 'hover:scale-110'
-                    }`}
+                    className={`w-8 h-8 sm:w-12 sm:h-12 object-contain relative z-10 transition-transform duration-300 ${isActive ? 'scale-110' : 'hover:scale-110'
+                      }`}
                   />
 
                   {/* Tooltip — appears above the button */}
                   <span
-                    className={`absolute bottom-full mb-2 sm:mb-3 px-3 py-1.5 bg-linear-to-r ${diamond.color} text-[hsl(var(--foreground))] text-xs sm:text-sm font-luxury-sans font-semibold rounded-lg whitespace-nowrap shadow-xl pointer-events-none transition-all duration-200 z-20 ${
-                      isHovered
+                    className={`absolute bottom-full mb-2 sm:mb-3 px-3 py-1.5 bg-linear-to-r ${diamond.color} text-[hsl(var(--foreground))] text-xs sm:text-sm font-luxury-sans font-semibold rounded-lg whitespace-nowrap shadow-xl pointer-events-none transition-all duration-200 z-20 ${isHovered
                         ? 'opacity-100 translate-y-0'
                         : 'opacity-0 translate-y-2'
-                    }`}
+                      }`}
                   >
                     {diamond.name}
                   </span>

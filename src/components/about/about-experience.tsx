@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { resolveImageSrc } from '@/lib/cloudinary';
 import { motion, useInView, useReducedMotion, animate } from 'framer-motion';
 import {
   Heart,
@@ -100,7 +101,7 @@ export function AboutExperience() {
 
       {/* ── Hero ── */}
       <section className="relative h-[68vh] min-h-[440px] sm:min-h-[520px] flex items-end overflow-hidden bg-[hsl(220_20%_6%)]">
-        <Image src="/hero-diamond-2.jpg" alt="The Ever & Always atelier" fill priority className="object-cover animate-slow-zoom" sizes="100vw" />
+        <Image src={resolveImageSrc('/hero-diamond-2.jpg') || '/hero-diamond-2.jpg'} alt="The Ever & Always atelier" fill priority className="object-cover animate-slow-zoom" sizes="100vw" />
         <div className="absolute inset-0 bg-linear-to-t from-black/88 via-black/45 to-black/30" />
         <div className="absolute inset-0 bg-linear-to-r from-black/60 via-transparent to-transparent" />
         <div className="absolute inset-4 sm:inset-6 border border-[hsl(var(--secondary)/0.25)] rounded-2xl pointer-events-none" />
@@ -151,7 +152,7 @@ export function AboutExperience() {
               className="relative order-2 lg:order-1"
             >
               <div className="relative aspect-4/5 rounded-2xl overflow-hidden shadow-(--shadow-elegant)">
-                <Image src="/hero-diamond-3.jpg" alt="Hand-crafted at the bench" fill className="object-cover" sizes="(min-width: 1024px) 40vw, 100vw" />
+                <Image src={resolveImageSrc('/hero-diamond-3.jpg') || '/hero-diamond-3.jpg'} alt="Hand-crafted at the bench" fill className="object-cover" sizes="(min-width: 1024px) 40vw, 100vw" />
                 <div className="absolute inset-3.5 border border-[hsl(var(--secondary)/0.3)] rounded-xl pointer-events-none" />
               </div>
               {/* Floating "Est." badge */}

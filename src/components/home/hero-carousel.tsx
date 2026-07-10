@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { resolveImageSrc } from '@/lib/cloudinary';
+
 //V0 17-06-26
 const slides = [
   {
@@ -49,6 +51,11 @@ const slides = [
   },
 ];
 
+const resolvedSlides = slides.map((slide) => ({
+  ...slide,
+  resolvedImage: resolveImageSrc(slide.image) || slide.image,
+}));
+
 export function HeroCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -72,6 +79,13 @@ export function HeroCarousel() {
     return () => clearTimer();
   }, []);
 
+  useEffect(() => {
+    resolvedSlides.forEach((slide) => {
+      const img = new window.Image();
+      img.src = slide.resolvedImage;
+    });
+  }, []);
+
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
     startTimer();
@@ -91,24 +105,28 @@ export function HeroCarousel() {
     <div className="relative h-[calc(100svh-4.25rem)] md:h-[calc(100vh-7rem)] min-h-[560px] overflow-hidden bg-[hsl(var(--foreground))]">
 
       {/* Full-bleed background image */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSlide}
-          initial={{ opacity: 0, scale: 1.04 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0"
-        >
-          <Image
-            src={slides[currentSlide].image}
-            alt={slides[currentSlide].title}
-            fill
-            className="object-cover object-center"
-            priority={currentSlide === 0}
-          />
-        </motion.div>
-      </AnimatePresence>
+      <div className="absolute inset-0">
+        {resolvedSlides.map((slide, index) => {
+          const isActive = index === currentSlide;
+          return (
+            <motion.div
+              key={slide.id}
+              initial={false}
+              animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 1.04 }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={slide.resolvedImage}
+                alt={slide.title}
+                fill
+                className="object-cover object-center"
+                priority={index === 0}
+              />
+            </motion.div>
+          );
+        })}
+      </div>
 
       {/* Gradient overlays for text readability */}
       <div className="absolute inset-0 bg-linear-to-r from-black/65 via-black/30 to-transparent pointer-events-none" />

@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Gem, ArrowRight, ChevronRight, Calendar } from 'lucide-react';
+import { resolveImageSrc } from '@/lib/cloudinary';
 import type { CategoryGroup, CategoryItem, RingCategoryConfig } from '@/lib/ring-categories';
 
 const luxEase = [0.22, 1, 0.36, 1] as const;
@@ -43,7 +44,7 @@ function TileArt({
   fit?: 'cover' | 'contain';
   rounded?: boolean;
 }) {
-  const src = item.image;
+  const src = resolveImageSrc(item.image) || item.image;
   if (!src) return null;
 
   const radius = rounded ? 'rounded-lg' : '';
@@ -110,7 +111,7 @@ function StyleCard({ item }: { item: CategoryItem }) {
 }
 
 function ShapeCard({ item }: { item: CategoryItem }) {
-  const img = SHAPE_IMAGES[item.name.toLowerCase()];
+  const img = resolveImageSrc(SHAPE_IMAGES[item.name.toLowerCase()]) || SHAPE_IMAGES[item.name.toLowerCase()];
   return (
     <Link href={collectionHref(item.slug)} className="group flex flex-col items-center gap-3 cursor-pointer">
       <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-linear-to-br from-white via-slate-50 to-slate-200 ring-1 ring-[hsl(var(--secondary)/0.25)] shadow-md flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:ring-[hsl(var(--secondary)/0.7)] group-hover:shadow-lg group-hover:-translate-y-1">
@@ -237,7 +238,7 @@ export function CategoryLanding({ config }: { config: RingCategoryConfig }) {
     <div className="min-h-screen">
       {/* ── Hero ── */}
       <section className="relative h-[62vh] min-h-[420px] sm:min-h-[480px] flex items-end overflow-hidden bg-[hsl(220_20%_6%)]">
-        <Image src={config.heroImage} alt={config.name} fill priority className="object-cover animate-slow-zoom" sizes="100vw" />
+        <Image src={resolveImageSrc(config.heroImage) || config.heroImage} alt={config.name} fill priority className="object-cover animate-slow-zoom" sizes="100vw" />
         <div className="absolute inset-0 bg-linear-to-t from-black/88 via-black/45 to-black/30" />
         <div className="absolute inset-0 bg-linear-to-r from-black/60 via-transparent to-transparent" />
         {/* gold frame */}

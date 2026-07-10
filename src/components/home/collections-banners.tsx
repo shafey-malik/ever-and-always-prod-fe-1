@@ -6,6 +6,7 @@ import Link from 'next/link';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { EmblaCarouselType } from 'embla-carousel';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { resolveImageSrc } from '@/lib/cloudinary';
 
 const collections = [
   {
@@ -230,7 +231,7 @@ export function CollectionsBanners() {
                   <div className="absolute inset-0 overflow-hidden">
                     <div className="collection-parallax-layer absolute inset-y-0 -left-[20%] w-[140%] will-change-transform">
                       <Image
-                        src={item.image}
+                        src={resolveImageSrc(item.image) || item.image}
                         alt={item.title}
                         fill
                         draggable={false}

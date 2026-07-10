@@ -41,6 +41,9 @@ const nextConfig: NextConfig = {
             },
             {
                 hostname: 'backend-production-28e0.up.railway.app'
+            },
+            {
+                hostname: 'res.cloudinary.com'
             }
         ],
     },

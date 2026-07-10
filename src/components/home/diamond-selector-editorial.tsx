@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { resolveImageSrc } from '@/lib/cloudinary';
 
 const diamondTypes = [
   {
@@ -154,7 +155,7 @@ export function DiamondSelectorEditorial() {
                   style={{ transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)' }}
                 >
                   <Image
-                    src={diamond.img}
+                    src={resolveImageSrc(diamond.img) || diamond.img}
                     alt={diamond.name}
                     width={56}
                     height={56}
@@ -194,7 +195,7 @@ export function DiamondSelectorEditorial() {
                 <div className="relative w-56 h-56 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full bg-linear-to-br from-[hsl(var(--surface-luxury))] via-[hsl(var(--card))] to-[hsl(var(--muted)/0.4)] flex items-center justify-center shadow-(--shadow-premium)">
                   <div className="absolute inset-0 rounded-full ring-1 ring-[hsl(var(--secondary)/0.2)]" />
                   <Image
-                    src={activeData.centralImg}
+                    src={resolveImageSrc(activeData.centralImg) || activeData.centralImg}
                     alt={activeData.name}
                     width={220}
                     height={220}
