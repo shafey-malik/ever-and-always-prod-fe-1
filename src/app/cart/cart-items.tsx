@@ -4,6 +4,7 @@ import { Minus, Plus, X } from 'lucide-react';
 import { Price } from '@/components/commerce/price';
 import { removeFromCart, adjustQuantity } from './actions';
 import { CartItemImage } from '@/components/commerce/cart-item-image';
+import { DeliveryNotice } from '@/components/commerce/delivery-notice';
 
 type ActiveOrder = {
     id: string;
@@ -17,9 +18,11 @@ type ActiveOrder = {
             id: string;
             name: string;
             sku: string;
+            facetValues?: Array<{ code: string }>;
             product: {
                 name: string;
                 slug: string;
+                facetValues?: Array<{ code: string }>;
                 featuredAsset?: {
                     preview: string;
                 } | null;
@@ -73,7 +76,13 @@ export async function CartItems({ activeOrder }: { activeOrder: ActiveOrder | nu
                         <p className="text-sm text-muted-foreground mt-1">
                             SKU: {line.productVariant.sku}
                         </p>
-                        <p className="text-sm text-muted-foreground mt-2 sm:hidden">
+                        
+                        <DeliveryNotice 
+                            facetValues={[...(line.productVariant.product.facetValues || []), ...(line.productVariant.facetValues || [])]} 
+                            className="mt-3 inline-flex w-full sm:w-auto"
+                        />
+
+                        <p className="text-sm text-muted-foreground mt-3 sm:hidden">
                             <Price value={line.unitPriceWithTax} currencyCode={activeOrder.currencyCode} /> each
                         </p>
 

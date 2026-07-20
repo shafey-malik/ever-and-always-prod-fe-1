@@ -10,18 +10,21 @@ import { addToCart } from '@/app/product/[slug]/actions';
 import { toast } from 'sonner';
 import { Price } from '@/components/commerce/price';
 import { useWishlist } from '@/lib/wishlist/wishlist-context';
+import { DeliveryNotice } from '@/components/commerce/delivery-notice';
 
 interface ProductInfoProps {
     product: {
         id: string;
         name: string;
         description: string;
+        facetValues?: Array<{ code: string }>;
         variants: Array<{
             id: string;
             name: string;
             sku: string;
             priceWithTax: number;
             stockLevel: string;
+            facetValues?: Array<{ code: string }>;
             options: Array<{
                 id: string;
                 code: string;
@@ -270,6 +273,14 @@ export function ProductInfo({ product, searchParams, slug, image }: ProductInfoP
                             SKU <span className="font-mono font-medium text-foreground/70 normal-case tracking-normal">{selectedVariant.sku}</span>
                         </span>
                     </div>
+                )}
+
+                {/* Delivery Notice */}
+                {selectedVariant && (
+                    <DeliveryNotice 
+                        facetValues={[...(product.facetValues || []), ...(selectedVariant.facetValues || [])]} 
+                        className="mb-4"
+                    />
                 )}
 
                 {/* Add to Cart + Wishlist */}

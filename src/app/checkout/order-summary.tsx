@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { OrderLine } from './types';
 import { useCheckout } from './checkout-provider';
 import { Price } from '@/components/commerce/price';
+import { DeliveryNotice } from '@/components/commerce/delivery-notice';
 
 export default function OrderSummary() {
   const { order } = useCheckout();
@@ -41,6 +42,10 @@ export default function OrderSummary() {
                 <p className="text-xs text-muted-foreground">
                   Qty: {line.quantity}
                 </p>
+                <DeliveryNotice 
+                    facetValues={[...(line.productVariant.product.facetValues || []), ...(line.productVariant.facetValues || [])]} 
+                    className="mt-2"
+                />
               </div>
               <div className="text-sm font-medium">
                 <Price value={line.linePriceWithTax} currencyCode={order.currencyCode} />

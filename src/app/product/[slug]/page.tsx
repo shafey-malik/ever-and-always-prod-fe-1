@@ -5,6 +5,7 @@ import { ProductImageCarousel } from '@/components/commerce/product-image-carous
 import { ProductInfo } from '@/components/commerce/product-info';
 import { ProductDiamondGuide } from '@/components/commerce/product-diamond-guide';
 import { RelatedProducts } from '@/components/commerce/related-products';
+import { ProductInterestPopup } from '@/components/commerce/product-interest-popup';
 import {
     Accordion,
     AccordionContent,
@@ -239,6 +240,7 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
                     currentProductId={product.id}
                 />
             )}
+            <ProductInterestPopup productName={product.name} productId={product.id} />
         </>
     );
 }

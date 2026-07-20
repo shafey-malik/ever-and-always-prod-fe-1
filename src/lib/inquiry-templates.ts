@@ -271,3 +271,27 @@ This is an automated confirmation — there's no need to reply.`;
 
     return { subject, html, text };
 }
+
+// ---------------------------------------------------------------------------
+// Product Interest notification (sent TO the shop owner)
+// ---------------------------------------------------------------------------
+
+export interface ProductInterestNotificationInput {
+    productName: string;
+    productId: string;
+}
+
+export function productInterestNotification(input: ProductInterestNotificationInput): EmailContent {
+    const heading = 'New Product Interest Detected';
+    const fields: Array<[string, string | undefined | null]> = [
+        ['Product Name', input.productName],
+        ['Product ID', input.productId],
+        ['Event', 'User stayed on product page for over 1 minute.'],
+    ];
+
+    return {
+        subject: `[Product Interest] ${input.productName}`,
+        html: notificationHtml(heading, fields),
+        text: notificationText(heading, fields),
+    };
+}
