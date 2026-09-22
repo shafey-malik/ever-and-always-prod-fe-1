@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBlogPost, getAllBlogPostSlugs } from "@/lib/seo/blog-posts";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
-import { generateOrganizationSchema, JsonLd } from "@/lib/seo/schema";
+import { generateArticleSchema, JsonLd } from "@/lib/seo/schema";
 import { buildCanonicalUrl } from "@/lib/metadata";
 import { SITE_URL } from "@/lib/metadata";
 import Link from "next/link";
@@ -66,19 +66,27 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  // Generate organization schema
-  const organizationSchema = generateOrganizationSchema({
-    url: SITE_URL,
+  // Article, not Organization. The page is an article; the brand entity is
+  // already declared once in the root layout, and repeating it here told search
+  // engines nothing about the post itself.
+  const articleSchema = generateArticleSchema({
+    title: post.title,
+    description: post.metaDescription,
+    url: buildCanonicalUrl(`/blog/${slug}`),
+    base: SITE_URL,
+    image: post.featuredImage,
+    datePublished: post.publishDate,
+    authorName: post.author,
+    section: post.category,
   });
 
   return (
     <>
-      <JsonLd data={organizationSchema} />
+      <JsonLd data={articleSchema} />
       <article className="container mx-auto px-4 py-8 max-w-4xl">
         <Breadcrumbs
           items={[
             { name: "Blog", href: "/blog" },
-            { name: post.category, href: `/blog/category/${post.category.toLowerCase().replace(/\s+/g, "-")}` },
             { name: post.title, href: `/blog/${slug}` },
           ]}
         />

@@ -1,10 +1,12 @@
 import type {Metadata} from 'next';
+import { noIndexRobots } from '@/lib/metadata';
 import {Suspense} from 'react';
 import { RegistrationForm } from "./registration-form";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
+    robots: noIndexRobots(),
     title: 'Create Account',
     description: 'Create a new account to start shopping with us.',
 };

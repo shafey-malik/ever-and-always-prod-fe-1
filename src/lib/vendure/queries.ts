@@ -484,3 +484,40 @@ export const GetCollectionProductsQuery = graphql(`
         }
     }
 `, [ProductCardFragment]);
+
+/**
+ * Every collection in the channel, for sitemap generation and for validating
+ * that the storefront SEO taxonomy still matches the catalogue.
+ * Vendure caps list queries at 100 results, so callers must page.
+ */
+export const GetAllCollectionsQuery = graphql(`
+    query GetAllCollections($skip: Int!) {
+        collections(options: { take: 100, skip: $skip }) {
+            totalItems
+            items {
+                id
+                slug
+                updatedAt
+            }
+        }
+    }
+`);
+
+/**
+ * Minimal product projection for the sitemap: enough to emit a <url> entry
+ * with a lastmod and an image, and nothing more.
+ */
+export const GetProductsForSitemapQuery = graphql(`
+    query GetProductsForSitemap($skip: Int!) {
+        search(input: { groupByProduct: true, take: 100, skip: $skip }) {
+            totalItems
+            items {
+                slug
+                productName
+                productAsset {
+                    preview
+                }
+            }
+        }
+    }
+`);

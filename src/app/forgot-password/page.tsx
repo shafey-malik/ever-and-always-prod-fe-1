@@ -1,7 +1,9 @@
 import type {Metadata} from 'next';
+import { noIndexRobots } from '@/lib/metadata';
 import { ForgotPasswordForm } from './forgot-password-form';
 
 export const metadata: Metadata = {
+    robots: noIndexRobots(),
     title: 'Forgot Password',
     description: 'Reset your password to regain access to your account.',
 };

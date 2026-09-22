@@ -116,22 +116,59 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
 
     const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark');
 
-    const getCollectionSlug = (category: string, item: string): string => {
-        const base = category === 'engagement' ? 'engagement' : 'wedding';
-        return `${base}-${item.toLowerCase().replace(/\s+/g, '-')}`;
+    // Menu entries carry their real collection slug rather than deriving one
+    // from the label. Deriving it produced 18 dead links in the site-wide
+    // navigation (e.g. "White Gold" -> /collection/engagement-white-gold, which
+    // does not exist; the real slugs are karat-qualified), and a 404 reachable
+    // from every page wastes crawl budget and leaks link equity.
+    const engagementCategories: Record<string, {label: string; slug: string}[]> = {
+        'By Shape': [
+            {label: 'Round', slug: 'engagement-round'},
+            {label: 'Princess', slug: 'engagement-princess'},
+            {label: 'Emerald', slug: 'engagement-emerald'},
+            {label: 'Oval', slug: 'engagement-oval'},
+            {label: 'Cushion', slug: 'engagement-cushion'},
+            {label: 'Pear', slug: 'engagement-pear'},
+        ],
+        'By Setting': [
+            {label: 'Solitaire', slug: 'engagement-solitaire'},
+            {label: 'Halo', slug: 'engagement-halo'},
+            {label: 'Hidden Halo', slug: 'engagement-hidden-halo'},
+            {label: 'Three Stone', slug: 'engagement-three-stone'},
+            {label: 'Vintage', slug: 'engagement-vintage-antique'},
+            {label: 'Minimalist', slug: 'engagement-modern-minimalist'},
+        ],
+        'By Metal': [
+            {label: 'Platinum', slug: 'engagement-platinum'},
+            {label: '14K White Gold', slug: 'engagement-14k-white-gold'},
+            {label: '14K Yellow Gold', slug: 'engagement-14k-yellow-gold'},
+            {label: '14K Rose Gold', slug: 'engagement-14k-rose-gold'},
+        ],
     };
 
-    const engagementCategories = {
-        'By Shape': ['Round', 'Princess', 'Emerald', 'Oval', 'Cushion', 'Pear'],
-        'By Setting': ['Solitaire', 'Halo', 'Three Stone', 'Vintage', 'Modern'],
-        'By Metal': ['Platinum', 'White Gold', 'Yellow Gold', 'Rose Gold'],
+    const weddingCategories: Record<string, {label: string; slug: string}[]> = {
+        "Women's": [
+            {label: 'Classic Bands', slug: 'wedding-classic-bands'},
+            {label: 'Diamond Bands', slug: 'wedding-diamond-bands'},
+            {label: 'Eternity Bands', slug: 'wedding-eternity-bands'},
+            {label: 'Stackable Bands', slug: 'wedding-stackable-bands'},
+        ],
+        "Men's": [
+            {label: "Men's Bands", slug: 'wedding-men-s-wedding-bands'},
+            {label: 'Comfort Fit', slug: 'wedding-comfort-fit'},
+            {label: 'Minimalist Bands', slug: 'wedding-minimalist-bands'},
+            {label: 'Braided & Twisted', slug: 'wedding-braided-twisted'},
+        ],
+        'Sets': [
+            {label: 'Couple Matching', slug: 'wedding-couple-matching-bands'},
+            {label: 'Bridal Sets', slug: 'bridal'},
+            {label: 'Ring Enhancers', slug: 'wedding-enhancers'},
+        ],
     };
 
-    const weddingCategories = {
-        "Women's": ['Classic Bands', 'Diamond Bands', 'Eternity Rings', 'Curved Bands'],
-        "Men's": ['Classic Bands', 'Diamond Bands', 'Modern Bands', 'Textured Bands'],
-        'Sets': ['Matching Sets', 'Bridal Sets', 'Custom Sets'],
-    };
+    /** Hub each dropdown column links to via its "View All". */
+    const categoryHub = (base: 'engagement' | 'wedding') =>
+        base === 'engagement' ? '/engagement-rings' : '/wedding-rings';
 
     // Shared icon-button styling — 44px touch targets on mobile, slightly tighter on sm+
     const iconBtn =
@@ -273,7 +310,17 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                             href="/custom"
                             className="py-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-luxury-sans text-xs tracking-[0.12em] uppercase transition-colors duration-200"
                         >
-                            Custom Jewelry
+                            Custom Rings
+                        </Link>
+
+                        {/* The lab-grown pillar page is the brand's main
+                            differentiator and its strongest informational entry
+                            point, so it gets a persistent nav link. */}
+                        <Link
+                            href="/lab-grown-diamonds"
+                            className="py-4 text-[hsl(var(--lead-text))] hover:text-[hsl(var(--foreground))] font-luxury-sans text-xs tracking-[0.12em] uppercase transition-colors duration-200"
+                        >
+                            Lab-Grown Diamonds
                         </Link>
 
                         <Link
@@ -308,20 +355,20 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                                     <div className="space-y-0.5">
                                         {items.map((item) => (
                                             <Link
-                                                key={item}
-                                                href={`/collection/${getCollectionSlug('engagement', item)}`}
+                                                key={item.slug}
+                                                href={`/collection/${item.slug}`}
                                                 className="group/link flex items-center gap-0 py-1.5 text-sm text-[hsl(var(--foreground)/0.58)] hover:text-[hsl(var(--foreground))] transition-all duration-200 font-luxury-sans"
                                                 onClick={() => setActiveDropdown(null)}
                                             >
                                                 <span className="w-0 group-hover/link:w-3 overflow-hidden transition-all duration-200 flex-shrink-0">
                                                     <span className="block w-2 h-px bg-[hsl(var(--secondary))] mr-1" />
                                                 </span>
-                                                {item}
+                                                {item.label}
                                             </Link>
                                         ))}
                                     </div>
                                     <Link
-                                        href={`/collection/engagement-${category.toLowerCase().replace(/\s+/g, '-')}`}
+                                        href={categoryHub('engagement')}
                                         className="inline-flex items-center gap-1 mt-5 text-[10px] uppercase tracking-[0.18em] text-[hsl(var(--secondary))] hover:text-[hsl(var(--secondary-rich))] transition-colors duration-200 font-luxury-sans"
                                         onClick={() => setActiveDropdown(null)}
                                     >
@@ -370,20 +417,20 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                                     <div className="space-y-0.5">
                                         {items.map((item) => (
                                             <Link
-                                                key={item}
-                                                href={`/collection/${getCollectionSlug('wedding', item)}`}
+                                                key={item.slug}
+                                                href={`/collection/${item.slug}`}
                                                 className="group/link flex items-center gap-0 py-1.5 text-sm text-[hsl(var(--foreground)/0.58)] hover:text-[hsl(var(--foreground))] transition-all duration-200 font-luxury-sans"
                                                 onClick={() => setActiveDropdown(null)}
                                             >
                                                 <span className="w-0 group-hover/link:w-3 overflow-hidden transition-all duration-200 flex-shrink-0">
                                                     <span className="block w-2 h-px bg-[hsl(var(--secondary))] mr-1" />
                                                 </span>
-                                                {item}
+                                                {item.label}
                                             </Link>
                                         ))}
                                     </div>
                                     <Link
-                                        href={`/collection/wedding-${category.toLowerCase().replace(/\s+/g, '-')}`}
+                                        href={categoryHub('wedding')}
                                         className="inline-flex items-center gap-1 mt-5 text-[10px] uppercase tracking-[0.18em] text-[hsl(var(--secondary))] hover:text-[hsl(var(--secondary-rich))] transition-colors duration-200 font-luxury-sans"
                                         onClick={() => setActiveDropdown(null)}
                                     >
@@ -573,12 +620,12 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                                                                 <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                                                                     {items.map((item) => (
                                                                         <Link
-                                                                            key={item}
-                                                                            href={`/collection/${getCollectionSlug('engagement', item)}`}
+                                                                            key={item.slug}
+                                                                            href={`/collection/${item.slug}`}
                                                                             onClick={() => setIsMobileMenuOpen(false)}
                                                                             className="text-sm text-[hsl(var(--foreground)/0.65)] hover:text-[hsl(var(--foreground))] py-1 font-luxury-sans transition-colors"
                                                                         >
-                                                                            {item}
+                                                                            {item.label}
                                                                         </Link>
                                                                     ))}
                                                                 </div>
@@ -627,12 +674,12 @@ export function Header({ cartQuantity, isSignedIn, collections }: HeaderProps) {
                                                                 <div className="grid grid-cols-2 gap-x-2 gap-y-1">
                                                                     {items.map((item) => (
                                                                         <Link
-                                                                            key={item}
-                                                                            href={`/collection/${getCollectionSlug('wedding', item)}`}
+                                                                            key={item.slug}
+                                                                            href={`/collection/${item.slug}`}
                                                                             onClick={() => setIsMobileMenuOpen(false)}
                                                                             className="text-sm text-[hsl(var(--foreground)/0.65)] hover:text-[hsl(var(--foreground))] py-1 font-luxury-sans transition-colors"
                                                                         >
-                                                                            {item}
+                                                                            {item.label}
                                                                         </Link>
                                                                     ))}
                                                                 </div>

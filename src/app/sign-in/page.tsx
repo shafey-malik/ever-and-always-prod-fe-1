@@ -1,10 +1,12 @@
 import type {Metadata} from 'next';
+import { noIndexRobots } from '@/lib/metadata';
 import {Suspense} from 'react';
 import {LoginForm} from "./login-form";
 import {Card, CardContent, CardFooter} from "@/components/ui/card";
 import {Skeleton} from "@/components/ui/skeleton";
 
 export const metadata: Metadata = {
+    robots: noIndexRobots(),
     title: 'Sign In',
     description: 'Sign in to your account to access your orders, wishlist, and more.',
 };

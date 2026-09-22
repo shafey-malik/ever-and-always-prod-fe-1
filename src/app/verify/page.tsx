@@ -1,10 +1,12 @@
 import type {Metadata} from 'next';
+import { noIndexRobots } from '@/lib/metadata';
 import {Suspense} from 'react';
 import {Card, CardContent} from '@/components/ui/card';
 import {Loader2} from 'lucide-react';
 import {VerifyContent} from './verify-content';
 
 export const metadata: Metadata = {
+    robots: noIndexRobots(),
     title: 'Verify Email',
     description: 'Verify your email address to complete registration.',
 };

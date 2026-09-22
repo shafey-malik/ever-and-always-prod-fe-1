@@ -44,8 +44,7 @@ We believe everyone deserves beautiful diamond jewelry, regardless of budget. Th
     maxPrice: 500,
     breadcrumbs: [
       { name: "Jewelry", href: "/jewelry" },
-      { name: "Price Range", href: "/price-range" },
-      { name: "Under $500", href: "/diamond-rings-under-500" },
+      { name: "Under $500", href: "/price/diamond-rings-under-500" },
     ],
   },
   {
@@ -76,8 +75,7 @@ At Ever and Always, we make luxury accessible with transparent pricing and guara
     maxPrice: 1000,
     breadcrumbs: [
       { name: "Jewelry", href: "/jewelry" },
-      { name: "Price Range", href: "/price-range" },
-      { name: "Under $1,000", href: "/diamond-rings-under-1000" },
+      { name: "Under $1,000", href: "/price/diamond-rings-under-1000" },
     ],
   },
   {
@@ -108,8 +106,7 @@ At Ever and Always, we combine premium quality with affordable pricing, ensuring
     maxPrice: 2000,
     breadcrumbs: [
       { name: "Jewelry", href: "/jewelry" },
-      { name: "Price Range", href: "/price-range" },
-      { name: "Under $2,000", href: "/diamond-rings-under-2000" },
+      { name: "Under $2,000", href: "/price/diamond-rings-under-2000" },
     ],
   },
   {
@@ -142,7 +139,7 @@ We believe every proposal deserves a beautiful ring, and we make that possible w
     breadcrumbs: [
       { name: "Jewelry", href: "/jewelry" },
       { name: "Engagement Rings", href: "/engagement-rings" },
-      { name: "Affordable", href: "/affordable-engagement-rings" },
+      { name: "Affordable", href: "/price/affordable-engagement-rings" },
     ],
   },
   {
@@ -174,7 +171,7 @@ We understand that weddings involve many expenses, which is why we offer beautif
     breadcrumbs: [
       { name: "Jewelry", href: "/jewelry" },
       { name: "Wedding Rings", href: "/wedding-rings" },
-      { name: "Budget", href: "/budget-wedding-rings" },
+      { name: "Budget", href: "/price/budget-wedding-rings" },
     ],
   },
 ];

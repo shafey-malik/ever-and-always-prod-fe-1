@@ -1,9 +1,11 @@
 import type {Metadata} from 'next';
+import { noIndexRobots } from '@/lib/metadata';
 import { Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 import { ResetPasswordForm } from './reset-password-form';
 
 export const metadata: Metadata = {
+    robots: noIndexRobots(),
     title: 'Reset Password',
     description: 'Create a new password for your account.',
 };

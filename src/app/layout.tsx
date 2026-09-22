@@ -6,8 +6,14 @@ import {Navbar} from "@/components/layout/navbar";
 import {Footer} from "@/components/layout/footer";
 import {ThemeProvider} from "@/components/providers/theme-provider";
 import {WishlistProvider} from "@/lib/wishlist/wishlist-context";
-import {SITE_NAME, SITE_URL} from "@/lib/metadata";
-import {generateOrganizationSchema, JsonLd} from "@/lib/seo/schema";
+import {SITE_NAME, SITE_URL, IS_PRODUCTION_SITE} from "@/lib/metadata";
+import {
+    generateOrganizationSchema,
+    generateWebSiteSchema,
+    generateLocalBusinessSchema,
+    JsonLd,
+} from "@/lib/seo/schema";
+import {BUSINESS} from "@/lib/seo/business";
 import {WelcomePopup} from "@/components/shared/welcome-popup";
 
 const geistSans = Geist({
@@ -26,8 +32,15 @@ export const metadata: Metadata = {
         default: SITE_NAME,
         template: `%s | ${SITE_NAME}`,
     },
-    description:
-        "Ever and Always - America's most trusted source for affordable diamond jewelry. Transparent pricing, premium craftsmanship, and reliable sourcing. Shop engagement rings, wedding bands, and fine diamond jewelry online.",
+    description: BUSINESS.description,
+    applicationName: SITE_NAME,
+    authors: [{name: SITE_NAME, url: SITE_URL}],
+    creator: SITE_NAME,
+    publisher: SITE_NAME,
+    category: "Jewelry",
+    alternates: {
+        canonical: "/",
+    },
     openGraph: {
         type: "website",
         siteName: SITE_NAME,
@@ -36,17 +49,21 @@ export const metadata: Metadata = {
     twitter: {
         card: "summary_large_image",
     },
-    robots: {
-        index: true,
-        follow: true,
-        googleBot: {
-            index: true,
-            follow: true,
-            "max-video-preview": -1,
-            "max-image-preview": "large",
-            "max-snippet": -1,
-        },
-    },
+    // Preview deploys must never be indexable: an indexed preview host competes
+    // with the production domain for the brand term.
+    robots: IS_PRODUCTION_SITE
+        ? {
+              index: true,
+              follow: true,
+              googleBot: {
+                  index: true,
+                  follow: true,
+                  "max-video-preview": -1,
+                  "max-image-preview": "large",
+                  "max-snippet": -1,
+              },
+          }
+        : {index: false, follow: false},
 };
 
 export const viewport: Viewport = {
@@ -60,18 +77,22 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({children}: LayoutProps<'/'>) {
-    // Generate organization schema for all pages
-    const organizationSchema = generateOrganizationSchema({
-        url: SITE_URL,
-        description: "Ever and Always - America's most trusted source for affordable diamond jewelry. Transparent pricing, premium craftsmanship, and reliable sourcing.",
-    });
+    // One connected entity graph on every page: the brand, the site it
+    // publishes, and the physical store that brand operates. Emitting these as
+    // a single @graph (rather than three separate scripts) is what lets search
+    // and AI answer engines resolve them to one business.
+    const entityGraph = [
+        generateOrganizationSchema({url: SITE_URL}),
+        generateWebSiteSchema(SITE_URL),
+        generateLocalBusinessSchema(SITE_URL),
+    ];
 
     return (
         <html lang="en" suppressHydrationWarning>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
             >
-                <JsonLd data={organizationSchema} />
+                <JsonLd data={entityGraph} />
                 <ThemeProvider>
                     <WishlistProvider>
                         <Navbar />

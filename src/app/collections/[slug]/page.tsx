@@ -101,6 +101,8 @@ export default async function SEOCollectionPage({
     name: seoCollection.h1,
     description: seoCollection.description,
     url: `${SITE_URL}/collections/${slug}`,
+    base: SITE_URL,
+    slug,
   });
 
   return (

@@ -29,11 +29,16 @@ const getPriceFilteredProducts = cache(async (
   });
 });
 
-// Return empty array to make this route dynamic (on-demand generation)
-// This avoids build issues with cacheComponents during static generation
-export async function generateStaticParams() {
-  return [];
-}
+/**
+ * Rendered per request, not prerendered.
+ *
+ * An empty `generateStaticParams` still puts the route in static-generation
+ * mode, and the shared navbar reads `cookies()` for the cart badge. That
+ * combination threw DYNAMIC_SERVER_USAGE at render time, so every price page
+ * returned HTTP 500 in production. Opting the route out of prerendering is the
+ * fix; it reads `searchParams` for filtering and paging anyway.
+ */
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({
   params,
@@ -96,6 +101,8 @@ export default async function PricePage({
     name: pricePage.h1,
     description: pricePage.description,
     url: `${SITE_URL}/price/${slug}`,
+    base: SITE_URL,
+    slug,
   });
 
   return (

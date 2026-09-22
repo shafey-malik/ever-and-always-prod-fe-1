@@ -57,7 +57,12 @@ function hasDialogTitle(children: React.ReactNode): boolean {
     }
 
     if (child.type === React.Fragment) {
-      return hasDialogTitle(child.props.children)
+      // React 19 types `isValidElement` as ReactElement<unknown>, so narrow
+      // before reading children rather than asserting.
+      const { children: fragmentChildren } = child.props as {
+        children?: React.ReactNode
+      }
+      return hasDialogTitle(fragmentChildren)
     }
 
     return false

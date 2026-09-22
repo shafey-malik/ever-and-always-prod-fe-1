@@ -1,7 +1,8 @@
 import {getTopCollections} from '@/lib/vendure/cached';
 import Link from "next/link";
 import {SITE_NAME} from '@/lib/metadata';
-import {ShieldCheck, Infinity as InfinityIcon, Truck} from 'lucide-react';
+import {ShieldCheck, Infinity as InfinityIcon, Truck, MapPin} from 'lucide-react';
+import {BUSINESS} from '@/lib/seo/business';
 
 function Copyright() {
     return (
@@ -14,7 +15,8 @@ function Copyright() {
 const maisonLinks = [
     { href: '/about-us', label: 'About Us' },
     { href: '/consultation', label: 'Book Consultation' },
-    { href: '/custom', label: 'Custom Jewelry' },
+    { href: '/custom', label: 'Custom Rings' },
+    { href: '/lab-grown-diamonds', label: 'Lab-Grown Diamonds' },
     { href: '/blog', label: 'Journal' },
 ];
 
@@ -53,6 +55,27 @@ export async function Footer() {
                             Heirloom-grade diamonds, composed with intention —
                             for the moments that deserve forever.
                         </p>
+
+                        {/* Name / address / phone, published site-wide. Must match
+                            the Google Business Profile character for character. */}
+                        <address className="mt-5 not-italic font-luxury-sans text-[13px] leading-relaxed text-[hsl(var(--muted-foreground))] font-light">
+                            <span className="inline-flex items-start gap-2">
+                                <MapPin className="w-3.5 h-3.5 mt-0.5 shrink-0 text-[hsl(var(--secondary))]" strokeWidth={1.5} />
+                                <span>
+                                    {BUSINESS.address.street}
+                                    <br />
+                                    {BUSINESS.address.locality}, {BUSINESS.address.region} {BUSINESS.address.postalCode}
+                                </span>
+                            </span>
+                            {BUSINESS.telephone && (
+                                <a
+                                    href={`tel:${BUSINESS.telephone.replace(/[^+\d]/g, '')}`}
+                                    className="mt-2 block hover:text-[hsl(var(--foreground))] transition-colors"
+                                >
+                                    {BUSINESS.telephone}
+                                </a>
+                            )}
+                        </address>
 
                         {/* Mini trust row */}
                         <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2.5">
@@ -100,8 +123,8 @@ export async function Footer() {
                             {[
                                 { href: '/engagement-rings', label: 'Engagement Rings' },
                                 { href: '/wedding-rings',    label: 'Wedding Rings'    },
-                                { href: '/custom',           label: 'Custom Jewelry'   },
-                                { href: '/search',           label: 'All Rings'        },
+                                { href: '/jewelry',          label: 'All Categories'   },
+                                { href: '/custom',           label: 'Custom Rings'     },
                                 { href: '/consultation',     label: 'Book a Visit'     },
                             ].map((link) => (
                                 <li key={link.href}>

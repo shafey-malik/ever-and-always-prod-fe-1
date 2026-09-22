@@ -1,12 +1,30 @@
 import type { Metadata } from 'next';
 import { Clock, Mail, Phone, MapPin, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SITE_NAME } from '@/lib/metadata';
+import { SITE_NAME, buildCanonicalUrl } from '@/lib/metadata';
 import { ConsultationForm } from './consultation-form';
 
+const TITLE = `Book a Free Ring Consultation | ${SITE_NAME}`;
+const DESCRIPTION =
+    `Book a free, no-obligation consultation with the ${SITE_NAME} design team. Talk through budget, diamond shape and setting before you commit to anything. In person in Hanover, MD or online.`;
+
 export const metadata: Metadata = {
-    title: 'Book a Consultation',
-    description: `Schedule a personalized consultation with our jewelry experts at ${SITE_NAME}.`,
+    title: { absolute: TITLE },
+    description: DESCRIPTION,
+    keywords: [
+        'engagement ring consultation',
+        'free ring consultation',
+        'jewelry consultation maryland',
+        'custom ring appointment',
+        'diamond buying help',
+    ],
+    alternates: { canonical: buildCanonicalUrl('/consultation') },
+    openGraph: {
+        title: TITLE,
+        description: DESCRIPTION,
+        type: 'website',
+        url: buildCanonicalUrl('/consultation'),
+    },
 };
 
 export default function ConsultationPage() {

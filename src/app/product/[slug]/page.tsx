@@ -23,6 +23,8 @@ import {
 } from '@/lib/metadata';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { generateProductSchema, generateFAQSchema, JsonLd } from '@/lib/seo/schema';
+import { getTaxonomyEntry } from '@/lib/seo/taxonomy';
+import { PRODUCT_FAQS } from '@/lib/seo/faqs';
 
 const getProductData = cache(async (slug: string) => {
     return await query(GetProductDetailQuery, { slug });
@@ -85,7 +87,15 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
     const productPrice = product.variants?.[0]?.priceWithTax || 0;
     const currencyCode = 'USD'; // You may want to get this from the active channel
 
-    // Generate product schema
+    // Facet values carry the metal and diamond shape, which are the two
+    // attributes shopping surfaces match products on.
+    const facetNames = [
+        ...(product.facetValues ?? []),
+        ...(product.variants?.flatMap((v) => v.facetValues ?? []) ?? []),
+    ].map((fv) => fv.name);
+
+    const metal = facetNames.find((n) => /gold|platinum|silver/i.test(n));
+
     const productSchema = generateProductSchema({
         name: product.name,
         description: product.description || undefined,
@@ -94,36 +104,26 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
         price: productPrice / 100, // Convert from cents if needed
         currency: currencyCode,
         url: `${SITE_URL}/product/${product.slug}`,
-        inStock: Number(product.variants?.[0]?.stockLevel ?? 0) > 0,
+        base: SITE_URL,
+        slug: product.slug,
+        category: primaryCollection ? getTaxonomyEntry(primaryCollection.slug)?.h1 : undefined,
+        material: metal,
+        // Made-to-order pieces are never truly out of stock, so a zero stock
+        // level must not emit OutOfStock and suppress the price snippet.
+        inStock: true,
     });
 
-    // Generate FAQ schema
-    const faqSchema = generateFAQSchema([
-        {
-            question: "What are your shipping options?",
-            answer: "We offer standard shipping (5-7 business days), express shipping (2-3 business days), and next-day delivery for select areas. Free standard shipping is available on orders over $50.",
-        },
-        {
-            question: "What is your return policy?",
-            answer: "We accept returns within 30 days of purchase. Items must be unused and in their original packaging. Simply contact our support team to initiate a return and receive a prepaid shipping label.",
-        },
-        {
-            question: "How can I track my order?",
-            answer: "Once your order ships, you'll receive an email with a tracking number. You can also view your order status anytime by logging into your account and visiting the order history section.",
-        },
-        {
-            question: "Do you offer international shipping?",
-            answer: "Yes! We ship to over 50 countries worldwide. International shipping rates and delivery times vary by location. You can see the exact cost at checkout before completing your purchase.",
-        },
-    ]);
+    const faqSchema = generateFAQSchema(PRODUCT_FAQS);
 
     // Build breadcrumbs
     const breadcrumbItems = [
         { name: "Jewelry", href: "/jewelry" },
     ];
     if (primaryCollection) {
+        // Vendure stores the collection name as its own slug, so prefer the
+        // storefront taxonomy's human label for the visible crumb.
         breadcrumbItems.push({
-            name: primaryCollection.name,
+            name: getTaxonomyEntry(primaryCollection.slug)?.h1 ?? primaryCollection.name,
             href: `/collection/${primaryCollection.slug}`,
         });
     }
@@ -206,30 +206,12 @@ export default async function ProductDetailPage({ params, searchParams }: PagePr
                 <div className="container mx-auto px-4 max-w-3xl">
                     <h2 className="text-2xl font-bold text-center mb-8">Frequently Asked Questions</h2>
                     <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="shipping">
-                            <AccordionTrigger>What are your shipping options?</AccordionTrigger>
-                            <AccordionContent>
-                                We offer standard shipping (5-7 business days), express shipping (2-3 business days), and next-day delivery for select areas. Free standard shipping is available on orders over $50.
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="returns">
-                            <AccordionTrigger>What is your return policy?</AccordionTrigger>
-                            <AccordionContent>
-                                We accept returns within 30 days of purchase. Items must be unused and in their original packaging. Simply contact our support team to initiate a return and receive a prepaid shipping label.
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="tracking">
-                            <AccordionTrigger>How can I track my order?</AccordionTrigger>
-                            <AccordionContent>
-                                Once your order ships, you&apos;ll receive an email with a tracking number. You can also view your order status anytime by logging into your account and visiting the order history section.
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="international">
-                            <AccordionTrigger>Do you offer international shipping?</AccordionTrigger>
-                            <AccordionContent>
-                                Yes! We ship to over 50 countries worldwide. International shipping rates and delivery times vary by location. You can see the exact cost at checkout before completing your purchase.
-                            </AccordionContent>
-                        </AccordionItem>
+                        {PRODUCT_FAQS.map((faq) => (
+                            <AccordionItem key={faq.id} value={faq.id}>
+                                <AccordionTrigger>{faq.question}</AccordionTrigger>
+                                <AccordionContent>{faq.answer}</AccordionContent>
+                            </AccordionItem>
+                        ))}
                     </Accordion>
                 </div>
             </section>

@@ -1,260 +1,93 @@
-# SEO Implementation Summary for Ever and Always
+# SEO implementation — Ever and Always
 
-## Overview
-This document outlines the comprehensive SEO buildout implemented for Ever and Always, a USA-based diamond jewelry brand focused on affordable, transparent pricing and trusted sourcing.
+Storefront: **https://everandalways.store**
+Positioning: certified **lab-grown** diamond rings, budget-friendly, made to order, Hanover MD.
 
-## ✅ Completed Features
+---
 
-### 1. Brand Identity & Metadata
-- **Updated brand name** to "Ever and Always" across all metadata
-- **Enhanced site description** with value propositions (affordable, transparent, trusted)
-- **Optimized homepage metadata** with targeted keywords
-- **Organization schema** added to root layout for brand recognition
+## 1. What was broken (fixed in this pass)
 
-### 2. Schema Markup (JSON-LD)
-Created comprehensive schema markup utilities in `/src/lib/seo/schema.ts`:
-- **Product Schema**: For individual product pages with pricing, availability, ratings
-- **Review Schema**: For product reviews and ratings
-- **FAQ Schema**: For FAQ sections (automatically added to product pages)
-- **Collection Schema**: For collection/landing pages
-- **Organization Schema**: For brand information
-- **Breadcrumb Schema**: For navigation structure
+These were live in production and each one independently prevented ranking.
 
-### 3. Breadcrumb Navigation
-- **Breadcrumb component** (`/src/components/seo/breadcrumbs.tsx`) with schema markup
-- **Integrated** into product, collection, blog, and landing pages
-- **Improves** internal linking and user navigation
+| Problem | Effect | Fix |
+|---|---|---|
+| `NEXT_PUBLIC_SITE_URL` held the Vendure API URL locally and `http://localhost:3001` on Vercel | Every canonical, OG URL and sitemap entry pointed at a non-existent host. Pages could not be indexed. | `src/lib/metadata.ts` now rejects localhost / API / preview hosts and pins production to the real domain |
+| `public/robots.txt` shadowed `app/robots.ts` | The generated rules and the sitemap reference were never served | Deleted the static file |
+| Sitemap listed 34 URLs, none of them a category or product | The ~90 category pages had no discovery path | `app/sitemap.ts` now pulls collections and products from Vendure; 105 URLs |
+| All 90 Vendure collections store `name`/`description` as their own slug | `<title>engagement-solitaire</title>` on every category page | `src/lib/seo/taxonomy.ts` supplies H1, title, description, copy and FAQs for all of them |
+| 18 navbar dropdown links built slugs by string munging | 18 site-wide 404s (e.g. `/collection/engagement-white-gold`) | Menu entries now carry real slugs |
+| `/jewelry` did not exist but was the root of every BreadcrumbList | Every breadcrumb trail started with a 404 | Built `/jewelry` as the category hub |
+| 24 `/collections/*` pages rendered the same unfiltered grid | Near-duplicate pages competing with the real categories | 301s into the canonical category pages |
+| All 5 `/price/*` pages returned HTTP 500 | Budget-intent pages entirely unavailable | Route opted out of prerendering |
+| Product FAQ markup promised free shipping over $50 and 50 countries | Contradicted the rest of the site; AI assistants quote this back as fact | One shared source in `src/lib/seo/faqs.ts` |
 
-### 4. SEO-Optimized Collection Pages
-Created 30+ collection landing pages targeting high-intent keywords:
+Verified: full crawl of 112 internal URLs returns **112× 200, 0 broken links**.
 
-**Engagement & Proposal:**
-- `/collections/engagement-rings`
-- `/collections/proposal-rings`
-- `/collections/promise-rings`
+---
 
-**Wedding & Commitment:**
-- `/collections/wedding-rings`
-- `/collections/mens-wedding-bands`
-- `/collections/womens-wedding-bands`
-
-**Diamond Types:**
-- `/collections/lab-grown-diamond-rings`
-- `/collections/natural-diamond-rings`
-- `/collections/ethical-diamond-rings`
-
-**Ring Styles:**
-- `/collections/solitaire-diamond-rings`
-- `/collections/halo-diamond-rings`
-- `/collections/three-stone-rings`
-- `/collections/vintage-diamond-rings`
-
-**Diamond Shapes (10 shapes):**
-- `/collections/round-cut-diamond-rings`
-- `/collections/princess-cut-diamond-rings`
-- `/collections/oval-cut-diamond-rings`
-- `/collections/cushion-cut-diamond-rings`
-- `/collections/emerald-cut-diamond-rings`
-- `/collections/pear-shaped-diamond-rings`
-- `/collections/marquise-cut-diamond-rings`
-- `/collections/radiant-cut-diamond-rings`
-- `/collections/asscher-cut-diamond-rings`
-- `/collections/heart-shaped-diamond-rings`
-
-**Metals:**
-- `/collections/white-gold-diamond-rings`
-- `/collections/yellow-gold-diamond-rings`
-- `/collections/rose-gold-diamond-rings`
-- `/collections/platinum-diamond-rings`
-
-Each collection page includes:
-- Unique, keyword-optimized title and meta description
-- H1, H2 headings with SEO content
-- Related collections for internal linking
-- Schema markup
-- Breadcrumb navigation
-- Product grid with filters
-
-### 5. Price-Based Landing Pages
-Created budget-focused landing pages:
-- `/price/diamond-rings-under-500`
-- `/price/diamond-rings-under-1000`
-- `/price/diamond-rings-under-2000`
-- `/price/affordable-engagement-rings`
-- `/price/budget-wedding-rings`
-
-Each page includes:
-- Price-filtered product results
-- SEO-optimized content targeting budget-conscious searches
-- Schema markup
-- Breadcrumb navigation
-
-### 6. Blog & Content Marketing
-Created blog structure with 5 initial SEO-optimized articles:
-
-**Buying Guides:**
-- `/blog/how-to-buy-diamond-rings-online` - Complete buying guide
-- `/blog/diamond-cut-color-clarity-guide` - Understanding the 4 Cs
-
-**Education:**
-- `/blog/lab-grown-vs-natural-diamonds` - Comparison guide
-- `/blog/ethical-diamond-sourcing` - Ethical sourcing information
-
-**Trends:**
-- `/blog/engagement-ring-trends-2024` - Current trends
-
-Blog features:
-- Article schema markup
-- Related posts linking
-- Category organization
-- SEO-optimized titles and descriptions
-
-### 7. Enhanced Existing Pages
-
-**Product Pages:**
-- Added Product schema markup
-- Added FAQ schema markup
-- Added breadcrumb navigation
-- Enhanced metadata with keywords
-
-**Collection Pages:**
-- Added Collection schema markup
-- Added breadcrumb navigation
-- Enhanced metadata
-
-### 8. Technical SEO
-
-**Sitemap (`/src/app/sitemap.ts`):**
-- Automatically generates sitemap including:
-  - All collection pages
-  - All price pages
-  - All blog posts
-  - Static pages
-- Proper priority and change frequency settings
-
-**Robots.txt (`/src/app/robots.ts`):**
-- Allows all public pages
-- Blocks private pages (account, cart, checkout)
-- References sitemap
-
-## File Structure
+## 2. Architecture
 
 ```
-src/
-├── lib/
-│   └── seo/
-│       ├── schema.ts          # Schema markup utilities
-│       ├── collections.ts     # Collection definitions
-│       ├── price-pages.ts     # Price page definitions
-│       └── blog-posts.ts       # Blog post content
-├── components/
-│   └── seo/
-│       └── breadcrumbs.tsx    # Breadcrumb component
-└── app/
-    ├── collections/
-    │   └── [slug]/
-    │       └── page.tsx       # Collection landing pages
-    ├── price/
-    │   └── [slug]/
-    │       └── page.tsx       # Price-based pages
-    ├── blog/
-    │   ├── page.tsx           # Blog listing
-    │   └── [slug]/
-    │       └── page.tsx       # Blog posts
-    ├── sitemap.ts             # Sitemap generation
-    └── robots.ts               # Robots.txt
+src/lib/seo/
+├── business.ts    NAP, hours, policies — single source of truth
+├── taxonomy.ts    SEO record for all 90 Vendure collections
+├── schema.tsx     JSON-LD generators
+├── faqs.ts        Shared store FAQs (visible copy + markup)
+├── collections.ts Legacy /collections data (now redirect targets only)
+├── price-pages.ts Budget landing pages
+└── blog-posts.ts  Journal content
 ```
 
-## Keyword Targeting Strategy
+### URL map
 
-### Transactional Keywords
-- "buy diamond rings online USA"
-- "affordable engagement rings"
-- "cheap but reliable diamond rings"
-- "best diamond ring prices online"
+| Route | Purpose |
+|---|---|
+| `/` | Home |
+| `/jewelry` | Category hub linking to all ~90 categories |
+| `/engagement-rings`, `/wedding-rings` | Taxonomy hubs with FAQ + ItemList |
+| `/collection/[slug]` | The 90 real category pages |
+| `/lab-grown-diamonds` | Pillar page for the core differentiator |
+| `/custom` | Custom design service + Service schema |
+| `/price/[slug]` | 5 budget landing pages |
+| `/product/[slug]` | Product detail |
+| `/blog`, `/blog/[slug]` | Journal |
+| `/llms.txt` | Plain-text brief for AI answer engines |
 
-### Comparison Keywords
-- "best affordable diamond ring store"
-- "Ever and Always vs competitors"
-- "is Ever and Always legit"
-- "trusted diamond jewelry store USA"
+---
 
-### Informational Keywords (Blog)
-- "how to buy diamond rings online"
-- "lab grown vs natural diamonds"
-- "diamond cut color clarity guide"
-- "engagement ring trends"
+## 3. Structured data
 
-### Long-Tail Keywords
-- "best oval engagement rings under $2000"
-- "men's diamond wedding bands USA"
-- "custom engagement rings affordable"
+Emitted on every page as one `@graph`: **Organization + WebSite + JewelryStore**, cross-linked by `@id` so the brand, the site and the store resolve to one entity.
 
-## Next Steps & Recommendations
+Per page type:
 
-### 1. Content Expansion
-- Add more blog posts targeting informational keywords
-- Create comparison pages (e.g., "Lab Grown vs Natural Diamonds")
-- Add customer testimonials and reviews with schema markup
+- Category → `CollectionPage` + `FAQPage` + `BreadcrumbList`
+- Product → `Product` (with `hasMerchantReturnPolicy`, `shippingDetails`, `priceValidUntil`) + `FAQPage` + `BreadcrumbList`
+- `/custom` → `Service` + `FAQPage`
+- `/lab-grown-diamonds`, `/blog/*` → `Article` + `FAQPage`
 
-### 2. Internal Linking
-- Add related products section to product pages
-- Create category hub pages (e.g., "/jewelry" hub)
-- Add contextual links in blog posts to collection pages
+`aggregateRating` is emitted **only** when real reviews exist. Inventing one is a manual-action risk.
 
-### 3. Image SEO
-- Add descriptive alt text to all product images
-- Implement image sitemap
-- Optimize image file names with keywords
+---
 
-### 4. Performance Optimization
-- Implement lazy loading for images
-- Optimize Core Web Vitals
-- Add caching strategies
+## 4. AI answer-engine optimisation
 
-### 5. Local SEO (if applicable)
-- Add LocalBusiness schema if you have physical locations
-- Create location-specific landing pages
-- Add Google Business Profile integration
+- `robots.ts` names 20 AI crawlers explicitly (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended, Applebot-Extended, meta-externalagent and others) with the same access as Googlebot.
+- `/llms.txt` states the business facts, price ranges, policies and a full category index in plain text.
+- Every category, hub and pillar page carries **visible** prose and FAQ answers, not just markup. Answer engines quote rendered text.
+- Faceted URLs (`?page=`, `?sort=`, `?facet=`) are disallowed to protect crawl budget.
 
-### 6. Analytics & Monitoring
-- Set up Google Search Console
-- Track keyword rankings
-- Monitor organic traffic growth
-- Set up conversion tracking
+---
 
-### 7. Additional Pages
-Consider creating:
-- About Us page with company history
-- Shipping & Returns policy page
-- Size guide pages
-- Care & maintenance guides
-- Customer reviews/testimonials page
+## 5. Still required from the business owner
 
-## Testing Checklist
+These cannot be done in code and are currently the largest remaining gaps.
 
-- [ ] Verify all collection pages load correctly
-- [ ] Test price filtering on price pages
-- [ ] Check schema markup with Google Rich Results Test
-- [ ] Verify sitemap.xml is accessible
-- [ ] Test robots.txt
-- [ ] Check breadcrumb navigation on all pages
-- [ ] Verify meta descriptions are unique
-- [ ] Test mobile responsiveness
-- [ ] Check page load speeds
-- [ ] Verify internal linking structure
-
-## Notes
-
-- All SEO implementation follows white-hat practices
-- Schema markup is validated and follows Schema.org standards
-- Content is optimized for both users and search engines
-- Internal linking structure supports crawlability
-- All pages are mobile-first optimized
-
-## Support
-
-For questions or issues with the SEO implementation, refer to:
-- Schema.org documentation: https://schema.org/
-- Next.js SEO documentation: https://nextjs.org/docs/app/building-your-application/optimizing/metadata
-- Google Search Central: https://developers.google.com/search
+1. **Set `NEXT_PUBLIC_SITE_URL=https://everandalways.store` in Vercel** (Production). The code now defends against a wrong value, but fix the source.
+2. **Fill in `telephone`, `email` and `sameAs` in `src/lib/seo/business.ts`.** `sameAs` (social and directory profiles) is the single weakest part of the brand's footprint and is how a brand query disambiguates.
+3. **Create and verify a Google Business Profile** at the Hanover MD address. The address is currently associated with a differently named jeweller, which can block verification — expect to provide evidence of a distinct business at that suite.
+4. **Confirm the opening hours** in `business.ts` match the profile exactly.
+5. **Submit the sitemap** in Google Search Console and Bing Webmaster Tools.
+6. **Replace the placeholder catalogue.** Three products named "ring 1/2/3" cannot rank category pages; the infrastructure is data-driven and will populate automatically.
+7. **Get reviews.** Once real ratings exist, pass them to `generateProductSchema` and the `aggregateRating` block activates.
+8. **Refresh `blog-posts.ts`** — one post is titled "Engagement Ring Trends 2024" and one references natural-diamond sourcing, which conflicts with lab-grown-only positioning.
