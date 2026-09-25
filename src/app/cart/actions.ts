@@ -23,8 +23,15 @@ export async function applyPromotionCode(formData: FormData) {
     const code = formData.get('code') as string;
     if (!code) return;
 
-    const res = await mutate(ApplyPromotionCodeMutation, {couponCode: code}, {useAuthToken: true});
-    console.log({res: res.data.applyCouponCode})
+    // The backend refuses coupon changes once checkout has started (the payment
+    // amount is already fixed). Swallow that so the cart re-renders unchanged
+    // instead of showing the error page.
+    try {
+        const res = await mutate(ApplyPromotionCodeMutation, {couponCode: code}, {useAuthToken: true});
+        console.log({res: res.data.applyCouponCode})
+    } catch (error) {
+        console.warn('applyCouponCode refused:', error instanceof Error ? error.message : error);
+    }
     updateTag('cart');
 }
 
@@ -32,7 +39,11 @@ export async function removePromotionCode(formData: FormData) {
     const code = formData.get('code') as string;
     if (!code) return;
 
-    const res = await mutate(RemovePromotionCodeMutation, {couponCode: code}, {useAuthToken: true});
-    console.log({removeRes: res.data.removeCouponCode});
+    try {
+        const res = await mutate(RemovePromotionCodeMutation, {couponCode: code}, {useAuthToken: true});
+        console.log({removeRes: res.data.removeCouponCode});
+    } catch (error) {
+        console.warn('removeCouponCode refused:', error instanceof Error ? error.message : error);
+    }
     updateTag('cart');
 }
